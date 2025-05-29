@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.Region?>
+<GridPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.StatisticalController" hgap="20" vgap="20">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="400.0" />
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="400.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="300.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="300.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+    <children>
+        <!-- Tình trạng thiết bị (Pie Chart) -->
+        <VBox alignment="CENTER" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-background-color: white; -fx-background-radius: 7px; -fx-border-color: #E6E8EF; -fx-border-radius: 7px; -fx-padding: 10px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.2, 0, 4);">
+            <children>
+                <Label text="TÌNH TRẠNG THIẾT BỊ">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+                <PieChart fx:id="pieChartTinhTrang" prefHeight="300.0" prefWidth="350.0" />
+            </children>
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+        </VBox>
+
+        <!-- Yêu cầu bảo trì (Table) -->
+        <VBox alignment="CENTER" spacing="15.0" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-background-color: white; -fx-background-radius: 7px; -fx-border-color: #E6E8EF; -fx-border-radius: 7px; -fx-padding: 10px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.2, 0, 4);">
+            <children>
+                <Label text="THỐNG KÊ YÊU CẦU BẢO TRÌ">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+                <VBox spacing="10.0" >
+                    <children>
+                        <HBox alignment="CENTER" spacing="10.0">
+                            <children>
+                                <Label prefWidth="200.0" text="Tổng số yêu cầu" />
+                                <Label fx:id="lblTongYeuCauBottom" text="15">
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER" spacing="10.0">
+                            <children>
+                                <Label prefWidth="200.0" text="Số yêu cầu đã xử lý" />
+                                <Label fx:id="lblDaXuLy" text="10">
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                            <children>
+                                <Label prefWidth="200.0" text="Số yêu cầu chưa xử lý" />
+                                <Label fx:id="lblChuaXuLy" text="5">
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER" spacing="10.0">
+                            <children>
+                                <Label prefWidth="200.0" text="Thiết bị yêu cầu sửa chữa hiệu nhất" />
+                                <Label fx:id="lblThietBiNhieu" text="Máy chiều">
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+        </VBox>
+
+        <VBox alignment="CENTER" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-background-color: white; -fx-background-radius: 7px; -fx-border-color: #E6E8EF; -fx-border-radius: 7px; -fx-padding: 10px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.2, 0, 4);">
+            <children>
+                <Label text="Tần suất sử dụng thiết bị theo thời gian">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+                <HBox alignment="CENTER_RIGHT" prefWidth="760" spacing="10.0">
+                    <children>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <ComboBox fx:id="roomComboBox" prefWidth="120"/>
+                        <ComboBox fx:id="yearComboBox" prefWidth="120"/>
+                    </children>
+                    <padding>
+                        <Insets right="20.0"/>
+                    </padding>
+                </HBox>
+                <LineChart fx:id="lineChart" layoutX="20" layoutY="20" prefWidth="760" prefHeight="560">
+                    <xAxis>
+                        <CategoryAxis fx:id="xAxis" label="Tháng"/>
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis fx:id="yAxis" label="Lượt sử dụng"/>
+                    </yAxis>
+                </LineChart>
+            </children>
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+        </VBox>
+
+        <VBox alignment="CENTER" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-background-color: white; -fx-background-radius: 7px; -fx-border-color: #E6E8EF; -fx-border-radius: 7px; -fx-padding: 10px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.2, 0, 4);">
+            <children>
+                <Label text="THIẾT BỊ THEO PHÒNG HỌC">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+                <ScrollPane fx:id="chartScrollPane" fitToHeight="true" hbarPolicy="AS_NEEDED" pannable="true" style="-fx-background-color:transparent; -fx-border-color:transparent;">
+                    <content>
+                        <BarChart fx:id="barChartPhongHoc" prefHeight="250.0" prefWidth="350.0" style="-fx-background-color: white;">
+                            <xAxis>
+                                <CategoryAxis fx:id="xAxisPhongHoc" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis fx:id="yAxisPhongHoc" />
+                            </yAxis>
+                        </BarChart>
+                    </content>
+                </ScrollPane>
+            </children>
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+        </VBox>
+    </children>
+</GridPane>

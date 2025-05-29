@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.PermissionController">
+    <center>
+        <VBox fx:id="rootPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #F2F7FB" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
+            <children>
+                <HBox alignment="CENTER_RIGHT">
+                    <children>
+                        <!-- Nút Tìm kiếm -->
+                        <StackPane fx:id="btnUpdate" style="-fx-cursor: hand; -fx-pref-width: 100" styleClass="custom-button" xmlns:fx="http://javafx.com/fxml">
+                            <children>
+                                <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#4099ff" height="40.0" width="100.0" />
+                                <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#73b3fe" height="40.0" scaleX="0.0" scaleZ="0.0" styleClass="before-layer" width="100.0" />
+                                <Text fill="WHITE" text="Cập nhật">
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Text>
+                            </children>
+                        </StackPane>
+                    </children>
+                    <padding>
+                        <Insets bottom="15.0" left="0.0" right="20.0" top="15.0" />
+                    </padding>
+                </HBox>
+                <VBox>
+                    <TableView fx:id="tbPermission" prefHeight="600.0" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 8, 0.6, 0, 1)" styleClass="table-view device_table">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="colFeatures" text="Tính năng" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                        <placeholder>
+                            <Label text="Không có dữ liệu" />
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

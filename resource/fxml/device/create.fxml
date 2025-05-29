@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.image.ImageView?>
+<BorderPane stylesheets="/css/style.css" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="730.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CreateDeviceController">
+    <center>
+        <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0" BorderPane.alignment="CENTER">
+            <children>
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Tên thiết bị">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtName" promptText="Nhập tên thiết bị" />
+                    </children>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Loại thiết bị">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtType" promptText="Nhập loại thiết bị" />
+                    </children>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Ngày mua">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <DatePicker fx:id="datePickerImport" promptText="dd/MM/yyyy" />
+                    </children>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Nhà cung cấp">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtSupplier" promptText="Nhập tên nhà cung cấp" />
+                    </children>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Giá">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtPrice" promptText="0" />
+                    </children>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Phòng">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="roomComboBox" promptText="Chọn phòng" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-border-color: #cac9c9"/>
+                    </children>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Số lượng">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <TextField fx:id="txtQuantity" promptText="0" />
+                    </children>
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <children>
+                        <Label text="Ảnh thiết bị">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <HBox spacing="10.0">
+                            <Button text="Chọn ảnh" onAction="#handleChooseImage"/>
+                            <ImageView fx:id="imagePreview" fitWidth="100" fitHeight="100" style="-fx-border-color: gray; -fx-border-width: 2px"/>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <Label text="Trạng thái">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets right="10.0" />
+                            </HBox.margin>
+                        </Label>
+                        <RadioButton fx:id="rbAvailble" mnemonicParsing="false" selected="true" text="Có sẵn">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="statusGroup" />
+                            </toggleGroup>
+                            <HBox.margin>
+                                <Insets right="15.0" />
+                            </HBox.margin>
+                        </RadioButton>
+                        <RadioButton fx:id="rbUnavailble" mnemonicParsing="false" text="Không có sẵn" toggleGroup="$statusGroup" />
+                        <RadioButton fx:id="rbMaintenance" mnemonicParsing="false" text="Đang bảo trì" toggleGroup="$statusGroup" />
+                        <RadioButton fx:id="rbBroken" mnemonicParsing="false" text="Bị hỏng" toggleGroup="$statusGroup" />
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <Label text="Cho phép">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                            <HBox.margin>
+                                <Insets right="10.0" />
+                            </HBox.margin>
+                        </Label>
+                        <RadioButton fx:id="rbAllow" mnemonicParsing="false" selected="true" text="Mượn">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="allowGroup" />
+                            </toggleGroup>
+                            <HBox.margin>
+                                <Insets right="15.0" />
+                            </HBox.margin>
+                        </RadioButton>
+                        <RadioButton fx:id="rbNotAllow" mnemonicParsing="false" text="Không mượn" toggleGroup="$allowGroup" />
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Button fx:id="btnSave" mnemonicParsing="false" prefHeight="35.0" prefWidth="100.0" text="Tạo mới" styleClass="device_button" onAction="#handleSave"/>
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+        </VBox>
+    </center>
+</BorderPane>

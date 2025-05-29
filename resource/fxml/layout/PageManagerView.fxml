@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.shape.Rectangle?>
+<StackPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.PageManagerController">
+    <BorderPane fx:id="root" stylesheets="/css/style.css">
+        <top>
+            <HBox alignment="CENTER_LEFT" prefHeight="80" style="-fx-background-color: #FFFFFF">
+                <children>
+                    <StackPane alignment="CENTER" style="-fx-background-color: #1F2C4C; -fx-pref-width: 250px; -fx-border-width: 0 0 2px 0; -fx-border-color: #1b2847">
+                        <children>
+                            <Label fx:id="logo">
+                                <graphic>
+                                    <ImageView fitHeight="60" fitWidth="60">
+                                        <image>
+                                            <Image url="@/img/logo-icon.png" />
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </Label>
+                        </children>
+                    </StackPane>
+                    <HBox alignment="CENTER_RIGHT" spacing="15" HBox.hgrow="ALWAYS" style="-fx-border-color: #eff2f4; -fx-border-width: 0 0 3px 0">
+                        <children>
+                            <HBox fx:id="userBox" alignment="CENTER" spacing="10" style="-fx-pref-width: 400px">
+                                <children>
+                                    <StackPane alignment="CENTER" styleClass="avatar-container" style="-fx-cursor: hand; -fx-border-width: 2px; -fx-border-color: white; -fx-border-radius: 100px; -fx-pref-width: 45px; -fx-max-height: 45px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 8, 0.6, 0, 1)">
+                                        <children>
+                                            <ImageView fx:id="imgAvatar" fitHeight="45" fitWidth="45" styleClass="avatar">
+                                                <image>
+                                                    <Image url="https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg"/>
+                                                </image>
+                                            </ImageView>
+                                        </children>
+                                    </StackPane>
+                                    <Label fx:id="lblUsername" text="Người dùng" style="-fx-cursor: hand; -fx-font-weight: Bold; -fx-font-size: 16px"/>
+                                </children>
+                            </HBox>
+                        </children>
+                    </HBox>
+                </children>
+            </HBox>
+        </top>
+        <left>
+            <VBox prefWidth="250" spacing="10" style="-fx-background-color: #1F2C4C;">
+                <padding>
+                    <Insets bottom="20" top="20" />
+                </padding>
+                <children>
+                    <Button fx:id="btnDashboard" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Tổng quan">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/house-black-silhouette-without-door (1).png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnDevice" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Quản lý thiết bị">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/device.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnRoom" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Quản lý phòng">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/room (2).png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnMaintenance" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Quản lý bảo trì">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/maintanance.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnUser" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Quản lý người dùng">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/user.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnGroupPermission" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Nhóm quyền">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/multiple-users-silhouette.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnPermission" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Phân quyền">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/key (2).png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnStatistical" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Thống kê">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/trend.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnSetting" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Cài đặt">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/settings (1).png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnBorrowEquipment" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Mượn thiết bị">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/settings (1).png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnBorrowClassroom" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Mượn phòng">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/settings (1).png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </children>
+            </VBox>
+        </left>
+        <center>
+            <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true" style="-fx-background-color:transparent; -fx-border-color: transparent;">
+                <StackPane fx:id="contentPane" style="-fx-background-color: #F2F7FB"/>
+            </ScrollPane>
+        </center>
+    </BorderPane>
+</StackPane>
