@@ -5,6 +5,8 @@ public class Room {
     private RoomStatus status;
     private String roomNumber;
     private int seatingCapacity;
+    private String room_type;
+    private String location;
 
     public Room() {}
 
@@ -13,11 +15,13 @@ public class Room {
         this.roomNumber = roomNumber;
     }
 
-    public Room(String id, RoomStatus status, String roomNumber, int seatingCapacity) {
+    public Room(String id, RoomStatus status, String roomNumber, int seatingCapacity, String room_type, String location) {
         this.id = id;
         this.status = status;
         this.roomNumber = roomNumber;
         this.seatingCapacity = seatingCapacity;
+        this.room_type = room_type;
+        this.location = location;
     }
 
     public String getId() {
@@ -52,6 +56,18 @@ public class Room {
         this.seatingCapacity = seatingCapacity;
     }
 
+    public String getRoom_type() {
+        return room_type;
+    }
+    public void setRoom_type(String room_type) {
+        this.room_type = room_type;
+    }
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
     public void informationDisplay() {
         System.out.println("Room ID: " + id);
         System.out.println("Status: " + status);

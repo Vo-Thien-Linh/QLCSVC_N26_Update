@@ -31,7 +31,7 @@ public class ScannerUtils {
     public static boolean showConfirm(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
-        alert.setHeaderText("Bạn có chắc muốn mục này?");
+        alert.setHeaderText(null);
         alert.setContentText(message);
         return alert.showAndWait().filter(response -> response == javafx.scene.control.ButtonType.OK).isPresent();
     }

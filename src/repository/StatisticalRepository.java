@@ -1,6 +1,7 @@
 package repository;
 
 import config.DatabaseConnection;
+import model.DeviceStatus;
 import model.Room;
 import model.UsageStat;
 
@@ -128,5 +129,22 @@ public class StatisticalRepository {
         }
 
         return stats;
+    }
+
+    public Map<DeviceStatus, Integer> getDeviceStatusCount() {
+        Map<DeviceStatus, Integer> result = new HashMap<>();
+        String query = "SELECT status, COUNT(*) as count FROM devices GROUP BY status";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                result.put(DeviceStatus.valueOf(rs.getString("status")), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }

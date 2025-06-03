@@ -1,5 +1,8 @@
 package model;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -15,7 +18,9 @@ public class Device extends Facilities {
     private int quantity;
     private boolean deleted;
     private boolean selected;
+    private final BooleanProperty selectedForBorrow = new SimpleBooleanProperty(false);
     private boolean allow;
+    private Integer quantityToBorrow = 0;
 
     public boolean isSelected() {
         return selected;
@@ -125,6 +130,26 @@ public class Device extends Facilities {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public boolean isSelectedForBorrow() {
+        return selectedForBorrow.get();
+    }
+
+    public void setSelectedForBorrow(boolean selected) {
+        selectedForBorrow.set(selected);
+    }
+
+    public BooleanProperty selectedForBorrowProperty() {
+        return selectedForBorrow;
+    }
+
+    public Integer getQuantityToBorrow() {
+        return quantityToBorrow;
+    }
+
+    public void setQuantityToBorrow(Integer quantityToBorrow) {
+        this.quantityToBorrow = quantityToBorrow;
     }
 
     @Override

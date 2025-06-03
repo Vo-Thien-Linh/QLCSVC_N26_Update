@@ -19,6 +19,67 @@
     -fx-border-color: white
 }
 
+.requestButton{
+    -fx-background-color: #4472DD;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-padding: 8 10 8 10
+}
+
+.requestButton:hover{
+    -fx-background-color: #2D4C93;
+}
+
+.confirmButton{
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-background-radius: 5px;
+    -fx-font-weight: bold;
+}
+
+.confirmButton:hover{
+    -fx-background-color: #226592;
+}
+
+.btn-cancel{
+    -fx-background-color: #FF5370;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-cancel:hover{
+    -fx-background-color: #FF869A;
+}
+
+.btn-detail{
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-pref-width: 100px;
+}
+
+.btn-detail:hover{
+    -fx-background-color: #08E3FF;
+    -fx-text-fill: black;
+}
+
+.btn-reason{
+    -fx-background-color: #FF9F14;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-pref-width: 100px;
+}
+
+.btn-reason:hover{
+    -fx-background-color: #FFC878;
+    -fx-text-fill: black;
+}
+
 .table-view {
     -fx-background-color: white;
     -fx-table-cell-border-color: transparent;

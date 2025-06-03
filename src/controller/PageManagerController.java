@@ -166,7 +166,7 @@ public class PageManagerController implements Initializable {
         });
 
         btnBorrowClassroom.setOnAction(e -> {
-            switchView(new Label("⚙️ Đây là mượn phòng"));
+            switchView(BorrowRoomView.getView());
             highlightButton(btnBorrowClassroom);
         });
 

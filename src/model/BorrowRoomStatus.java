@@ -1,14 +1,14 @@
 package model;
 
-public enum DeviceStatus {
-    AVAILABLE("Có sẵn"),
-    UNAVAILABLE("Đang sử dụng"),
-    UNDER_MAINTENANCE("Đang bảo trì"),
-    BROKEN("Bị hỏng");
+public enum BorrowRoomStatus {
+    PENDING("Đang duyệt"),
+    APPROVED("Đã duyệt"),
+    CANCELLED ("Hủy bỏ"),
+    REJECTED("Bị từ chối");
 
     private final String label;
 
-    DeviceStatus(String label) {
+    BorrowRoomStatus(String label) {
         this.label = label;
     }
 
@@ -21,4 +21,3 @@ public enum DeviceStatus {
         return label;
     }
 }
-

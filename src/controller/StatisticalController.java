@@ -9,6 +9,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.util.StringConverter;
+import model.Device;
+import model.DeviceStatus;
 import model.Room;
 import model.UsageStat;
 import repository.StatisticalRepository;
@@ -61,7 +63,7 @@ public class StatisticalController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setupPieChart();
+        loadPieChart();
         setupBarChart();
         setupLabels();
         loadRoomData();
@@ -91,12 +93,13 @@ public class StatisticalController implements Initializable {
         }
     }
 
-    private void setupPieChart() {
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
-                new PieChart.Data("Đang sử dụng", 60),
-                new PieChart.Data("Đang bảo trì", 20),
-                new PieChart.Data("Đã hỏng", 20)
-        );
+    private void loadPieChart() {
+        Map<DeviceStatus, Integer> datas = statisticalRepository.getDeviceStatusCount();
+
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        for (Map.Entry<DeviceStatus, Integer> entry : datas.entrySet()) {
+            pieChartData.add(new PieChart.Data(entry.getKey().getLabel(), entry.getValue()));
+        }
 
         double total = pieChartData.stream().mapToDouble(PieChart.Data::getPieValue).sum();
 

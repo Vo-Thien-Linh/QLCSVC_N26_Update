@@ -1,14 +1,14 @@
 package model;
 
 public class UserSession {
-    private static int userId;
-    private static int roleId = 3;
+    private static String userId = "MTL0001";
+    private static int roleId = 5;
 
-    public static void startSession(int id) {
+    public static void startSession(String id) {
         userId = id;
     }
 
-    public static int getUserId() {
+    public static String getUserId() {
         return userId;
     }
 
@@ -17,7 +17,7 @@ public class UserSession {
     }
 
     public static void clearSession() {
-        userId = 0;
+        userId = "";
         roleId = 0;
     }
 }
