@@ -35,7 +35,7 @@ public class BorrowRoomConfirmController implements Initializable {
     @FXML private TableColumn<Device, Void> colQuantityBorrow;
     @FXML private Button confirmButton;
     @FXML private DatePicker dataPickerBorrow;
-    @FXML private TextField startTimeField, endTimeField;
+    @FXML private TextField startPeriodCombo, endPeriodCombo;
     @FXML private ListView<String> listAvailableTime;
     @FXML private TextArea txtReason;
 
@@ -46,8 +46,8 @@ public class BorrowRoomConfirmController implements Initializable {
     @FXML
     private void handleConfirmButtonAction(ActionEvent event) {
         LocalDate dateBorrow = dataPickerBorrow.getValue();
-        String startTimeText = startTimeField.getText().trim();
-        String endTimeText = endTimeField.getText().trim();
+        String startPeriodText = startPeriodCombo.getText().trim();
+        String endPeriodText = endPeriodCombo.getText().trim();
         String reason = txtReason.getText().trim();
 
         if(dateBorrow == null){
@@ -56,27 +56,27 @@ public class BorrowRoomConfirmController implements Initializable {
         }
 
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        if (startTimeText.isEmpty() || endTimeText.isEmpty()) {
-            ScannerUtils.showError("Lỗi", "Vui lòng nhập đầy đủ thời gian bắt đầu và kết thúc.");
+        if (startPeriodText.isEmpty() || endPeriodText.isEmpty()) {
+            ScannerUtils.showError("Lỗi", "Vui lòng nhập đầy đủ tiết bắt đầu và kết thúc.");
             return;
         }
 
-        LocalTime startTime, endTime;
+        int startPeriod, endPeriod;
         try {
-            startTime = LocalTime.parse(startTimeText, timeFormatter);
-            endTime = LocalTime.parse(endTimeText, timeFormatter);
-        } catch (DateTimeParseException e) {
-            ScannerUtils.showError("Lỗi", "Thời gian không đúng định dạng (HH:mm). Vui lòng nhập lại, ví dụ: 08:30.");
+            startPeriod = Integer.parseInt(startPeriodText);
+            endPeriod = Integer.parseInt(endPeriodText);
+        } catch (NumberFormatException e) {
+            ScannerUtils.showError("Lỗi", "Tiết học không hợp lệ. Vui lòng chọn lại.");
             return;
         }
 
-        if (endTime.isBefore(startTime) || endTime.equals(startTime)) {
-            ScannerUtils.showError("Lỗi", "Thời gian kết thúc phải sau thời gian bắt đầu.");
+        if (endPeriod < startPeriod) {
+            ScannerUtils.showError("Lỗi", "Tiết kết thúc phải bằng hoặc sau tiết bắt đầu.");
             return;
         }
 
-        if(startTime.isBefore(LocalTime.of(7, 0)) || endTime.isAfter(LocalTime.of(22, 0))) {
-            ScannerUtils.showError("Thông báo", "Thời gian đặt phòng ngoài giờ mở cửa (07:00 - 22:00).");
+        if (startPeriod < 1 || endPeriod > 14) {
+            ScannerUtils.showError("Thông báo", "Tiết học phải trong khoảng 1 đến 14.");
             return;
         }
 
@@ -98,28 +98,18 @@ public class BorrowRoomConfirmController implements Initializable {
         }
 
         if(ScannerUtils.showConfirm("Xác nhận", "Bạn có chắc chắn muốn mượn phòng " + lbRoomName.getText() + " và " + borrowDevices.size() + " thiết bị kèm theo?")){
-            if (borrowRoomRepository.isRoomScheduleConflict(roomId, dateBorrow, startTime, endTime)) {
+            if (borrowRoomRepository.isRoomScheduleConflict(roomId, dateBorrow, startPeriod, endPeriod)) {
                 ScannerUtils.showError("Lỗi", "Phòng này đã có người đăng ký trong khoảng thời gian này!");
                 return;
             }
 
-            BorrowRoom data = new BorrowRoom(0, roomId, null, UserSession.getUserId(), dateBorrow, startTime, endTime, reason,null, null, borrowDevices);
+            BorrowRoom data = new BorrowRoom(0, roomId, null, UserSession.getUserId(), dateBorrow, startPeriod, endPeriod, reason,null, null, borrowDevices);
             Boolean success = borrowRoomRepository.createBorrowRoom(data);
             if(success){
                 ScannerUtils.showInfo("Thông báo", "Gửi yêu cầu mượn phòng thành công! Vui lòng chờ xét duyệt");
-                List<String> availableSlots = getAvailableTimeSlots(roomId, dateBorrow);
-                if(availableSlots.isEmpty()){
-                    borrowRoomRepository.updateRoomStatus(roomId, "OCCUPIED");
-                    Stage stage = (Stage) confirmButton.getScene().getWindow();
-                    stage.close();
 
-                    if (reloadRoomListCallback != null) {
-                        reloadRoomListCallback.run();
-                    }
-                } else {
-                    Stage stage = (Stage) confirmButton.getScene().getWindow();
-                    stage.close();
-                }
+                Stage stage = (Stage) confirmButton.getScene().getWindow();
+                stage.close();
             } else {
                 ScannerUtils.showError("Thông báo", "Mượn phòng không thành công!");
             }
@@ -132,38 +122,51 @@ public class BorrowRoomConfirmController implements Initializable {
     }
 
     private void loadAvailableTime(String roomId, LocalDate dateBorrow) {
-        List<String> slots = getAvailableTimeSlots(roomId, dateBorrow);
+        List<String> slots = getAvailablePeriodSlots(roomId, dateBorrow);
         listAvailableTime.getItems().setAll(slots);
     }
 
-    private List<String> getAvailableTimeSlots(String roomId, LocalDate borrowDate) {
-        LocalTime openTime = LocalTime.of(7, 0);
-        LocalTime closeTime = LocalTime.of(21, 0);
-
-        List<Pair<LocalTime, LocalTime>> booked = borrowRoomRepository.getBookedTimeSlots(roomId, borrowDate);
+    private List<String> getAvailablePeriodSlots(String roomId, LocalDate borrowDate) {
+        List<Pair<Integer, Integer>> booked = borrowRoomRepository.getBookedPeriodSlots(roomId, borrowDate);
         List<String> availableSlots = new ArrayList<>();
 
         booked.sort(Comparator.comparing(Pair::getKey));
 
-        LocalTime current = openTime;
-        for (Pair<LocalTime, LocalTime> slot : booked) {
-            if (current.isBefore(slot.getKey())) {
-                availableSlots.add(current + " - " + slot.getKey());
+        int current = 1;
+        int lastPeriod = 14;
+
+        for (Pair<Integer, Integer> slot : booked) {
+            int bookedStart = slot.getKey();
+            int bookedEnd = slot.getValue();
+
+            if (current < bookedStart) {
+                availableSlots.add((current == (bookedStart - 1)) ? ("Tiết " + current) : ("Tiết " + current + " - Tiết " + (bookedStart - 1)));
             }
-            current = current.isAfter(slot.getValue()) ? current : slot.getValue();
+
+            current = Math.max(current, bookedEnd + 1);
         }
 
-        if (current.isBefore(closeTime)) {
-            availableSlots.add(current + " - " + closeTime);
+        if (current <= lastPeriod) {
+            availableSlots.add((current == lastPeriod) ? ("Tiết " + current) : ("Tiết " + current + " - Tiết " + lastPeriod));
         }
 
         return availableSlots;
     }
 
+
     public void initialize(URL location, ResourceBundle resources) {
         dataPickerBorrow.valueProperty().addListener((obs, oldDate, newDate) -> {
             if (newDate != null && roomId != null) {
-                loadAvailableTime(roomId, newDate);
+                List<String> availableSlots = getAvailablePeriodSlots(roomId, newDate);
+                listAvailableTime.getItems().clear();
+
+                if (availableSlots.isEmpty()) {
+                    listAvailableTime.getItems().add("Không còn thời gian trống");
+                    confirmButton.setDisable(true);
+                } else {
+                    listAvailableTime.getItems().addAll(availableSlots);
+                    confirmButton.setDisable(false);
+                }
             }
         });
     }
@@ -208,7 +211,7 @@ public class BorrowRoomConfirmController implements Initializable {
                                 quantityField.textProperty().addListener(quantityListener);
                             } else if (value > available) {
                                 quantityField.textProperty().removeListener(quantityListener);
-                                ScannerUtils.showError("Thông báo", "Số lượng mượn không được vượt quá " + available + "!");
+                                ScannerUtils.showError("Thông báo", "Số lượng mượn không được vượt quá số lượng có sẵn");
                                 quantityField.setText(oldVal);
                                 quantityField.textProperty().addListener(quantityListener);
                             } else {

@@ -27,7 +27,7 @@
                         <TableColumn fx:id="colId" text="Mã mượn phòng" />
                         <TableColumn fx:id="colName" text="Tên phòng" />
                         <TableColumn fx:id="colDate" text="Ngày mượn" />
-                        <TableColumn fx:id="colHour" text="Giờ mượn" />
+                        <TableColumn fx:id="colHour" text="Từ tiết đến tiết" />
                         <TableColumn fx:id="colStatus" text="Trạng thái" />
                         <TableColumn fx:id="colAction" text="Hành động" />
                     </columns>

@@ -165,16 +165,16 @@ public class BorrowRoomRepository {
         return null;
     }
 
-    public boolean isRoomScheduleConflict(String roomId, LocalDate borrowDate, LocalTime startTime, LocalTime endTime) {
-        String sql = "SELECT 1 FROM borrow_room WHERE room_id = ? AND borrow_date = ? AND status IN ('PENDING', 'APPROVED') AND (? < end_time AND ? > start_time) LIMIT 1";
+    public boolean isRoomScheduleConflict(String roomId, LocalDate borrowDate, int startPeriod, int endPeriod) {
+        String sql = "SELECT 1 FROM borrow_room WHERE room_id = ? AND borrow_date = ? AND status IN ('PENDING', 'APPROVED') AND (? <= end_period AND ? >= start_period) LIMIT 1";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, roomId);
             stmt.setDate(2, Date.valueOf(borrowDate));
-            stmt.setTime(3, Time.valueOf(startTime));
-            stmt.setTime(4, Time.valueOf(endTime));
+            stmt.setInt(3, startPeriod);
+            stmt.setInt(4, endPeriod);
 
             ResultSet rs = stmt.executeQuery();
             return rs.next();
@@ -185,15 +185,15 @@ public class BorrowRoomRepository {
     }
 
     public Boolean createBorrowRoom(BorrowRoom borrowRoom) {
-        String sql = "INSERT INTO borrow_room(room_id, borrower_id, borrow_date, start_time, end_time, borrow_reason, status) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO borrow_room(room_id, borrower_id, borrow_date, start_period, end_period, borrow_reason, status) VALUES(?, ?, ?, ?, ?, ?, ?)";
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
 
             stmt.setString(1, borrowRoom.getRoomId());
             stmt.setString(2, borrowRoom.getBorrowerId());
             stmt.setDate(3, Date.valueOf(borrowRoom.getBorrowDate()));
-            stmt.setTime(4, Time.valueOf(borrowRoom.getStartTime()));
-            stmt.setTime(5, Time.valueOf(borrowRoom.getEndTime()));
+            stmt.setInt(4, borrowRoom.getstartPeriod());
+            stmt.setInt(5, borrowRoom.getEndPeriod());
             stmt.setString(6, borrowRoom.getBorrowReason());
             stmt.setString(7, "PENDING");
 
@@ -247,9 +247,9 @@ public class BorrowRoomRepository {
         return false;
     }
 
-    public List<Pair<LocalTime, LocalTime>> getBookedTimeSlots(String roomId, LocalDate borrowDate) {
-        List<Pair<LocalTime, LocalTime>> list = new ArrayList<>();
-        String sql = "SELECT start_time, end_time FROM borrow_room WHERE room_id = ? AND borrow_date = ? AND status IN ('APPROVED', 'PENDING')";
+    public List<Pair<Integer, Integer>> getBookedPeriodSlots(String roomId, LocalDate borrowDate) {
+        List<Pair<Integer, Integer>> list = new ArrayList<>();
+        String sql = "SELECT start_period, end_period FROM borrow_room WHERE room_id = ? AND borrow_date = ? AND status IN ('APPROVED', 'PENDING')";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -258,8 +258,8 @@ public class BorrowRoomRepository {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                LocalTime start = rs.getTime("start_time").toLocalTime();
-                LocalTime end = rs.getTime("end_time").toLocalTime();
+                Integer start = rs.getInt("start_period");
+                Integer end = rs.getInt("end_period");
                 list.add(new Pair<>(start, end));
             }
         } catch (SQLException e) {
@@ -295,12 +295,12 @@ public class BorrowRoomRepository {
                 String roomId = rs.getString("room_id");
                 String roomNumber = rs.getString("room_number");
                 LocalDate borrowDate = rs.getDate("borrow_date").toLocalDate();
-                LocalTime startTime = rs.getTime("start_time").toLocalTime();
-                LocalTime endTime = rs.getTime("end_time").toLocalTime();
+                Integer startPeriod = rs.getInt("start_period");
+                Integer endPeriod = rs.getInt("end_period");
                 String statusStr = rs.getString("borrowStatus");
                 BorrowRoomStatus status = BorrowRoomStatus.valueOf(statusStr.toUpperCase());
 
-                list.add(new BorrowRoom(id, roomId, roomNumber, UserSession.getUserId(), borrowDate, startTime, endTime, null, null, status, null));
+                list.add(new BorrowRoom(id, roomId, roomNumber, UserSession.getUserId(), borrowDate, startPeriod, endPeriod, null, null, status, null));
             }
             return list;
 

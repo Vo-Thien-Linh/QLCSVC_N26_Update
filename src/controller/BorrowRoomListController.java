@@ -36,7 +36,7 @@ public class BorrowRoomListController implements Initializable {
         colDate.setCellValueFactory(new PropertyValueFactory<>("borrowDate"));
         colHour.setCellValueFactory(cellData -> {
             BorrowRoom br = cellData.getValue();
-            String hourRange = br.getStartTime().toString() + " - " + br.getEndTime().toString();
+            String hourRange = br.getstartPeriod() + " - " + br.getEndPeriod();
             return new SimpleStringProperty(hourRange);
         });
         colStatus.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getStatus().toString()));
@@ -67,7 +67,7 @@ public class BorrowRoomListController implements Initializable {
                     StringBuilder content = new StringBuilder();
                     content.append("Phòng: ").append(br.getRoomId()).append("\n");
                     content.append("Ngày mượn: ").append(br.getBorrowDate()).append("\n");
-                    content.append("Thời gian: ").append(br.getStartTime()).append(" - ").append(br.getEndTime()).append("\n");
+                    content.append("Từ tiết đến tiết: ").append(br.getstartPeriod()).append(" - ").append(br.getEndPeriod()).append("\n");
                     content.append("Lý do: ").append(br.getBorrowReason()).append("\n");
                     content.append("Trạng thái: ").append(br.getStatus()).append("\n");
 

@@ -46,17 +46,18 @@
                             </children>
                         </HBox>
                         <HBox spacing="8.0">
-                            <Label text="Thời gian:" textFill="#2c3e50">
+                            <Label text="Tiết học:" textFill="#2c3e50">
                                 <font>
                                     <Font size="16.0" />
                                 </font>
                             </Label>
                             <HBox spacing="5">
-                                <TextField fx:id="startTimeField" prefWidth="80" promptText="08:00" />
+                                <TextField fx:id="startPeriodCombo" prefWidth="80" promptText="Tiết bắt đầu" />
                                 <Label text="-" />
-                                <TextField fx:id="endTimeField" prefWidth="80" promptText="10:00" />
+                                <TextField fx:id="endPeriodCombo" prefWidth="80" promptText="Tiết kết thúc" />
                             </HBox>
                         </HBox>
+
                         <VBox>
                             <Label text="Lý do mượn phòng:" textFill="#2c3e50">
                                 <font>

@@ -54,13 +54,13 @@ CREATE TABLE room_types (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type_name VARCHAR(100) NOT NULL
 );
- 
- 
+
+
 -- Bảng room
 CREATE TABLE room (
     room_id VARCHAR(10) PRIMARY KEY,
     status ENUM('AVAILABLE', 'OCCUPIED', 'MAINTENANCE') NOT NULL,
-    room_number VARCHAR(10) UNIQUE NOT NULL, 
+    room_number VARCHAR(10) UNIQUE NOT NULL,
     seating_capacity INT NOT NULL,
     deleted TINYINT DEFAULT 0,
 	room_type_id INT,
@@ -84,7 +84,7 @@ CREATE TABLE devices (
     deleted BOOLEAN DEFAULT FALSE,
     thumbnail varchar(500),
     is_borrowable boolean DEFAULT FALSE,
-    FOREIGN KEY (room_id) REFERENCES room(room_id) 
+    FOREIGN KEY (room_id) REFERENCES room(room_id)
 );
 
 -- Tạo bảng borrow_room
@@ -93,12 +93,12 @@ CREATE TABLE borrow_room (
      room_id VARCHAR(255) NOT NULL,
      borrower_id VARCHAR(255) NOT NULL,
      borrow_date DATE NOT NULL,
-     start_time TIME NOT NULL,
-     end_time TIME NOT NULL,
+     start_period INT NOT NULL,
+     end_period INT NOT NULL,
      status VARCHAR(50) NOT NULL,
      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
      borrow_reason TEXT,
-     reject_reason TEXT
+     reject_reason TEXT,
      FOREIGN KEY (borrower_id) REFERENCES users(user_id),
      FOREIGN KEY (room_id) REFERENCES room(room_id)
 
@@ -112,7 +112,7 @@ CREATE TABLE borrow_device (
    device_id VARCHAR(255) NOT NULL,
    quantity INT NOT NULL,
    FOREIGN KEY (borrow_room_id) REFERENCES borrow_room(id),
-   FOREIGN KEY (device_id) REFERENCES device(id)
+   FOREIGN KEY (device_id) REFERENCES devices(id)
 );
 
 
@@ -124,7 +124,7 @@ CREATE TABLE usage_logs (
     FOREIGN KEY (device_id) REFERENCES devices(id)
 );
 
--- Bảng device_borrow_requests 
+-- Bảng device_borrow_requests
 CREATE TABLE device_borrow_requests (
     id_request VARCHAR(10) PRIMARY KEY,
     lecturer_user VARCHAR(10) NOT NULL,
@@ -268,7 +268,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- Trigger cập nhật trạng thái thiết bị khi đơn mượn được duyệt hoặc từ chối 
+-- Trigger cập nhật trạng thái thiết bị khi đơn mượn được duyệt hoặc từ chối
 DELIMITER //
 CREATE TRIGGER after_update_device_borrow_requests
 AFTER UPDATE ON device_borrow_requests
@@ -287,14 +287,14 @@ END //
 DELIMITER ;
 
 -- 1. Insert roles
-INSERT INTO roles (role_id, role_name) VALUES 
+INSERT INTO roles (role_id, role_name) VALUES
 (3, 'Quản trị viên'),
 (5, 'Giáo viên'),
 (6, 'Bảo trì');
 
 -- 2. Insert users
 INSERT INTO users (user_id, fullname, username, yearold, email, phoneNumber, password, status, deleted, thumbnail, role_id)
-VALUES 
+VALUES
 ('MTL0001', 'Nguyễn Anh Nguyên', 'nguyen34', '2000-12-09 ', 'nanh@gmail.com', '0983772722', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg', 3),
 ('MTL0002', 'Vo Thien Linh', 'vothienlinh', '1999-05-15', 'vothienlinh2@gmail.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 5),
 ('MTL0003', 'Nguyen Van A', 'nguyenvana', '1998-03-20', 'vana@example.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 6);
@@ -327,10 +327,10 @@ INSERT INTO room (room_id, status, room_number, seating_capacity, deleted, room_
 ('R015', 'AVAILABLE', 'A212', 18, 0, 3, 'Khu A2'),
 ('R016', 'AVAILABLE', 'A213', 28, 0, 4, 'Khu A2'),
 ('R017', 'AVAILABLE', 'A214', 8, 0, 5, 'Khu A2');
-       
+
 -- 5. Insert devices (đồng bộ với cấu trúc mới)
 INSERT INTO devices (
-	id, device_name, device_type, purchase_date, supplier, price, status, 
+	id, device_name, device_type, purchase_date, supplier, price, status,
     room_id, quantity, created_at, updated_at, deleted, thumbnail, is_borrowable) VALUES
 ('D001', 'micro', 'điện tử', '2006-09-12', 'anhh', 120000.00, 'UNDER_MAINTENANCE', 'R001', 1, '2025-05-01 00:00:00', '2025-05-30 10:01:48', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747476219/tjwrnnfzgxengjil9ezx.jpg', 1),
 ('D002', 'máy chiếu', 'điện tử', '2008-09-13', 'addi', 12000000.00, 'AVAILABLE', 'R002', 1, '2025-05-01 00:00:00', '2025-05-02 18:40:09', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1746185908/parmi9gbcnpmape8k2bg.jpg', 1),
@@ -355,15 +355,21 @@ INSERT INTO devices (
 
 -- Insert borrow_room
 INSERT INTO borrow_room (
-    id, room_id, borrower_id, borrow_date, start_time, end_time, status, created_at, borrow_reason, reject_reason
+    id, room_id, borrower_id, borrow_date, start_period, end_period, status, created_at, borrow_reason
 ) VALUES
-      (2, 'R001', 'MTL0001', '2025-06-02', '08:00:00', '10:00:00', 'PENDING', '2025-06-01 11:55:56', NULL, NULL),
-      (5, 'R001', 'MTL0001', '2025-06-02', '14:00:00', '16:00:00', 'PENDING', '2025-06-01 18:05:04', NULL, NULL),
-      (6, 'R001', 'MTL0001', '2025-06-02', '07:00:00', '08:00:00', 'CANCELLED', '2025-06-01 20:39:06', NULL, NULL),
-      (7, 'R002', 'MTL0001', '2025-06-02', '07:00:00', '21:00:00', 'REJECTED', '2025-06-01 20:39:35', NULL, NULL),
-      (8, 'R004', 'MTL0001', '2025-06-03', '08:00:00', '10:30:00', 'APPROVED', '2025-06-01 21:03:23', NULL, NULL),
-      (9, 'R007', 'MTL0001', '2025-06-03', '14:00:00', '16:30:00', 'PENDING', '2025-06-02 14:47:55', 'Dùng để họp.', NULL),
-      (10, 'R001', 'MTL0001', '2025-06-03', '07:00:00', '09:00:00', 'PENDING', '2025-06-02 22:31:36', NULL, NULL);
+    (2, 'R001', 'MTL0001', '2025-06-02', 1, 3, 'PENDING', '2025-06-01 11:55:56', NULL),
+    (5, 'R001', 'MTL0001', '2025-06-02', 4, 5, 'PENDING', '2025-06-01 18:05:04', NULL),
+    (6, 'R001', 'MTL0001', '2025-06-02', 7, 10, 'CANCELLED', '2025-06-01 20:39:06', NULL),
+    (7, 'R002', 'MTL0001', '2025-06-02', 3, 5, 'REJECTED', '2025-06-01 20:39:35', NULL),
+    (8, 'R004', 'MTL0001', '2025-06-03', 5, 10, 'APPROVED', '2025-06-01 21:03:23', NULL),
+    (9, 'R007', 'MTL0001', '2025-06-03', 1, 5, 'PENDING', '2025-06-02 14:47:55', 'Dùng để họp.'),
+    (10, 'R001', 'MTL0001', '2025-06-03', 11, 13, 'PENDING', '2025-06-02 22:31:36', NULL),
+    (11, 'R001', 'MTL0001', '2025-06-02', 7, 10, 'PENDING', '2025-06-03 14:25:03', NULL),
+    (12, 'R001', 'MTL0001', '2025-06-04', 1, 14, 'CANCELLED', '2025-06-03 14:39:14', 'Dùng để họp'),
+    (13, 'R001', 'MTL0001', '2025-06-04', 1, 14, 'PENDING', '2025-06-03 14:46:00', 'Dùng để họp'),
+    (14, 'R001', 'MTL0001', '2025-06-02', 6, 7, 'CANCELLED', '2025-06-03 14:52:15', NULL),
+    (15, 'R001', 'MTL0001', '2025-06-02', 6, 6, 'PENDING', '2025-06-03 14:56:52', NULL);
+
 
 
 -- Insert borrow_device

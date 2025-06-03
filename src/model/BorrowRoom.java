@@ -11,21 +11,21 @@ public class BorrowRoom {
     private String roomNumber;
     private String borrowerId;
     private LocalDate borrowDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private int startPeriod;
+    private int endPeriod;
     private String borrowReason;
     private String rejectReason;
     private BorrowRoomStatus status;
     private List<BorrowDevice> devices; // mượn kèm
 
-    public BorrowRoom(int id, String roomId, String roomNumber, String borrowerId, LocalDate borrowDate, LocalTime startTime, LocalTime endTime, String borrowReason, String rejectReason, BorrowRoomStatus status, List<BorrowDevice> devices) {
+    public BorrowRoom(int id, String roomId, String roomNumber, String borrowerId, LocalDate borrowDate, int startPeriod, int endPeriod, String borrowReason, String rejectReason, BorrowRoomStatus status, List<BorrowDevice> devices) {
         this.id = id;
         this.roomId = roomId;
         this.roomNumber = roomNumber;
         this.borrowerId = borrowerId;
         this.borrowDate = borrowDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
+        this.startPeriod = startPeriod;
+        this.endPeriod = endPeriod;
         this.borrowReason = borrowReason;
         this.rejectReason = rejectReason;
         this.status = status;
@@ -52,12 +52,12 @@ public class BorrowRoom {
         return borrowDate;
     }
 
-    public LocalTime getStartTime() {
-        return startTime;
+    public int getstartPeriod () {
+        return startPeriod;
     }
 
-    public LocalTime getEndTime() {
-        return endTime;
+    public int getEndPeriod() {
+        return endPeriod;
     }
 
     public String getBorrowReason() {
