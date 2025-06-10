@@ -7,6 +7,8 @@ public class Room {
     private int seatingCapacity;
     private String room_type;
     private String location;
+    private boolean selected;
+
 
     public Room() {}
 
@@ -59,15 +61,27 @@ public class Room {
     public String getRoom_type() {
         return room_type;
     }
+
     public void setRoom_type(String room_type) {
         this.room_type = room_type;
     }
+
     public String getLocation() {
         return location;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     public void informationDisplay() {
         System.out.println("Room ID: " + id);
         System.out.println("Status: " + status);
