@@ -86,12 +86,8 @@ public class PermissionRepository {
             stmt.setInt(2, functionId);
             stmt.setInt(3, permissionTypeId);
             stmt.setBoolean(4, allowed);
-            int rs = stmt.executeUpdate();
-            if(rs > 0){
-                return true;
-            } else {
-                return false;
-            }
+            int result = stmt.executeUpdate();
+            return result > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -100,7 +96,7 @@ public class PermissionRepository {
 
     public List<String> getAllFunctions() {
         List<String> functions = new ArrayList<>();
-        String sql = "SELECT name FROM functions  ORDER BY id";
+        String sql = "SELECT name FROM functions ORDER BY id";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -136,7 +132,26 @@ public class PermissionRepository {
         return types;
     }
 
+    public boolean testConnection() {
+        String sql = "SELECT 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                System.out.println("Database connection successful!");
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Database connection failed!");
+        return false;
+    }
+
     public boolean isAllowed(int roleId, String functionName, String permissionTypeName) {
+        System.out.println("Checking permission: roleId=" + roleId + ", functionName='" + functionName + "', permissionTypeName='" + permissionTypeName + "'");
+        System.out.println("Testing connection: " + testConnection());
+
         String sql = """
             SELECT p.allowed
             FROM permissions p
@@ -151,12 +166,18 @@ public class PermissionRepository {
             stmt.setString(3, permissionTypeName);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getBoolean("allowed");
+                    boolean allowed = rs.getBoolean("allowed");
+                    System.out.println("Permission found: allowed=" + allowed);
+                    return allowed;
+                } else {
+                    System.out.println("No permission record found.");
                 }
             }
         } catch (SQLException e) {
+            System.out.println("SQLException occurred: " + e.getMessage());
             e.printStackTrace();
         }
+        System.out.println("Returning default: false");
         return false;
     }
 }

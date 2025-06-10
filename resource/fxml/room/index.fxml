@@ -1,119 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Pagination?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.shape.SVGPath?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="/css/style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ManagerRoomController">
     <center>
-        <VBox prefHeight="200.0" prefWidth="100.0" styleClass="main-content" BorderPane.alignment="CENTER">
+        <VBox fx:id="rootPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #F2F7FB" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
             <children>
-                <HBox alignment="CENTER_LEFT" prefHeight="60.0" styleClass="header">
+                <VBox styleClass="room-filter">
                     <children>
-                        <Label alignment="CENTER" contentDisplay="CENTER" styleClass="page-title" text="Quản lý Phòng học">
-                            <font>
-                                <Font name="System Bold" size="20.0" />
-                            </font>
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 24px" text="Bộ lọc và Tìm kiếm">
+                            <VBox.margin>
+                                <Insets bottom="10.0" />
+                            </VBox.margin>
                         </Label>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <ComboBox fx:id="cboSearchType" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-border-color: #cac9c9" />
+                                <TextField fx:id="txtSearch" prefHeight="40.0" prefWidth="300.0" promptText="Nhập từ khóa" />
+                                <StackPane fx:id="btnSearch" style="-fx-cursor: hand; -fx-pref-width: 100" styleClass="custom-button">
+                                    <children>
+                                        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#4099ff" height="40.0" width="100.0" />
+                                        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#73b3fe" height="40.0" scaleX="0.0" scaleZ="0.0" styleClass="before-layer" width="100.0" />
+                                        <Text fill="WHITE" text="Tìm kiếm">
+                                            <font>
+                                                <Font name="System Bold" size="14.0" />
+                                            </font>
+                                        </Text>
+                                    </children>
+                                </StackPane>
+                            </children>
+                        </HBox>
                     </children>
                     <padding>
-                        <Insets left="20.0" right="20.0" />
+                        <Insets bottom="15.0" left="0.0" right="0.0" top="15.0" />
                     </padding>
-                </HBox>
-                <VBox spacing="20.0">
+                </VBox>
+                <VBox style="-fx-background-color: #F2F7FB;">
                     <children>
-                        <VBox spacing="10.0" styleClass="filter-container">
+                        <HBox alignment="CENTER_LEFT" spacing="40.0">
                             <children>
-                                <Label styleClass="section-title" text="Bộ lọc &amp; Tìm kiếm">
-                                    <font>
-                                        <Font name="System Bold" size="14.0" />
-                                    </font>
+                                <Label style="-fx-font-weight: bold; -fx-font-size: 24px" text="Danh sách">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" />
+                                    </VBox.margin>
                                 </Label>
-                                <HBox spacing="10.0">
+                                <HBox alignment="CENTER_RIGHT" spacing="50.0" HBox.hgrow="ALWAYS">
                                     <children>
-                                        <ComboBox prefHeight="40.0" prefWidth="200.0" promptText="Tất cả" styleClass="combo-filter" />
-                                        <TextField prefHeight="40.0" prefWidth="300.0" promptText="Nhập từ khóa..." styleClass="search-field">
-                                            <padding>
-                                                <Insets left="10.0" right="10.0" />
-                                            </padding>
-                                        </TextField>
-                                        <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="100.0" styleClass="search-button" text="Tìm kiếm" />
-                                    </children>
-                                </HBox>
-                            </children>
-                            <padding>
-                                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
-                            </padding>
-                        </VBox>
-                        <VBox spacing="15.0" styleClass="table-container">
-                            <children>
-                                <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="10.0">
-                                    <children>
-                                        <Label styleClass="section-title" text="Danh sách phòng học">
+                                        <Button fx:id="btnApproveBorrowRequest" lineSpacing="1.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="137.0" text="Duyệt đơn mượn" textFill="#4099ff" wrapText="true">
+                                            <HBox.margin>
+                                                <Insets right="-25.0" />
+                                            </HBox.margin>
                                             <font>
-                                                <Font name="System Bold" size="16.0" />
+                                                <Font name="System Bold" size="14.0" />
                                             </font>
-                                        </Label>
-                                        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                                        </Button>
+                                        <HBox spacing="10.0">
+                                            <ComboBox fx:id="cboChangeStatus" prefHeight="40.0" prefWidth="200.0" promptText="Có sẵn" styleClass="room_change-status" />
+                                            <StackPane fx:id="btnApply" style="-fx-cursor: hand" styleClass="custom-button">
+                                                <children>
+                                                    <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#4099ff" height="40.0" width="100.0" />
+                                                    <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#73b3fe" height="40.0" scaleX="0.0" scaleZ="0.0" styleClass="before-layer" width="100.0" />
+                                                    <Text fill="WHITE" text="Áp dụng">
+                                                        <font>
+                                                            <Font name="System Bold" size="14.0" />
+                                                        </font>
+                                                    </Text>
+                                                </children>
+                                            </StackPane>
+                                        </HBox>
+                                        <HBox alignment="CENTER_RIGHT" spacing="50.0">
                                             <children>
-                                                <ComboBox prefHeight="40.0" prefWidth="150.0" promptText="Hoạt động" styleClass="status-filter" />
-                                                <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" styleClass="add-button" text="Thêm mới">
+                                                <StackPane fx:id="btnAddNew" onMouseClicked="#handleAddNewAction" style="-fx-cursor: hand; -fx-pref-width: 100" styleClass="custom-button">
+                                                    <children>
+                                                        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="transparent" height="40.0" stroke="#4099ff" width="110.0" />
+                                                        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#4099ff" height="40.0" scaleX="0.0" scaleZ="0.0" styleClass="before-layer" width="110.0" />
+                                                        <HBox alignment="CENTER" spacing="6">
+                                                            <SVGPath fx:id="iconAdd" content="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="#4099ff" scaleX="0.8" scaleY="0.8">
+                                                                <HBox.margin>
+                                                                    <Insets left="30.0" />
+                                                                </HBox.margin>
+                                                            </SVGPath>
+                                                            <Text fx:id="textAdd" fill="#4099ff" text="Thêm mới">
+                                                                <font>
+                                                                    <Font name="System Bold" size="14.0" />
+                                                                </font>
+                                                                <HBox.margin>
+                                                                    <Insets />
+                                                                </HBox.margin>
+                                                            </Text>
+                                                            <StackPane.margin>
+                                                                <Insets left="-30.0" />
+                                                            </StackPane.margin>
+                                                        </HBox>
+                                                    </children>
                                                     <HBox.margin>
-                                                        <Insets left="10.0" />
+                                                        <Insets left="-30.0" />
                                                     </HBox.margin>
-                                                    <graphic>
-                                                        <SVGPath content="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="WHITE" />
-                                                    </graphic>
-                                                </Button>
+                                                </StackPane>
                                             </children>
                                         </HBox>
                                     </children>
-                                    <VBox.margin>
-                                        <Insets left="20.0" right="20.0" />
-                                    </VBox.margin>
-                                </HBox>
-                                <TableView styleClass="classroom-table" VBox.vgrow="ALWAYS">
-                                    <columns>
-                                        <TableColumn prefWidth="100.0" text="Mã phòng" />
-                                        <TableColumn prefWidth="150.0" text="Tên phòng" />
-                                        <TableColumn prefWidth="120.0" text="Loại phòng" />
-                                        <TableColumn prefWidth="100.0" text="Sức chứa" />
-                                        <TableColumn prefWidth="120.0" text="Trạng thái" />
-                                        <TableColumn prefWidth="120.0" text="Hành động" />
-                                    </columns>
-                                    <columnResizePolicy>
-                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                    </columnResizePolicy>
-                                    <VBox.margin>
-                                        <Insets left="20.0" right="20.0" />
-                                    </VBox.margin>
-                                </TableView>
-                                <HBox alignment="CENTER">
-                                    <children>
-                                        <Pagination pageCount="5" prefHeight="40.0" styleClass="pagination-control" />
-                                    </children>
-                                    <VBox.margin>
-                                        <Insets bottom="20.0" />
-                                    </VBox.margin>
                                 </HBox>
                             </children>
-                        </VBox>
+                        </HBox>
                     </children>
-                    <VBox.margin>
-                        <Insets top="20.0" />
-                    </VBox.margin>
+                    <padding>
+                        <Insets bottom="15.0" left="0.0" right="0.0" top="15.0" />
+                    </padding>
+                </VBox>
+                <VBox>
+                    <TableView fx:id="tblRooms" prefHeight="523.0" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 8, 0.6, 0, 1)" styleClass="table-view room_table">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="colCheck" prefWidth="20.0" resizable="true" />
+                            <TableColumn fx:id="colId" text="Mã phòng" />
+                            <TableColumn fx:id="colRoomNumber" text="Số phòng" />
+                            <TableColumn fx:id="colRoomType" text="Loại phòng" />
+                            <TableColumn fx:id="colSeatingCapacity" text="Sức chứa" />
+                            <TableColumn fx:id="colStatus" text="Trạng thái" />
+                            <TableColumn fx:id="colLocation" text="Vị trí" />
+                            <TableColumn fx:id="colActions" text="Hành động" />
+                        </columns>
+                        <placeholder>
+                            <Label text="Không có dữ liệu" />
+                        </placeholder>
+                        <VBox.margin>
+                            <Insets />
+                        </VBox.margin>
+                    </TableView>
+                    <HBox alignment="CENTER" prefHeight="60.0" prefWidth="200.0" spacing="10.0">
+                        <children>
+                            <Pagination fx:id="pagination" maxPageIndicatorCount="4" prefHeight="60.0" prefWidth="879.0" />
+                        </children>
+                    </HBox>
                 </VBox>
             </children>
         </VBox>
