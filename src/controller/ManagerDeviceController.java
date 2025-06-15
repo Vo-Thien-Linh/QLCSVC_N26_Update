@@ -23,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -35,6 +36,7 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import model.BorrowRoom;
 import model.Device;
 import model.DeviceStatus;
 import model.UserSession;
@@ -50,7 +52,7 @@ public class ManagerDeviceController implements Initializable {
             colSupplier, colStatus, colRoom, colAllow;
     @FXML private TableColumn<Device, BigDecimal> colPrice;
     @FXML private TableColumn<Device, Void> colActions;
-    @FXML private TableColumn<Device, Integer> colQuantity;
+    @FXML private TableColumn<Device, Integer> colQuantity, colAvailableQuantity;
     @FXML private VBox rootPane;
     @FXML private ComboBox<String> cboSearchType, cboChangeStatus;
     @FXML private TextField txtSearch;
@@ -93,6 +95,7 @@ public class ManagerDeviceController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupButton();
         dataDumpCbo();
+        formatHeaderLabel();
         cboSearchType.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             updateStatus(newVal);
             loadPage(0);
@@ -111,6 +114,11 @@ public class ManagerDeviceController implements Initializable {
         btnApply.setOnMouseClicked(event -> {
             ObservableList<Device> devices = tblDevices.getItems();
             List<String> ids = devices.stream().filter(Device::isSelected).map(Device::getId).collect(Collectors.toList());
+            if (ids.isEmpty()) {
+                ScannerUtils.showError("Lỗi", "Vui lòng chọn ít nhất một thiết bị!");
+                return;
+            }
+
             String status = cboChangeStatus.getSelectionModel().getSelectedItem();
             for(DeviceStatus deviceStatus : DeviceStatus.values()) {
                 if(deviceStatus.toString().equals(status)) {
@@ -129,6 +137,27 @@ public class ManagerDeviceController implements Initializable {
 
         loadPage(0);
         permisson();
+    }
+
+    private void formatHeaderLabel(){
+        Label supplier = new Label("Tên nhà\nsản xuất");
+        supplier.setWrapText(true);
+        supplier.setMinHeight(50);
+        supplier.setAlignment(Pos.CENTER);
+        supplier.setMaxWidth(Double.MAX_VALUE);
+        colSupplier.setGraphic(supplier);
+
+        Label totalQuantity = new Label("Tổng số\nlượng");
+        totalQuantity.setWrapText(true);
+        totalQuantity.setAlignment(Pos.CENTER);
+        totalQuantity.setMaxWidth(Double.MAX_VALUE);
+        colQuantity.setGraphic(totalQuantity);
+
+        Label remainingQuantity = new Label("Số lượng\ncó sẵn");
+        remainingQuantity.setWrapText(true);
+        remainingQuantity.setAlignment(Pos.CENTER);
+        remainingQuantity.setMaxWidth(Double.MAX_VALUE);
+        colAvailableQuantity.setGraphic(remainingQuantity);
     }
 
     private void permisson(){
@@ -276,6 +305,28 @@ public class ManagerDeviceController implements Initializable {
             });
             colDeviceName.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
             colDeviceType.setCellValueFactory(new PropertyValueFactory<>("deviceType"));
+            colDeviceType.setCellFactory(column -> {
+                return new TableCell<Device, String>() {
+                    private final Text text = new Text();
+
+                    {
+                        text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+                        text.setLineSpacing(2);
+                        setGraphic(text);
+                        setAlignment(Pos.CENTER);
+                    }
+
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            text.setText("");
+                        } else {
+                            text.setText(item);
+                        }
+                    }
+                };
+            });
             colSupplier.setCellValueFactory(new PropertyValueFactory<>("supplier"));
             colPurchaseDate.setCellValueFactory(new PropertyValueFactory<>("purchaseDate"));
             colPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
@@ -293,15 +344,13 @@ public class ManagerDeviceController implements Initializable {
                 }
             });
             colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+            colAvailableQuantity.setCellValueFactory(new PropertyValueFactory<>("availableQuantity"));
 
             colStatus.setCellValueFactory(cellData ->
                     new ReadOnlyStringWrapper(cellData.getValue().getStatus().toString()));
 
             colRoom.setCellValueFactory(cellData ->
                     new ReadOnlyStringWrapper(cellData.getValue().getRoom().getRoomNumber()));
-            colAllow.setCellValueFactory(cellData ->
-                    new ReadOnlyStringWrapper(cellData.getValue().getAllow() ? "Mượn" : "Không mượn")
-            );
             colActions.setCellFactory(new Callback<TableColumn<Device, Void>, TableCell<Device, Void>>() {
                 @Override
                 public TableCell<Device, Void> call(final TableColumn<Device, Void> param) {

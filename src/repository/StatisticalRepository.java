@@ -48,7 +48,7 @@ public class StatisticalRepository {
             while(result.next()) {
                 String roomId = result.getString("room_id");
                 String roomNumber = result.getString("room_number");
-                rooms.add(new Room(roomId, roomNumber));
+                rooms.add(new Room(roomId, roomNumber, null));
             }
         } catch (SQLException e) {
             e.printStackTrace();

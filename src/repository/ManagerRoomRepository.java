@@ -1,15 +1,16 @@
 package repository;
 
 import config.DatabaseConnection;
-import model.Room;
-import model.RoomStatus;
+import model.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ManagerRoomRepository {
@@ -231,5 +232,111 @@ public class ManagerRoomRepository {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<BorrowRoom> getDataBorrowRooms(){
+        Map<Integer, BorrowRoom> requestMap = new LinkedHashMap<>();
+        String sql = """
+            SELECT 
+                br.*, 
+                u.fullname, 
+                r.room_number,
+                d.device_name,
+                d.id AS device_id,
+                d.available_quantity,
+                bdd.quantity
+            FROM borrow_room br 
+            JOIN Users u ON br.borrower_id = u.user_id 
+            JOIN room r ON br.room_id = r.room_id 
+            LEFT JOIN borrow_device bd ON br.id = bd.borrow_room_id
+            LEFT JOIN borrow_device_detail bdd ON bd.id =  bdd.borrow_device_id
+            LEFT JOIN devices d ON bdd.device_id = d.id
+            WHERE br.status = 'PENDING'
+            ORDER BY br.id DESC
+        """;
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int borrowRoomId =  rs.getInt("id");
+                if(!requestMap.containsKey(borrowRoomId)) {
+                    BorrowRoom  borrowRoom = new BorrowRoom();
+                    borrowRoom.setId(borrowRoomId);
+                    borrowRoom.setRoomId(rs.getString("room_id"));
+                    borrowRoom.setRoomNumber(rs.getString("room_number"));
+                    borrowRoom.setBorrower(new User(null, rs.getString("fullname")));
+                    borrowRoom.setBorrowDate(rs.getDate("borrow_date").toLocalDate());
+                    borrowRoom.setStartPeriod(rs.getInt("start_period"));
+                    borrowRoom.setEndPeriod(rs.getInt("end_period"));
+                    borrowRoom.setBorrowReason(rs.getString("borrow_reason"));
+                    borrowRoom.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    borrowRoom.setStatus(BorrowStatus.valueOf(rs.getString("status")));
+                    requestMap.put(borrowRoomId, borrowRoom);
+                }
+
+                String deviceId = rs.getString("device_id");
+                if(!rs.wasNull()) {
+                    BorrowDeviceDetail borrowDeviceDetail = new BorrowDeviceDetail();
+                    borrowDeviceDetail.setDevice(new Device(deviceId, rs.getString("device_name"), rs.getInt("available_quantity")));
+                    borrowDeviceDetail.setQuantity(rs.getInt("quantity"));
+                    requestMap.get(borrowRoomId).addDevice(borrowDeviceDetail);
+                }
+            }
+
+            return new ArrayList<>(requestMap.values());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Boolean approveRequest(int borrowRoomId){
+        String sql = "UPDATE borrow_room SET status = 'APPROVED' WHERE id = ?";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setInt(1, borrowRoomId);
+            int rs = stmt.executeUpdate();
+            if(rs > 0) {
+                return true;
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void updateAvailableQuantity(String deviceId, int availableQuantity){
+        String sql = "UPDATE devices SET  available_quantity = ? WHERE id = ?";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setInt(1, availableQuantity);
+            stmt.setString(2, deviceId);
+            stmt.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public Boolean refuseRequest(int borrowRoomId, String rejectReason){
+        String sql = "UPDATE borrow_room SET status = 'REJECTED', reject_reason = ? WHERE id = ?";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setString(1, rejectReason);
+            stmt.setInt(2, borrowRoomId);
+            int rs = stmt.executeUpdate();
+            if(rs > 0) {
+                return true;
+            }
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

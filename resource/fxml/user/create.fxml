@@ -124,7 +124,7 @@
                     </children>
                 </HBox>
 
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <HBox alignment="CENTER" spacing="10.0">
                     <children>
                         <Button fx:id="btnSave" mnemonicParsing="false" prefHeight="35.0" prefWidth="100.0" text="Tạo mới" styleClass="device_button" onAction="#handleSave"/>
                     </children>

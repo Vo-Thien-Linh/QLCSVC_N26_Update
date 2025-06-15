@@ -101,6 +101,11 @@ public class ManagerUserController implements Initializable {
         btnApply.setOnMouseClicked(event -> {
             ObservableList<User> users = tblUsers.getItems();
             List<String> ids = users.stream().filter(User::isSelected).map(User::getUserId).collect(Collectors.toList());
+            if (ids.isEmpty()) {
+                ScannerUtils.showError("Lỗi", "Vui lòng chọn ít nhất một người dùng!");
+                return;
+            }
+
             String status = cboChangeStatus.getSelectionModel().getSelectedItem();
             for(Status userStatus : Status.values()) {
                 if(userStatus.toString().equals(status)) {

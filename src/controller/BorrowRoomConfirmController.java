@@ -1,20 +1,13 @@
 package controller;
 
-import javafx.animation.ScaleTransition;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import javafx.util.Pair;
 import model.*;
 import repository.BorrowRoomRepository;
@@ -22,9 +15,7 @@ import utils.ScannerUtils;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class BorrowRoomConfirmController implements Initializable {
@@ -81,29 +72,20 @@ public class BorrowRoomConfirmController implements Initializable {
         }
 
         List<Device> allDevices = tblDevice.getItems();
-        List<Device> selectedDevices = allDevices.stream()
-                .filter(Device::isSelectedForBorrow)
-                .toList();
-        Optional<Device> invalidDevice = selectedDevices.stream()
-                .filter(device -> device.getQuantityToBorrow() <= 0)
-                .findFirst();
-        if (invalidDevice.isPresent()) {
-            ScannerUtils.showError("Lỗi", "Vui lòng nhập số lượng mượn!");
-            return;
+
+        List<BorrowDeviceDetail> borrowDevicesDetail = new ArrayList<>();
+        for(Device device : allDevices) {
+            borrowDevicesDetail.add(new BorrowDeviceDetail(0, 0, new Device(device.getId(), device.getDeviceName(), null), device.getAvailableQuantity()));
         }
 
-        List<BorrowDevice> borrowDevices = new ArrayList<>();
-        for(Device device : selectedDevices) {
-            borrowDevices.add(new BorrowDevice(0, 0, device.getId(), device.getQuantityToBorrow()));
-        }
-
-        if(ScannerUtils.showConfirm("Xác nhận", "Bạn có chắc chắn muốn mượn phòng " + lbRoomName.getText() + " và " + borrowDevices.size() + " thiết bị kèm theo?")){
+        if(ScannerUtils.showConfirm("Xác nhận", "Bạn có chắc chắn muốn mượn phòng " + lbRoomName.getText() + " và " + borrowDevicesDetail.size() + " thiết bị kèm theo?")){
             if (borrowRoomRepository.isRoomScheduleConflict(roomId, dateBorrow, startPeriod, endPeriod)) {
                 ScannerUtils.showError("Lỗi", "Phòng này đã có người đăng ký trong khoảng thời gian này!");
                 return;
             }
 
-            BorrowRoom data = new BorrowRoom(0, roomId, null, UserSession.getUserId(), dateBorrow, startPeriod, endPeriod, reason,null, null, borrowDevices);
+            User borrower = new User(UserSession.getUserId(), null);
+            BorrowRoom data = new BorrowRoom(0, roomId, null, borrower, dateBorrow, startPeriod, endPeriod, reason,null, null, borrowDevicesDetail);
             Boolean success = borrowRoomRepository.createBorrowRoom(data);
             if(success){
                 ScannerUtils.showInfo("Thông báo", "Gửi yêu cầu mượn phòng thành công! Vui lòng chờ xét duyệt");
@@ -185,97 +167,7 @@ public class BorrowRoomConfirmController implements Initializable {
             colName.setCellValueFactory(new PropertyValueFactory<>("deviceName"));
             colStatus.setCellValueFactory(cellData ->
                     new ReadOnlyStringWrapper(cellData.getValue().getStatus().toString()));
-            colQuantityAvailable.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-            colQuantityBorrow.setCellFactory(column -> new TableCell<>() {
-                private final TextField quantityField = new TextField();
-                private ChangeListener<String> quantityListener;
-
-                {
-                    quantityListener = (obs, oldVal, newVal) -> {
-                        int index = getIndex();
-                        if (index < 0 || index >= getTableView().getItems().size()) return;
-                        Device device = getTableView().getItems().get(index);
-                        if (newVal.isEmpty()) {
-                            device.setQuantityToBorrow(0);
-                            return;
-                        }
-
-                        try {
-                            int value = Integer.parseInt(newVal);
-                            int available = device.getQuantity();
-
-                            if (value < 1) {
-                                quantityField.textProperty().removeListener(quantityListener);
-                                ScannerUtils.showError("Thông báo", "Vui lòng nhập số lượng từ 1 trở lên!");
-                                quantityField.setText(oldVal);
-                                quantityField.textProperty().addListener(quantityListener);
-                            } else if (value > available) {
-                                quantityField.textProperty().removeListener(quantityListener);
-                                ScannerUtils.showError("Thông báo", "Số lượng mượn không được vượt quá số lượng có sẵn");
-                                quantityField.setText(oldVal);
-                                quantityField.textProperty().addListener(quantityListener);
-                            } else {
-                                device.setQuantityToBorrow(value);
-                            }
-                        } catch (NumberFormatException e) {
-                            quantityField.textProperty().removeListener(quantityListener);
-                            ScannerUtils.showError("Lỗi", "Vui lòng chỉ nhập số nguyên!");
-                            quantityField.setText(oldVal);
-                            quantityField.textProperty().addListener(quantityListener);
-                            device.setQuantityToBorrow(0);
-                        }
-                    };
-
-                    quantityField.setPrefWidth(80);
-                    quantityField.setPromptText("Nhập số lượng");
-                    quantityField.textProperty().addListener(quantityListener);
-                }
-
-                @Override
-                protected void updateItem(Void item, boolean empty) {
-                    super.updateItem(item, empty);
-
-                    if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
-                        setGraphic(null);
-                    } else {
-                        Device device = getTableView().getItems().get(getIndex());
-
-                        quantityField.textProperty().removeListener(quantityListener);
-                        quantityField.setPromptText("Nhập số lượng");
-                        quantityField.textProperty().addListener(quantityListener);
-
-                        quantityField.disableProperty().bind(device.selectedForBorrowProperty().not());
-
-                        setGraphic(quantityField);
-                    }
-                }
-            });
-
-
-
-            colBorrow.setCellFactory(tc -> new TableCell<Device, Boolean>() {
-                private final CheckBox checkBox = new CheckBox();
-
-                {
-                    checkBox.setOnAction(e -> {
-                        Device device = getTableView().getItems().get(getIndex());
-                        device.setSelectedForBorrow(checkBox.isSelected());
-                    });
-                }
-
-                @Override
-                protected void updateItem(Boolean item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty) {
-                        setGraphic(null);
-                    } else {
-                        Device device = getTableView().getItems().get(getIndex());
-                        checkBox.setSelected(device.isSelectedForBorrow());
-                        setGraphic(checkBox);
-                    }
-                }
-            });
-
+            colQuantityAvailable.setCellValueFactory(new PropertyValueFactory<>("availableQuantity"));
             tblDevice.setItems(FXCollections.observableArrayList(datas));
             tblDevice.setSelectionModel(null);
         }

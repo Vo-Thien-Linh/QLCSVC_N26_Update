@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class CreateDeviceController {
     @FXML
     private TextField txtName;
-    @FXML private TextField txtType;
+    @FXML private ComboBox<String> deviceTypeCombox;
     @FXML private TextField txtSupplier;
     @FXML private TextField txtPrice;
     @FXML private TextField txtQuantity;
@@ -34,8 +34,6 @@ public class CreateDeviceController {
     @FXML private RadioButton rbUnavailble;
     @FXML private RadioButton rbMaintenance;
     @FXML private RadioButton rbBroken;
-    @FXML private RadioButton rbAllow;
-    @FXML private RadioButton rbNotAllow;
     @FXML private ImageView imagePreview;
     @FXML private File selectedImageFile;
     @FXML private ComboBox<Room> roomComboBox;
@@ -67,7 +65,7 @@ public class CreateDeviceController {
     @FXML
     private void handleSave(ActionEvent event) {
         String name = txtName.getText().trim();
-        String type = txtType.getText().trim();
+        String type = deviceTypeCombox.getValue();
         LocalDate purchaseDate = datePickerImport.getValue();
         String supplier = txtSupplier.getText().trim();
         String priceText = txtPrice.getText().trim();
@@ -114,12 +112,7 @@ public class CreateDeviceController {
             return;
         }
 
-        Boolean isAllow = true;
-        if(rbNotAllow.isSelected()) {
-            isAllow = false;
-        }
-
-        Device data = new Device(null, imageUrl, name, type, purchaseDate, supplier, price, status, selectedRoom, quantity, isAllow);
+        Device data = new Device(null, imageUrl, name, type, purchaseDate, supplier, price, status, selectedRoom, quantity, 0);
         Boolean success = ManagerDeviceRepository.create(data);
         if(success) {
             ScannerUtils.showInfo("Thông báo", "Thiết bị đã thêm thành công!");
@@ -135,7 +128,19 @@ public class CreateDeviceController {
 
     @FXML
     public void initialize() {
+        loadDeviceTypeData();
         loadRoomData();
+    }
+
+    private void loadDeviceTypeData(){
+        if(deviceTypeCombox != null){
+            ArrayList<String> deviceTypeList = managerDeviceRepository.getAllDeviceTypes();
+            deviceTypeCombox.setItems(FXCollections.observableArrayList(deviceTypeList));
+
+            if(!deviceTypeCombox.getItems().isEmpty()){
+                deviceTypeCombox.getSelectionModel().selectFirst();
+            }
+        }
     }
 
     private void loadRoomData() {

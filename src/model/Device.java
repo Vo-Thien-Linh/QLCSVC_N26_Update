@@ -16,11 +16,11 @@ public class Device extends Facilities {
     private DeviceStatus status;
     private Room room;
     private int quantity;
+    private int availableQuantity;
     private boolean deleted;
     private boolean selected;
-    private final BooleanProperty selectedForBorrow = new SimpleBooleanProperty(false);
-    private boolean allow;
-    private Integer quantityToBorrow = 0;
+//    private final BooleanProperty selectedForBorrow = new SimpleBooleanProperty(false);
+//    private Integer quantityToBorrow = 0;
 
     public boolean isSelected() {
         return selected;
@@ -36,7 +36,13 @@ public class Device extends Facilities {
         this.status = status;
     }
 
-    public Device(String id, String thumbnail, String deviceName, String deviceType, LocalDate purchaseDate, String supplier, BigDecimal price, DeviceStatus status, Room room, int quantity, Boolean allow) {
+    public Device(String id, String deviceName, int availableQuantity) {
+        super(id, null, null);
+        this.deviceName = deviceName;
+        this.availableQuantity = availableQuantity;
+    }
+
+    public Device(String id, String thumbnail, String deviceName, String deviceType, LocalDate purchaseDate, String supplier, BigDecimal price, DeviceStatus status, Room room, int quantity, int availableQuantity) {
         super(id, null, null);
         this.thumbnail = thumbnail;
         this.deviceName = deviceName;
@@ -46,8 +52,8 @@ public class Device extends Facilities {
         this.price = price;
         this.status = status;
         this.room = room;
+        this.availableQuantity = availableQuantity;
         this.quantity = quantity;
-        this.allow = allow;
     }
 
     public void updateDevice(String deviceType, int quantity) {
@@ -120,8 +126,11 @@ public class Device extends Facilities {
         this.quantity = quantity;
     }
 
-    public boolean getAllow(){
-        return allow;
+    public int getAvailableQuantity() {
+        return availableQuantity;
+    }
+    public void setAvailableQuantity(int availableQuantity) {
+        this.availableQuantity = availableQuantity;
     }
 
     public boolean isDeleted() {
@@ -132,25 +141,25 @@ public class Device extends Facilities {
         this.deleted = deleted;
     }
 
-    public boolean isSelectedForBorrow() {
-        return selectedForBorrow.get();
-    }
-
-    public void setSelectedForBorrow(boolean selected) {
-        selectedForBorrow.set(selected);
-    }
-
-    public BooleanProperty selectedForBorrowProperty() {
-        return selectedForBorrow;
-    }
-
-    public Integer getQuantityToBorrow() {
-        return quantityToBorrow;
-    }
-
-    public void setQuantityToBorrow(Integer quantityToBorrow) {
-        this.quantityToBorrow = quantityToBorrow;
-    }
+//    public boolean isSelectedForBorrow() {
+//        return selectedForBorrow.get();
+//    }
+//
+//    public void setSelectedForBorrow(boolean selected) {
+//        selectedForBorrow.set(selected);
+//    }
+//
+//    public BooleanProperty selectedForBorrowProperty() {
+//        return selectedForBorrow;
+//    }
+//
+//    public Integer getQuantityToBorrow() {
+//        return quantityToBorrow;
+//    }
+//
+//    public void setQuantityToBorrow(Integer quantityToBorrow) {
+//        this.quantityToBorrow = quantityToBorrow;
+//    }
 
     @Override
     public void informationDisplay() {

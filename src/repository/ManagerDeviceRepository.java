@@ -21,7 +21,7 @@ public class ManagerDeviceRepository {
 
     public static ArrayList<Room> getAllRooms(){
         ArrayList<Room> rooms = new ArrayList<>();
-        String query = "SELECT room_id, room_number FROM room WHERE status = 'AVAILABLE'";
+        String query = "SELECT r.room_id, r.room_number, rt.type_name  FROM room r JOIN room_types rt ON r.room_type_id = rt.id WHERE r.status = 'AVAILABLE'";
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -29,7 +29,8 @@ public class ManagerDeviceRepository {
             while(result.next()) {
                 String roomId = result.getString("room_id");
                 String roomNumber = result.getString("room_number");
-                rooms.add(new Room(roomId, roomNumber));
+                String typeName =  result.getString("type_name");
+                rooms.add(new Room(roomId, roomNumber,  typeName));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -37,13 +38,48 @@ public class ManagerDeviceRepository {
         return rooms;
     }
 
+    public static ArrayList<String> getAllDeviceTypes(){
+        ArrayList<String> deviceTypes = new ArrayList<>();
+        String query = "SELECT type_name FROM device_types";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            ResultSet result = stmt.executeQuery();
+            while(result.next()) {
+                String deviceType = result.getString("type_name");
+                deviceTypes.add(deviceType);
+            }
+            return deviceTypes;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static int getDeviceTypeId(String deviceType){
+        String sql = "SELECT id FROM device_types WHERE type_name = ?";
+        try(Connection conn = DatabaseConnection.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setString(1, deviceType);
+            ResultSet result = stmt.executeQuery();
+            if(result.next()) {
+                return result.getInt("id");
+            }
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     public static Boolean create(Device device) {
-        String query = "INSERT INTO devices (device_name, device_type, purchase_date, supplier, price, status, room_id, quantity, created_at, updated_at, thumbnail, is_borrowable) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        int deviceTypeId = getDeviceTypeId(device.getDeviceType());
+        String query = "INSERT INTO devices (device_name, device_type_id, purchase_date, supplier, price, status, room_id, quantity, created_at, updated_at, thumbnail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
 
             stmt.setString(1, device.getDeviceName());
-            stmt.setString(2, device.getDeviceType());
+            stmt.setInt(2, deviceTypeId);
             stmt.setDate(3, Date.valueOf(device.getPurchaseDate()));
             stmt.setString(4, device.getSupplier());
             stmt.setBigDecimal(5, device.getPrice());
@@ -53,7 +89,6 @@ public class ManagerDeviceRepository {
             stmt.setDate(9, Date.valueOf(device.getCreatedAt()));
             stmt.setDate(10, Date.valueOf(device.getUpdatedAt()));
             stmt.setString(11, device.getThumbnail());
-            stmt.setBoolean(12, device.getAllow());
 
             int resultSet = stmt.executeUpdate();
             if(resultSet > 0) {
@@ -69,14 +104,14 @@ public class ManagerDeviceRepository {
 
 
     public static Room findById(Connection conn, String roomId) throws SQLException {
-        String query = "SELECT room_number FROM room WHERE room_id = ?";
+        String query = "SELECT r.room_number, rt.type_name  FROM room r JOIN room_types rt ON r.room_type_id = rt.id WHERE room_id = ?";
         try(PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, roomId);
 
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                return new Room(roomId, rs.getString("room_number"));
+                return new Room(roomId, rs.getString("room_number"), rs.getString("type_name"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -86,7 +121,7 @@ public class ManagerDeviceRepository {
     }
 
     public static Device DataDevice(String deviceId) {
-        String query = "SELECT * FROM devices WHERE id = ? AND deleted = false";
+        String query = "SELECT d.*, dt.type_name FROM devices d JOIN device_types dt ON d.device_type_id = dt.id WHERE d.id = ? AND d.deleted = false";
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -96,20 +131,20 @@ public class ManagerDeviceRepository {
             if(result.next()) {
                 String thumbnail = result.getString("thumbnail");
                 String deviceName = result.getString("device_name");
-                String deviceType = result.getString("device_type");
+                String deviceType = result.getString("type_name");
                 LocalDate purchaseDate = result.getDate("purchase_date").toLocalDate();
                 String supplier = result.getString("supplier");
                 BigDecimal price = result.getBigDecimal("price");
                 String statusStr = result.getString("status");
                 String roomId = result.getString("room_id");
                 int quantity = result.getInt("quantity");
-                Boolean isAllow = result.getBoolean("is_borrowable");
+                int availableQuantity = result.getInt("available_quantity");
 
                 DeviceStatus status = DeviceStatus.valueOf(statusStr);
 
                 Room room = findById(conn, roomId);
 
-                return new Device(null, thumbnail, deviceName, deviceType, purchaseDate, supplier, price, status, room, quantity, isAllow);
+                return new Device(null, thumbnail, deviceName, deviceType, purchaseDate, supplier, price, status, room, quantity, availableQuantity);
             }
 
         } catch (SQLException e) {
@@ -120,12 +155,13 @@ public class ManagerDeviceRepository {
     }
 
     public static boolean edit(Device device) {
-        String query = "UPDATE devices SET device_name = ?, device_type = ?, purchase_date = ?, supplier = ?, price = ?, status = ?, room_id = ?, quantity = ?, updated_at = ?, thumbnail = ?, is_borrowable = ? WHERE id = ? AND deleted = false";
+        int deviceTypeId = getDeviceTypeId(device.getDeviceType());
+        String query = "UPDATE devices SET device_name = ?, device_type_id = ?, purchase_date = ?, supplier = ?, price = ?, status = ?, room_id = ?, quantity = ?, updated_at = ?, thumbnail = ? WHERE id = ? AND deleted = false";
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, device.getDeviceName());
-            stmt.setString(2, device.getDeviceType());
+            stmt.setInt(2, deviceTypeId);
             stmt.setDate(3, Date.valueOf(device.getPurchaseDate()));
             stmt.setString(4, device.getSupplier());
             stmt.setBigDecimal(5, device.getPrice());
@@ -134,8 +170,7 @@ public class ManagerDeviceRepository {
             stmt.setInt(8, device.getQuantity());
             stmt.setDate(9, Date.valueOf(device.getUpdatedAt()));
             stmt.setString(10, device.getThumbnail());
-            stmt.setBoolean(11, device.getAllow());
-            stmt.setString(12, device.getId());
+            stmt.setString(11, device.getId());
 
             int result = stmt.executeUpdate();
             if(result > 0) {
@@ -170,61 +205,23 @@ public class ManagerDeviceRepository {
         return false;
     }
 
-    //	Tìm kiếm người dùng
-//    public List<Device> searchUsers(String[] keyword){
-//        List<Device> listDevices = new ArrayList<>();
-//        StringBuilder sql = new StringBuilder("SELECT * FROM devices WHERE deleted = false");
-//        for (String kw : keyword) {
-//            sql.append(" AND LOWER(device_name) LIKE ?");
-//        }
-//        try(Connection conn = DatabaseConnection.getConnection();
-//            PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-//            for (int i = 0; i < keyword.length; i++) {
-//                stmt.setString(i + 1, "%" + keyword[i] + "%");
-//            }
-//            ResultSet result = stmt.executeQuery();
-//            while(result.next()) {
-//                String deviceId = result.getString("id");
-//                String thumbnail = result.getString("thumbnail");
-//                String deviceName = result.getString("device_name");
-//                String deviceType = result.getString("device_type");
-//                LocalDate purchaseDate = result.getDate("purchase_date").toLocalDate();
-//                String supplier = result.getString("supplier");
-//                BigDecimal price = result.getBigDecimal("price");
-//                String statusStr = result.getString("status");
-//                String roomId = result.getString("room_id");
-//                int quantity = result.getInt("quantity");
-//
-//                DeviceStatus status = DeviceStatus.valueOf(statusStr);
-//
-//                Room room = findById(conn, roomId);
-//
-//                listDevices.add(new Device(deviceId, thumbnail, deviceName, deviceType, purchaseDate, supplier, price, status, room, quantity));
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return listDevices;
-//    }
-
     public List<Device> filterAndSearch(String status, String keyword, int limitItem, int skip) {
-        String sql = "SELECT * FROM devices WHERE deleted = false";
+        String sql = "SELECT d.*, dt.type_name FROM devices d JOIN device_types dt ON d.device_type_id = dt.id WHERE d.deleted = false";
         List<Object> params = new ArrayList<>();
 
 //        Lọc theo trạng thái
         if (status != null && !status.equals("Tất cả")) {
-            sql += " AND status = ?";
+            sql += " AND d.status = ?";
             params.add(status);
         }
 
 //        Tìm kiếm
         if (keyword != null && !keyword.isBlank()) {
-            sql += " AND LOWER(device_name) LIKE ?";
+            sql += " AND LOWER(d.device_name) LIKE ?";
             params.add("%" + keyword.toLowerCase() + "%");
         }
 
-        sql += " ORDER BY id DESC";
+        sql += " ORDER BY d.id DESC";
 
 //        Phân trang
         sql += " LIMIT ? OFFSET ?";
@@ -244,19 +241,19 @@ public class ManagerDeviceRepository {
                 String deviceId = result.getString("id");
                 String thumbnail = result.getString("thumbnail");
                 String deviceName = result.getString("device_name");
-                String deviceType = result.getString("device_type");
+                String deviceType = result.getString("type_name");
                 LocalDate purchaseDate = result.getDate("purchase_date").toLocalDate();
                 String supplier = result.getString("supplier");
                 BigDecimal price = result.getBigDecimal("price");
                 String statusStr = result.getString("status");
                 String roomId = result.getString("room_id");
                 int quantity = result.getInt("quantity");
-                Boolean isAllow = result.getBoolean("is_borrowable");
+                int availableQuantity = result.getInt("available_quantity");
 
                 DeviceStatus deviceStatus = DeviceStatus.valueOf(statusStr);
                 Room room = findById(conn, roomId);
 
-                list.add(new Device(deviceId, thumbnail, deviceName, deviceType, purchaseDate, supplier, price, deviceStatus, room, quantity, isAllow));
+                list.add(new Device(deviceId, thumbnail, deviceName, deviceType, purchaseDate, supplier, price, deviceStatus, room, quantity, availableQuantity));
             }
 
             return list;

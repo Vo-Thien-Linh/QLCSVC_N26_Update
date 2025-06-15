@@ -161,7 +161,7 @@ public class PageManagerController implements Initializable {
         });
 
         btnBorrowEquipment.setOnAction(e -> {
-            switchView(new Label("⚙️ Đây là mượn thiết bị"));
+            switchView(BorrowDeviceView.getView());
             highlightButton(btnBorrowEquipment);
         });
 

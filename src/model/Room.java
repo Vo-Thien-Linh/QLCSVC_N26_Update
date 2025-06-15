@@ -12,9 +12,10 @@ public class Room {
 
     public Room() {}
 
-    public Room(String id, String roomNumber) {
+    public Room(String id, String roomNumber, String room_type) {
         this.id = id;
         this.roomNumber = roomNumber;
+        this.room_type =  room_type;
     }
 
     public Room(String id, RoomStatus status, String roomNumber, int seatingCapacity, String room_type, String location) {
@@ -91,6 +92,6 @@ public class Room {
 
     @Override
     public String toString() {
-        return roomNumber;
+        return roomNumber + " - " + room_type;
     }
 }

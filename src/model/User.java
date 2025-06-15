@@ -24,6 +24,11 @@ public class User {
         this.selected = selected;
     }
 
+    public User(String id, String fullName) {
+        this.user_id = id;
+        this.fullname = fullName;
+    }
+
     public User(String user_id, String fullname, String username, String thumbnail, LocalDate yearold, String email, String phoneNumber, String password, Status status, Role role) {
         this.user_id = user_id;
         this.fullname = fullname;

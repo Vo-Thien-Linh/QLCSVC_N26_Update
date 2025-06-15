@@ -80,6 +80,50 @@
     -fx-text-fill: black;
 }
 
+.browseButton{
+    -fx-background-color: #2ED8B6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.browseButton:hover{
+    -fx-background-color: #59E0C5;
+}
+
+.refuseButton{
+    -fx-background-color: #FF5370;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.refuseButton:hover{
+    -fx-background-color: #FF869A;
+}
+
+.exportButton{
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.exportButton:hover {
+    -fx-background-color: #08E3FF;
+}
+
+.btnApproveBorrowRequest{
+    -fx-background-color: #00BCD4;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.btnApproveBorrowRequest:hover{
+    -fx-background-color: #007D8D;
+    -fx-text-fill: white;
+}
+
 .table-view {
     -fx-background-color: white;
     -fx-table-cell-border-color: transparent;
@@ -106,6 +150,7 @@
 }
 
 .table-view .column-header .label {
+    -fx-text-fill: white;
     -fx-border-color: transparent;
 }
 
@@ -122,7 +167,7 @@
 
 
 .table-view .column-header-background {
-    -fx-background-color: #f5f5f5;
+    -fx-background-color: #1a326a;
     -fx-border-color: transparent;
     -fx-border-width: 0;
 }

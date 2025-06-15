@@ -1,14 +1,14 @@
 package model;
 
-public enum BorrowRoomStatus {
-    PENDING("Đang duyệt"),
+public enum BorrowStatus {
+    PENDING("Chờ duyệt"),
     APPROVED("Đã duyệt"),
     CANCELLED ("Hủy bỏ"),
     REJECTED("Bị từ chối");
 
     private final String label;
 
-    BorrowRoomStatus(String label) {
+    BorrowStatus(String label) {
         this.label = label;
     }
 

@@ -112,7 +112,7 @@ public class DashboardRepository {
 
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                return new Room(roomId, rs.getString("room_number"));
+                return new Room(roomId, rs.getString("room_number"), null);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -123,9 +123,10 @@ public class DashboardRepository {
 
     public List<Device> filterAndSearch(String roomNumber, String keyword, int limitItem, int skip) {
         String sql = """
-            SELECT d.*
+            SELECT d.*, dt.type_name
             FROM devices d
             JOIN room r ON d.room_id = r.room_id
+            JOIN device_types dt ON dt.id = d.device_type_id
             WHERE d.deleted = FALSE AND r.deleted = FALSE
         """;
         List<Object> params = new ArrayList<>();
@@ -138,11 +139,11 @@ public class DashboardRepository {
 
 //        Tìm kiếm
         if (keyword != null && !keyword.isBlank()) {
-            sql += " AND LOWER(device_name) LIKE ?";
+            sql += " AND LOWER(d.device_name) LIKE ?";
             params.add("%" + keyword.toLowerCase() + "%");
         }
 
-        sql += " ORDER BY id DESC";
+        sql += " ORDER BY d.id DESC";
 
 //        Phân trang
         sql += " LIMIT ? OFFSET ?";
@@ -162,19 +163,19 @@ public class DashboardRepository {
                 String deviceId = result.getString("id");
                 String thumbnail = result.getString("thumbnail");
                 String deviceName = result.getString("device_name");
-                String deviceType = result.getString("device_type");
+                String deviceType = result.getString("type_name");
                 LocalDate purchaseDate = result.getDate("purchase_date").toLocalDate();
                 String supplier = result.getString("supplier");
                 BigDecimal price = result.getBigDecimal("price");
                 String statusStr = result.getString("status");
                 String roomId = result.getString("room_id");
                 int quantity = result.getInt("quantity");
-                Boolean isAllow = result.getBoolean("is_borrowable");
+                int availableQuantity = result.getInt("available_quantity");
 
                 DeviceStatus deviceStatus = DeviceStatus.valueOf(statusStr);
                 Room room = findById(conn, roomId);
 
-                list.add(new Device(deviceId, thumbnail, deviceName, deviceType, purchaseDate, supplier, price, deviceStatus, room, quantity, isAllow));
+                list.add(new Device(deviceId, thumbnail, deviceName, deviceType, purchaseDate, supplier, price, deviceStatus, room, quantity, availableQuantity));
             }
 
             return list;

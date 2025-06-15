@@ -185,7 +185,7 @@
                 <!-- Chart Box -->
                 <VBox fx:id="chartBox" alignment="CENTER" prefWidth="600" spacing="10" style="-fx-background-color: white; -fx-background-radius: 7px; -fx-border-width: 1; -fx-border-radius: 7px; -fx-padding: 10px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.2, 0, 4);">
                     <children>
-                        <Label alignment="CENTER" style="-fx-padding: 0 0 40 0;" text="Biểu đồ sử dụng thiết bị của phòng học">
+                        <Label alignment="CENTER" style="-fx-padding: 0 0 40 0;" text="Số lượng thiết bị của phòng học">
                             <font>
                                 <Font name="Arial Bold" size="24.0" />
                             </font>

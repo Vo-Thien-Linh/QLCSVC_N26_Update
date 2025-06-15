@@ -4,6 +4,7 @@ import javafx.animation.ScaleTransition;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -56,6 +57,7 @@ public class ManagerRoomController implements Initializable {
     @FXML private StackPane btnAddNew;
     @FXML private SVGPath iconAdd;
     @FXML private Text textAdd;
+    @FXML private Button btnApproveBorrowRequest;
 
     private PermissionRepository permissionRepository = new PermissionRepository();
     private ManagerRoomRepository managerRoomRepository = new ManagerRoomRepository();
@@ -85,11 +87,23 @@ public class ManagerRoomController implements Initializable {
         }
     }
 
+    @FXML
+    private void handleActionBrowse(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/room/browse.fxml"));
+            Parent root = loader.load();
+            Stage addNewStage = new Stage();
+            addNewStage.setTitle("Duyệt yêu cầu");
+            addNewStage.setScene(new Scene(root));
+            addNewStage.show();
+        } catch (IOException e) {
+            ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ thêm mới!");
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("Role ID: " + roleId);
-        System.out.println("Can Create: " + canCreate + ", Can Edit: " + canEdit + ", Can Delete: " + canDelete);
-
         setupButton();
         dataDumpCbo();
         cboSearchType.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
@@ -179,7 +193,7 @@ public class ManagerRoomController implements Initializable {
     }
 
     private void setupButton() {
-        if (rootPane != null) {
+        if(rootPane != null){
             Set<Node> buttons = rootPane.lookupAll(".custom-button");
             for (Node node : buttons) {
                 if (node instanceof StackPane btn) {
@@ -207,18 +221,10 @@ public class ManagerRoomController implements Initializable {
                             scaleOut.setToX(0);
                             scaleOut.playFromStart();
                         });
+
                     }
                 }
             }
-
-            btnAddNew.setOnMouseEntered(e -> {
-                iconAdd.setFill(Color.WHITE);
-                textAdd.setFill(Color.WHITE);
-            });
-            btnAddNew.setOnMouseExited(e -> {
-                iconAdd.setFill(Color.web("#4099ff"));
-                textAdd.setFill(Color.web("#4099ff"));
-            });
         }
     }
 

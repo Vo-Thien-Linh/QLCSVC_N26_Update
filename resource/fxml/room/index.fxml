@@ -6,7 +6,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ManagerRoomController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ManagerRoomController" stylesheets="/css/style.css">
     <center>
         <VBox fx:id="rootPane" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #F2F7FB" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
             <children>
@@ -32,6 +32,15 @@
                                         </Text>
                                     </children>
                                 </StackPane>
+                                <Rectangle width="450.0"/>
+                                <Button fx:id="btnApproveBorrowRequest" lineSpacing="1.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="137.0" text="Duyệt đơn mượn" wrapText="true" styleClass="btnApproveBorrowRequest" onAction="#handleActionBrowse">
+                                    <HBox.margin>
+                                        <Insets right="-25.0" />
+                                    </HBox.margin>
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Button>
                             </children>
                         </HBox>
                     </children>
@@ -50,14 +59,6 @@
                                 </Label>
                                 <HBox alignment="CENTER_RIGHT" spacing="50.0" HBox.hgrow="ALWAYS">
                                     <children>
-                                        <Button fx:id="btnApproveBorrowRequest" lineSpacing="1.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="137.0" text="Duyệt đơn mượn" textFill="#4099ff" wrapText="true">
-                                            <HBox.margin>
-                                                <Insets right="-25.0" />
-                                            </HBox.margin>
-                                            <font>
-                                                <Font name="System Bold" size="14.0" />
-                                            </font>
-                                        </Button>
                                         <HBox spacing="10.0">
                                             <ComboBox fx:id="cboChangeStatus" prefHeight="40.0" prefWidth="200.0" promptText="Có sẵn" styleClass="room_change-status" />
                                             <StackPane fx:id="btnApply" style="-fx-cursor: hand" styleClass="custom-button">
