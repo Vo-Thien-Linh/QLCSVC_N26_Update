@@ -283,8 +283,10 @@ public class ManagerRoomController implements Initializable {
                     return new TableCell<Room, Void>() {
                         private final SVGPath editIcon = new SVGPath();
                         private final SVGPath deleteIcon = new SVGPath();
+                        private final SVGPath scheduleIcon = new SVGPath();
                         private final HBox actionBox = new HBox(10);
                         private final StackPane editWrapper;
+                        private final StackPane scheduleWrapper;
 
                         {
                             // Icon chỉnh sửa
@@ -298,6 +300,13 @@ public class ManagerRoomController implements Initializable {
                             deleteIcon.setContent("M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z");
                             deleteIcon.setFill(Color.web("#F44336"));
                             deleteIcon.setCursor(Cursor.HAND);
+
+                            // Icon lịch
+                            scheduleIcon.setContent("M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V8h14v12z");
+                            scheduleIcon.setFill(Color.web("#2196F3"));
+                            scheduleWrapper = new StackPane(scheduleIcon);
+                            scheduleWrapper.setPrefSize(24, 24);
+                            scheduleWrapper.setStyle("-fx-cursor: hand;");
 
                             editWrapper.setOnMouseClicked(event -> {
                                 Room room = getTableView().getItems().get(getIndex());
@@ -324,10 +333,29 @@ public class ManagerRoomController implements Initializable {
                                 }
                             });
 
+                            scheduleWrapper.setOnMouseClicked(event -> {
+                                Room room = getTableView().getItems().get(getIndex());
+                                System.out.println("Schedule icon clicked for room: " + room.getRoomNumber());
+                                try {
+                                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SChedule/Schedule.fxml"));
+                                    Parent root = loader.load();
+                                    RoomScheduleController controller = loader.getController();
+                                    controller.setRoomId(room.getId());
+                                    Stage stage = new Stage();
+                                    stage.setTitle("Lịch mượn phòng: " + room.getRoomNumber());
+                                    stage.setScene(new Scene(root));
+                                    stage.show();
+                                } catch (IOException e) {
+                                    ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ lịch!");
+                                    e.printStackTrace();
+                                }
+                            });
+
                             actionBox.setAlignment(Pos.CENTER);
                             if (canEdit) {
                                 actionBox.getChildren().add(editWrapper);
                             }
+                            actionBox.getChildren().add(scheduleWrapper); // Thêm icon lịch
                             if (canDelete) {
                                 actionBox.getChildren().add(deleteIcon);
                             }
@@ -347,6 +375,7 @@ public class ManagerRoomController implements Initializable {
                                 } else {
                                     System.out.println("Edit icon not added due to lack of edit permission.");
                                 }
+                                System.out.println("Adding schedule icon for room: " + room.getRoomNumber());
                                 if (canDelete) {
                                     System.out.println("Adding delete icon for room: " + room.getRoomNumber());
                                 } else {

@@ -85,6 +85,7 @@ CREATE TABLE devices (
     status ENUM('AVAILABLE', 'UNAVAILABLE', 'UNDER_MAINTENANCE', 'BROKEN', 'DISCARDED') DEFAULT 'AVAILABLE', -- Đồng bộ với DeviceStatus
     room_id VARCHAR(255),
     quantity INT DEFAULT 1,
+	available_quantity  INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted BOOLEAN DEFAULT FALSE,
@@ -347,30 +348,39 @@ INSERT INTO room (room_id, status, room_number, seating_capacity, deleted, room_
 ('R016', 'AVAILABLE', 'A213', 28, 0, 4, 'Khu A2'),
 ('R017', 'AVAILABLE', 'A214', 8, 0, 5, 'Khu A2');
 
+INSERT INTO device_types (id, type_name) VALUES
+(1, 'Thiết bị trình chiếu và âm thanh'),
+(2, 'Máy tính'),
+(3, 'Bộ phát wifi'),
+(4, 'Ổ cắm điện'),
+(5, 'Quạt trần'),
+(6, 'Bóng đèn');
+
 -- 5. Insert devices (đồng bộ với cấu trúc mới)
 INSERT INTO devices (
     id, device_name, device_type_id, purchase_date, supplier, price, status,
-    room_id, quantity, created_at, updated_at, deleted, thumbnail) VALUES
-   ('D001', 'micro', 1, '2006-09-12', 'anhh', 120000.00, 'UNDER_MAINTENANCE', 'R001', 1, '2025-05-01 00:00:00', '2025-05-30 10:01:48', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747476219/tjwrnnfzgxengjil9ezx.jpg'),
-   ('D002', 'máy chiếu', 1, '2008-09-13', 'addi', 12000000.00, 'AVAILABLE', 'R002', 1, '2025-05-01 00:00:00', '2025-05-02 18:40:09', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1746185908/parmi9gbcnpmape8k2bg.jpg'),
-   ('D003', 'Máy chiếu', 1, '2005-09-12', 'ad', 120000000.00, 'AVAILABLE', 'R003', 1, '2025-05-02 00:00:00', '2025-05-29 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747476240/nuajtmk7d7cwfv0bfaib.jpg'),
-   ('D004', 'Loa', 1, '2000-09-12', 'dsd', 120000000.00, 'UNAVAILABLE', 'R002', 2, '2025-05-02 00:00:00', '2025-05-02 18:55:39', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1746186928/unje6kfrnntmrpawzvhx.jpg'),
-   ('D005', 'Loa', 1, '2010-04-28', 'adidas', 14000000.00, 'AVAILABLE', 'R001', 3, '2025-05-16 00:00:00', '2025-05-18 21:00:29', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747476309/ve1at9h62ce6y5g4kzrq.jpg'),
-   ('D006', 'micro', 1, '2014-04-29', 'addd', 120000.00, 'UNAVAILABLE', 'R004', 2, '2025-05-16 00:00:00', '2025-05-21 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747379389/lw87w2rui2qci0uqtscc.jpg'),
-   ('D007', 'máy chiếu', 1, '2021-05-13', 'qer', 14000000.00, 'UNAVAILABLE', 'R003', 1, '2025-05-16 00:00:00', '2025-05-18 21:00:58', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747381895/qvp28lvaplekq8pu2l85.jpg'),
-   ('D008', 'Loa', 1, '2010-04-29', 'er', 13000000.00, 'UNAVAILABLE', 'R005', 1, '2025-05-16 00:00:00', '2025-05-21 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747382464/vgtmkw2x0bmwhg5mdgxt.jpg'),
-   ('D009', 'micro', 1, '2021-05-05', 'df', 1200000.00, 'UNAVAILABLE', 'R002', 1, '2025-05-16 00:00:00', '2025-05-18 21:00:58', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747382757/okx6cjpnayzyqzcbfnsv.jpg'),
-   ('D010', 'máy chiếu', 1, '2021-04-29', 'fg', 12000000.00, 'AVAILABLE', 'R001', 1, '2025-05-16 00:00:00', '2025-06-01 08:58:40', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747383878/ttzqcg7esxlycmvahahy.jpg'),
-   ('D011', 'micro', 1, '2018-04-28', 'df', 1300000.00, 'UNAVAILABLE', 'R003', 1, '2025-05-16 00:00:00', '2025-05-20 20:43:01', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747385161/t8fqdylcpl296v4omaq8.jpg'),
-   ('D012', 'máy chiếu', 1, '2021-04-29', 'qq', 13000000.00, 'UNAVAILABLE', 'R002', 2, '2025-05-16 00:00:00', '2025-05-18 21:02:14', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747394291/zvbxfsh5ptkpgy4syiu2.jpg'),
-   ('D013', 'Loa', 1, '2021-05-11', 'fe', 120000000.00, 'UNDER_MAINTENANCE', 'R003', 3, '2025-05-18 00:00:00', '2025-05-18 21:00:21', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747557414/ocraqs2yv9lb8r2lknn0.jpg'),
-   ('D014', 'Máy tính', 2, '2016-05-04', 'lind', 19000000.00, 'UNAVAILABLE', 'R008', 20, '2025-05-22 00:00:00', '2025-05-22 13:09:29', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894064/jppih1urlvit6p8u6oit.jpg'),
-   ('D015', 'Bộ phát wifi', 3, '2021-04-28', 'kfc', 1000000.00, 'BROKEN', 'R009', 1, '2025-05-22 00:00:00', '2025-05-22 14:27:35', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894288/xn2wuh5rzzpxxslgrbbt.jpg'),
-   ('D016', 'Ô cắm điện', 4, '2022-05-03', 'xyz', 200000.00, 'BROKEN', 'R012', 3, '2025-05-22 00:00:00', '2025-05-22 14:27:35', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894389/vs1uvoyzuv3wp7homn3n.jpg'),
-   ('D017', 'Quạt trần', 5, '2018-05-11', 'denis', 2000000.00, 'AVAILABLE', 'R015', 6, '2025-05-22 00:00:00', '2025-05-22 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747897818/d9ngbxibhoxuxxmxyrrp.jpg'),
-   ('D018', 'Bóng đèn', 6, '2019-04-29', 'dass', 400000.00, 'UNDER_MAINTENANCE', 'R014', 6, '2025-05-22 00:00:00', '2025-05-30 10:01:48', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747898017/lgzhdj9bwoww3gnq46er.jpg'),
-   ('D019', 'Bộ phát wifi', 3, '2013-04-29', 'rebe', 500000.00, 'AVAILABLE', 'R017', 2, '2025-05-25 00:00:00', '2025-05-29 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1748142113/h4tpgqxhvblyocm8kogq.jpg'),
-   ('D020', 'Ổ cắm điện', 4, '2021-04-30', 'qer', 120000.00, 'AVAILABLE', 'R014', 3, '2025-05-29 00:00:00', '2025-05-29 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1748527511/w8grorlxgceiwk0goulr.jpg');
+    room_id, quantity, available_quantity, created_at, updated_at, deleted, thumbnail
+) VALUES
+('D001', 'micro', 1, '2006-09-12', 'anhh', 120000.00, 'UNDER_MAINTENANCE', 'R001', 1, 1, '2025-05-01 00:00:00', '2025-05-30 10:01:48', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747476219/tjwrnnfzgxengjil9ezx.jpg'),
+('D002', 'máy chiếu', 1, '2008-09-13', 'addi', 12000000.00, 'AVAILABLE', 'R002', 1, 1, '2025-05-01 00:00:00', '2025-05-02 18:40:09', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1746185908/parmi9gbcnpmape8k2bg.jpg'),
+('D003', 'Máy chiếu', 1, '2005-09-12', 'ad', 120000000.00, 'AVAILABLE', 'R003', 1, 1, '2025-05-02 00:00:00', '2025-05-29 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747476240/nuajtmk7d7cwfv0bfaib.jpg'),
+('D004', 'Loa', 1, '2000-09-12', 'dsd', 120000000.00, 'UNAVAILABLE', 'R002', 2, 2, '2025-05-02 00:00:00', '2025-05-02 18:55:39', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1746186928/unje6kfrnntmrpawzvhx.jpg'),
+('D005', 'Loa', 1, '2010-04-28', 'adidas', 14000000.00, 'AVAILABLE', 'R001', 3, 3, '2025-05-16 00:00:00', '2025-05-18 21:00:29', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747476309/ve1at9h62ce6y5g4kzrq.jpg'),
+('D006', 'micro', 1, '2014-04-29', 'addd', 120000.00, 'UNAVAILABLE', 'R004', 2, 2, '2025-05-16 00:00:00', '2025-05-21 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747379389/lw87w2rui2qci0uqtscc.jpg'),
+('D007', 'máy chiếu', 1, '2021-05-13', 'qer', 14000000.00, 'UNAVAILABLE', 'R003', 1, 1, '2025-05-16 00:00:00', '2025-05-18 21:00:58', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747381895/qvp28lvaplekq8pu2l85.jpg'),
+('D008', 'Loa', 1, '2010-04-29', 'er', 13000000.00, 'UNAVAILABLE', 'R005', 1, 1, '2025-05-16 00:00:00', '2025-05-21 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747382464/vgtmkw2x0bmwhg5mdgxt.jpg'),
+('D009', 'micro', 1, '2021-05-05', 'df', 1200000.00, 'UNAVAILABLE', 'R002', 1, 1, '2025-05-16 00:00:00', '2025-05-18 21:00:58', 1, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747382757/okx6cjpnayzyqzcbfnsv.jpg'),
+('D010', 'máy chiếu', 1, '2021-04-29', 'fg', 12000000.00, 'AVAILABLE', 'R001', 1, 1, '2025-05-16 00:00:00', '2025-06-01 08:58:40', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747383878/ttzqcg7esxlycmvahahy.jpg'),
+('D011', 'micro', 1, '2018-04-28', 'df', 1300000.00, 'UNAVAILABLE', 'R003', 1, 1, '2025-05-16 00:00:00', '2025-05-20 20:43:01', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747385161/t8fqdylcpl296v4omaq8.jpg'),
+('D012', 'máy chiếu', 1, '2021-04-29', 'qq', 13000000.00, 'UNAVAILABLE', 'R002', 2, 2, '2025-05-16 00:00:00', '2025-05-18 21:02:14', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747394291/zvbxfsh5ptkpgy4syiu2.jpg'),
+('D013', 'Loa', 1, '2021-05-11', 'fe', 120000000.00, 'UNDER_MAINTENANCE', 'R003', 3, 3, '2025-05-18 00:00:00', '2025-05-18 21:00:21', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747557414/ocraqs2yv9lb8r2lknn0.jpg'),
+('D014', 'Máy tính', 2, '2016-05-04', 'lind', 19000000.00, 'UNAVAILABLE', 'R008', 20, 20, '2025-05-22 00:00:00', '2025-05-22 13:09:29', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894064/jppih1urlvit6p8u6oit.jpg'),
+('D015', 'Bộ phát wifi', 3, '2021-04-28', 'kfc', 1000000.00, 'BROKEN', 'R009', 1, 1, '2025-05-22 00:00:00', '2025-05-22 14:27:35', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894288/xn2wuh5rzzpxxslgrbbt.jpg'),
+('D016', 'Ô cắm điện', 4, '2022-05-03', 'xyz', 200000.00, 'BROKEN', 'R012', 3, 3, '2025-05-22 00:00:00', '2025-05-22 14:27:35', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894389/vs1uvoyzuv3wp7homn3n.jpg'),
+('D017', 'Quạt trần', 5, '2018-05-11', 'denis', 2000000.00, 'AVAILABLE', 'R015', 6, 6, '2025-05-22 00:00:00', '2025-05-22 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747897818/d9ngbxibhoxuxxmxyrrp.jpg'),
+('D018', 'Bóng đèn', 6, '2019-04-29', 'dass', 400000.00, 'UNDER_MAINTENANCE', 'R014', 6, 6, '2025-05-22 00:00:00', '2025-05-30 10:01:48', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747898017/lgzhdj9bwoww3gnq46er.jpg'),
+('D019', 'Bộ phát wifi', 3, '2013-04-29', 'rebe', 500000.00, 'AVAILABLE', 'R017', 2, 2, '2025-05-25 00:00:00', '2025-05-29 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1748142113/h4tpgqxhvblyocm8kogq.jpg'),
+('D020', 'Ổ cắm điện', 4, '2021-04-30', 'qer', 120000.00, 'AVAILABLE', 'R014', 3, 3, '2025-05-29 00:00:00', '2025-05-29 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1748527511/w8grorlxgceiwk0goulr.jpg');
 
 -- Insert borrow_room
 INSERT INTO borrow_room (
