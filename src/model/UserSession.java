@@ -1,24 +1,22 @@
 package model;
 
-public class UserSession {
-    private static String userId = "MTL0001";
-    private static int roleId = 3;
+    public class UserSession {
+        private static String userId = null;
+        private static int roleId = 0;
 
-    public static void startSession(String id) {
-        userId = id;
+        public static void startSession(String id, int role) {
+            userId = id;
+            roleId = role;
+        }
+        public static String getUserId() {
+            return userId;
+        }
+        public static int getRoleId() {
+            return roleId;
+        }
+        public static void clearSession() {
+            userId = null;
+            roleId = 0;
+        }
     }
-
-    public static String getUserId() {
-        return userId;
-    }
-
-    public static int getRoleId() {
-        return roleId;
-    }
-
-    public static void clearSession() {
-        userId = "";
-        roleId = 0;
-    }
-}
 

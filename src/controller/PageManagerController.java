@@ -1,20 +1,26 @@
 package controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
+import javafx.stage.Stage;
 import model.UserSession;
 import repository.PermissionRepository;
 import view.*;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -229,6 +235,7 @@ public class PageManagerController implements Initializable {
         MenuItem logoutItem = new MenuItem("Đăng xuất");
         logoutItem.setGraphic(logoutIcon);
         logoutItem.getStyleClass().add("manager_menu-item");
+        logoutItem.setOnAction(e -> handleLogout());
 
 
         contextMenu.getItems().addAll(profileItem, settingsItem, logoutItem);
@@ -250,5 +257,51 @@ public class PageManagerController implements Initializable {
             btn.getStyleClass().remove("active");
         }
         activeButton.getStyleClass().add("active");
+    }
+    public void loadContentBasedOnRole() {
+        try {
+            String contentPath = "";
+            int roleId = UserSession.getRoleId();
+            switch (roleId) {
+                case 3: // Quản trị viên
+                    contentPath = "/fxml/layout/PageManagerView.fxml"; // Tổng quan quản lý
+                    break;
+                case 5: // Giáo viên
+                    contentPath = "/fxml/borrow-device/index.fxml.fxml"; // Mượn thiết bị
+                    break;
+                case 6: // Bảo trì
+                    contentPath = "/fxml/statistical/index.fxml.fxml"; // Thống kê
+                    break;
+                default:
+                    contentPath = "/fxml/login/index.fxml"; // Fallback
+                    break;
+            }
+            if (getClass().getResource(contentPath) != null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(contentPath));
+                Pane content = loader.load();
+                contentPane.getChildren().setAll(content);
+            } else {
+                System.err.println("File FXML không tồn tại: " + contentPath);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi tải nội dung: " + e.getMessage());
+        }
+    }
+    private void handleLogout() {
+        // Xóa session
+        UserSession.clearSession();
+
+        try {
+            // Tải lại giao diện đăng nhập
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login/index.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) userBox.getScene().getWindow(); // Lấy Stage từ userBox
+            stage.setScene(new Scene(root, 1350, 721));
+            stage.setTitle("Đăng nhập");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

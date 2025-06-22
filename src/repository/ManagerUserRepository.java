@@ -381,4 +381,36 @@ public class ManagerUserRepository {
 
         return null;
     }
+    public User getUserByUsername(String username) {
+        String sql = "SELECT u.*, r.role_id, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.deleted = false AND u.username = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String userId = rs.getString("user_id");
+                String fullname = rs.getString("fullname");
+                String thumbnail = rs.getString("thumbnail");
+                LocalDate yearold = rs.getDate("yearold").toLocalDate();
+                String email = rs.getString("email");
+                String phoneNumber = rs.getString("phoneNumber");
+                String password = rs.getString("password");
+                String statusString = rs.getString("status");
+                int roleId = rs.getInt("role_id");
+                String roleString = rs.getString("role_name");
+
+                Status statusUser = Status.valueOf(statusString);
+                Role role = new Role(roleId, roleString);
+
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
