@@ -337,6 +337,28 @@
     -fx-background-color: #4099ff;
     -fx-text-fill: white;
 }
+.vbox_background_center{
+    -fx-background-image: url("/img/img5_UTC2.jpg");
+}
+.vbox_background_right{
+    -fx-background-image: url("/img/img-utc.jpg");
+    -fx-fill: rgba(255, 255, 255, 0.5);
+}
+#tempPasswordField {
+    -fx-background-radius: 50;
+    -fx-pref-height: 53;
+    -fx-pref-width: 419;
+    -fx-font-family: "Cambria";
+    -fx-font-size: 20;
+}
+.transparent-notification {
+    -fx-background-color: transparent; /* Đảm bảo nền trong suốt */
+    -fx-background-insets: 0; /* Loại bỏ insets gây màu trắng */
+    -fx-padding: 0; /* Loại bỏ padding */
+    -fx-border-color: transparent; /* Loại bỏ viền */
+    -fx-text-fill: #ff0000; /* Màu chữ đỏ để nổi bật */
+    -fx-font-size: 18px; /* Điều chỉnh kích thước chữ */
+}
 /*end pagination*/
 
 

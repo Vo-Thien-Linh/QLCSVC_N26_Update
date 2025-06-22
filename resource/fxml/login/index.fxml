@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="721.0" prefWidth="1350.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+   <center>
+      <VBox prefHeight="724.0" prefWidth="834.0" style="-fx-background-color: rgba(255, 255, 255, 0.8);" styleClass="vbox_background_center" stylesheets="/css/style.css" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_RIGHT" prefHeight="311.0" prefWidth="834.0" style="-fx-background-color: rgba(255, 255, 255, 0.4);">
+               <padding>
+                  <Insets right="30.0" />
+               </padding>
+            </HBox>
+            <VBox alignment="TOP_CENTER" prefHeight="603.0" prefWidth="834.0" style="-fx-background-color: rgba(255, 255, 255, 0.4);">
+               <children>
+                  <HBox prefHeight="111.0" prefWidth="824.0">
+                     <children>
+                        <Label contentDisplay="CENTER" prefHeight="114.0" prefWidth="838.0" text="Facilities">
+                           <font>
+                              <Font name="Impact" size="64.0" />
+                           </font>
+                           <textFill>
+                              <LinearGradient cycleMethod="REPEAT" endX="1.0" endY="1.0" startX="0.11848341232227488">
+                                 <stops>
+                                    <Stop>
+                                       <color>
+                                          <Color red="1.0" green="1.0" blue="0.28999999165534973" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.4061302681992335">
+                                       <color>
+                                          <Color red="1.0" green="1.0" blue="0.28999999165534973" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="1.0">
+                                       <color>
+                                          <Color red="1.0" green="1.0" blue="1.0" />
+                                       </color>
+                                    </Stop>
+                                 </stops>
+                              </LinearGradient>
+                           </textFill>
+                           <padding>
+                              <Insets left="50.0" />
+                           </padding></Label>
+                     </children></HBox>
+                  <HBox prefHeight="110.0" prefWidth="831.0">
+                     <children>
+                        <Label alignment="BASELINE_LEFT" prefHeight="110.0" prefWidth="403.0" text="Manager" textAlignment="JUSTIFY">
+                           <font>
+                              <Font name="Impact" size="64.0" />
+                           </font>
+                           <textFill>
+                              <LinearGradient cycleMethod="REPEAT" endX="1.0" endY="1.0" startX="0.11848341232227488">
+                                 <stops>
+                                    <Stop>
+                                       <color>
+                                          <Color red="0.10020711272954941" green="0.3420403003692627" blue="0.6184210777282715" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.7279693486590035">
+                                       <color>
+                                          <Color red="0.10020711272954941" green="0.3420403003692627" blue="0.6184210777282715" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="1.0">
+                                       <color>
+                                          <Color red="1.0" green="1.0" blue="1.0" />
+                                       </color>
+                                    </Stop>
+                                 </stops>
+                              </LinearGradient>
+                           </textFill>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="150.0" />
+                     </padding></HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="607.0" text="UTC2" textAlignment="RIGHT">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <font>
+                              <Font name="Impact" size="64.0" />
+                           </font>
+                           <textFill>
+                              <LinearGradient cycleMethod="REPEAT" endX="1.0" endY="1.0" startX="0.11848341232227488">
+                                 <stops>
+                                    <Stop>
+                                       <color>
+                                          <Color red="0.9325129985809326" green="0.9736841917037964" blue="0.35611599683761597" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.4061302681992335">
+                                       <color>
+                                          <Color red="0.9325129985809326" green="0.9736841917037964" blue="0.35611599683761597" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="1.0">
+                                       <color>
+                                          <Color red="1.0" green="1.0" blue="1.0" />
+                                       </color>
+                                    </Stop>
+                                 </stops>
+                              </LinearGradient>
+                           </textFill></Label>
+                     </children></HBox>
+               </children>
+            </VBox>
+         </children></VBox>
+   </center>
+   <right>
+      <VBox prefHeight="729.0" prefWidth="619.0" styleClass="vbox_background_right" stylesheets="/css/style.css" BorderPane.alignment="CENTER">
+         <children>
+            <VBox prefHeight="728.0" prefWidth="619.0" style="-fx-background-color: rgba(255, 255, 255, 0.5);">
+               <children>
+                  <HBox prefHeight="217.0" prefWidth="624.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="225.0" prefWidth="621.0" text="Đăng nhập">
+                           <font>
+                              <Font name="Cambria Bold Italic" size="45.0" />
+                           </font>
+                           <textFill>
+                              <LinearGradient cycleMethod="REPEAT" endX="0.7440758293838863" endY="0.7345971563981042" proportional="false">
+                                 <stops>
+                                    <Stop>
+                                       <color>
+                                          <Color red="0.24774609506130219" green="0.4991735816001892" blue="0.6447368264198303" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="0.7394636015325666">
+                                       <color>
+                                          <Color red="0.24774609506130219" green="0.4991735816001892" blue="0.6447368264198303" />
+                                       </color>
+                                    </Stop>
+                                    <Stop offset="1.0">
+                                       <color>
+                                          <Color red="1.0" green="1.0" blue="1.0" />
+                                       </color>
+                                    </Stop>
+                                 </stops>
+                              </LinearGradient>
+                           </textFill>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <GridPane prefHeight="217.0" prefWidth="619.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <TextField fx:id="userField" prefHeight="50.0" prefWidth="560.0" promptText="Tên đăng nhập" style="-fx-background-radius: 50;">
+                           <font>
+                              <Font name="Cambria" size="20.0" />
+                           </font>
+                           <GridPane.margin>
+                              <Insets left="100.0" right="100.0" />
+                           </GridPane.margin>
+                        </TextField>
+                        <PasswordField fx:id="PasswordField" prefHeight="53.0" prefWidth="419.0" promptText="Mật khẩu" style="-fx-background-radius: 50;" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets left="100.0" right="100.0" />
+                           </GridPane.margin>
+                           <font>
+                              <Font name="Cambria" size="20.0" />
+                           </font>
+                        </PasswordField>
+                        <TextField fx:id="tempPasswordField" managed="false" prefHeight="53.0" prefWidth="419.0" style="-fx-background-radius: 50;" visible="false" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets left="100.0" right="100.0" />
+                           </GridPane.margin>
+                           <font>
+                              <Font name="Cambria" size="26.0" />
+                           </font>
+                        </TextField>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="51.0" prefWidth="469.0" GridPane.rowIndex="2">
+                           <children>
+                              <CheckBox fx:id="displaypassword" mnemonicParsing="false" onAction="#togglePasswordVisibility" prefHeight="40.0" prefWidth="243.0" text="Hiển thị mật khẩu" textFill="#a82222">
+                                 <font>
+                                    <Font name="Cambria" size="17.0" />
+                                 </font>
+                                 <cursor>
+                                    <Cursor fx:constant="OPEN_HAND" />
+                                 </cursor>
+                              </CheckBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </GridPane>
+                  <VBox prefHeight="127.0" prefWidth="624.0">
+                     <children>
+                        <Button fx:id="login" alignment="CENTER" mnemonicParsing="false" onAction="#onHelloButtonClick" prefHeight="56.0" prefWidth="221.0" style="-fx-background-color: rgba(17, 140, 46, 0.9); -fx-background-radius: 30;" text="Đăng nhập" textFill="#4cdd42">
+                           <opaqueInsets>
+                              <Insets left="300.0" />
+                           </opaqueInsets>
+                           <VBox.margin>
+                              <Insets left="200.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font name="Cambria" size="20.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="CLOSED_HAND" />
+                           </cursor>
+                        </Button>
+                        <Button fx:id="forgot" mnemonicParsing="false" onAction="#forgotPassword" prefHeight="55.0" prefWidth="224.0" style="-fx-background-color: rgba(196, 118, 88, 0.9); -fx-background-radius: 30;" text="Quên mật khẩu" textFill="#d71313">
+                           <VBox.margin>
+                              <Insets left="200.0" top="10.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="CLOSED_HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </VBox>
+                  <TextArea fx:id="notificationArea" disable="true" editable="false" prefHeight="23.0" prefWidth="619.0" promptText="* Thông báo *" styleClass="transparent-notification" wrapText="true">
+                     <VBox.margin>
+                        <Insets top="50.0" />
+                     </VBox.margin>
+                     <cursor>
+                        <Cursor fx:constant="TEXT" />
+                     </cursor>
+                  </TextArea>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </right>
+</BorderPane>
