@@ -78,12 +78,15 @@ public class User {
         return status;
     }
 
-
     public Role getRole() {
         return role;
     }
 
     public Boolean deleted() {
         return deleted;
+    }
+
+    public void setPassword(String password) {
+        this.password = password; // Đảm bảo gán giá trị mới
     }
 }
