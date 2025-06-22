@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="595.0" prefWidth="920.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.login.Fogot">
+<BorderPane prefHeight="595.0" prefWidth="920.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ForgotPasswordController">
    <left>
       <VBox prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #8B0016;" BorderPane.alignment="CENTER">
          <children>
-            <Label contentDisplay="CENTER" prefHeight="119.0" prefWidth="400.0" text="Fogot " textAlignment="CENTER" textFill="#d8f235">
+            <Label text="Forgot" textAlignment="CENTER" textFill="#d8f235">
                <font>
                   <Font name="Arial Black" size="39.0" />
                </font>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
             </Label>
-            <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="120.0" prefWidth="407.0" text="Password" textAlignment="RIGHT" textFill="#edff49">
+            <Label text="Password" textAlignment="RIGHT" textFill="#edff49">
                <font>
                   <Font name="Arial Black" size="44.0" />
                </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
             </Label>
-            <Label alignment="TOP_LEFT" contentDisplay="RIGHT" nodeOrientation="RIGHT_TO_LEFT" prefHeight="110.0" prefWidth="233.0" text="?" textAlignment="RIGHT" textFill="#c5fc2d">
+            <Label nodeOrientation="RIGHT_TO_LEFT" text="?" textAlignment="RIGHT" textFill="#c5fc2d">
                <font>
                   <Font name="Calibri Bold Italic" size="84.0" />
                </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
             </Label>
          </children>
          <padding>
@@ -33,63 +43,129 @@
    <center>
       <BorderPane BorderPane.alignment="CENTER">
          <top>
-            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="214.0" prefWidth="520.0" style="-fx-background-color: #EE7C6B;" text="Vui lòng nhập đầy đủ các thông tin " textAlignment="CENTER" textFill="#cd0d0d">
-                     <font>
-                        <Font name="Calibri Light Italic" size="33.0" />
-                     </font>
-                  </Label>
-               </children></VBox>
+            <VBox alignment="CENTER" style="-fx-background-color: #EE7C6B;">
+               <Label alignment="CENTER" prefHeight="70.0" prefWidth="520.0" text="Vui lòng nhập đầy đủ các thông tin" textAlignment="CENTER" textFill="#cd0d0d">
+                  <font>
+                     <Font name="Calibri Italic" size="27.0" />
+                  </font>
+                  <VBox.margin>
+                     <Insets top="20.0" />
+                  </VBox.margin>
+                  <style>
+                     -fx-background-color: #EE7C6B;
+                  </style>
+               </Label>
+            </VBox>
          </top>
          <bottom>
-            <VBox prefHeight="157.0" prefWidth="520.0" style="-fx-background-color: #EE7C6B;" BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" prefHeight="57.0" prefWidth="520.0" style="-fx-background-color: #EE7C6B;">
                <children>
-                  <Button fx:id="back" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="34.0" prefWidth="104.0" style="-fx-background-color: #C8E2B1;" text="Quay lại" textAlignment="CENTER" textFill="#358f2e">
+                  <Button fx:id="submitButton" alignment="CENTER" contentDisplay="CENTER" onAction="#submitNewPassword" prefWidth="106.0" text="Xác nhận" textFill="#ff7708">
                      <font>
                         <Font name="Calibri Bold" size="18.0" />
                      </font>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
                      <VBox.margin>
-                        <Insets left="200.0" top="50.0" />
+                        <Insets top="10.0" />
                      </VBox.margin>
+                     <style>
+                        -fx-background-color: #FFFFFF;
+                        -fx-pref-height: 34.0;
+                        -fx-pref-width: 105.0;
+                     </style>
                   </Button>
-               </children></VBox>
+                  <Button fx:id="backButton" onAction="#backToLogin" text="Quay lại" textFill="#358f2e">
+                     <font>
+                        <Font name="Calibri Bold" size="18.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                     <style>
+                        -fx-background-color: #C8E2B1;
+                        -fx-pref-height: 34.0;
+                        -fx-pref-width: 104.0;
+                     </style>
+                     <cursor>
+                        <Cursor fx:constant="CLOSED_HAND" />
+                     </cursor>
+                  </Button>
+                  <TextArea fx:id="notificationArea" editable="false" styleClass="transparent-notification" wrapText="true">
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                     <style>
+                        -fx-pref-height: 64.0;
+                        -fx-pref-width: 520.0;
+                     </style>
+                  </TextArea>
+               </children>
+            </VBox>
          </bottom>
          <center>
-            <GridPane style="-fx-background-color: #EE7C6B;" BorderPane.alignment="CENTER">
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
+            <GridPane alignment="CENTER" style="-fx-background-color: #EE7C6B;">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+               </rowConstraints>
                <children>
-                  <TextField opacity="0.74" prefHeight="42.0" prefWidth="520.0" promptText="Nhập email">
+                  <TextField fx:id="emailField" promptText="Nhập email" GridPane.rowIndex="0">
                      <font>
                         <Font name="Calibri Bold" size="20.0" />
                      </font>
+                     <style>
+                        -fx-opacity: 0.74;
+                        -fx-pref-height: 42.0;
+                        -fx-pref-width: 520.0;
+                     </style>
                   </TextField>
-                  <TextField opacity="0.73" prefHeight="40.0" prefWidth="520.0" promptText="Nhập mật khẩu mới" GridPane.rowIndex="2">
+                  <Button fx:id="sendCodeButton" onAction="#sendVerificationCode" text="Gửi mã" GridPane.rowIndex="1">
+                     <font>
+                        <Font name="Calibri Bold" size="12.0" />
+                     </font>
+                     <style>
+                        -fx-pref-height: 25.0;
+                        -fx-pref-width: 87.0;
+                     </style>
+                     <cursor>
+                        <Cursor fx:constant="CLOSED_HAND" />
+                     </cursor>
+                  </Button>
+                  <TextField fx:id="codeField" promptText="Nhập mã xác thực" GridPane.rowIndex="2">
                      <font>
                         <Font name="Calibri Bold" size="20.0" />
                      </font>
+                     <style>
+                        -fx-opacity: 0.72;
+                        -fx-pref-height: 40.0;
+                        -fx-pref-width: 520.0;
+                     </style>
                   </TextField>
-                  <TextField opacity="0.72" promptText="Nhập mã xác thực" GridPane.rowIndex="1">
+                  <PasswordField fx:id="newPasswordField" promptText="Nhập mật khẩu mới" GridPane.rowIndex="3">
                      <font>
                         <Font name="Calibri Bold" size="20.0" />
                      </font>
-                  </TextField>
-                  <TextField opacity="0.76" prefHeight="15.0" prefWidth="506.0" promptText="Nhập lại mật khẩu mới" GridPane.rowIndex="3">
+                     <style>
+                        -fx-opacity: 0.74;
+                        -fx-pref-height: 38.0;
+                        -fx-pref-width: 420.0;
+                     </style>
+                  </PasswordField>
+                  <PasswordField fx:id="confirmPasswordField" promptText="Nhập lại mật khẩu mới" GridPane.rowIndex="4">
                      <font>
                         <Font name="Calibri Bold" size="20.0" />
                      </font>
-                  </TextField>
+                     <style>
+                        -fx-opacity: 0.73;
+                        -fx-pref-height: 39.0;
+                        -fx-pref-width: 420.0;
+                     </style>
+                  </PasswordField>
                </children>
                <padding>
                   <Insets left="50.0" right="50.0" />
