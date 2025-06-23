@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.IncidentReportFormController" spacing="10" style="-fx-padding: 20;">
+    <Label text="Báo cáo sự cố" style="-fx-font-size: 16; -fx-font-weight: bold;" />
+    <TextField fx:id="txtTitle" promptText="Tiêu đề" />
+    <TextArea fx:id="txtDescription" promptText="Mô tả sự cố" />
+    <DatePicker fx:id="dateIncident" promptText="Ngày xảy ra" />
+    <HBox spacing="10">
+        <Button fx:id="btnSubmit" text="Gửi" onAction="#handleSubmit" />
+        <Button fx:id="btnCancel" text="Hủy" onAction="#handleCancel" />
+    </HBox>
+</VBox>

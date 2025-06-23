@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:controller="controller.ResolvedIncidentsController"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      spacing="12"
+      style="-fx-background-color: #F2F7FB; -fx-padding: 30 40 30 40;">
+
+    <Label text="Lịch sử đã xử lý"
+           style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+    <TableView fx:id="tblResolvedIncidents"
+               prefHeight="400"
+               VBox.vgrow="ALWAYS"
+               style="-fx-background-color: transparent; -fx-border-color: #e0e0e0; -fx-border-radius: 6px;">
+        <columns>
+            <TableColumn fx:id="colIdReport" text="Mã báo cáo" prefWidth="120" />
+            <TableColumn fx:id="colRoomNumber" text="Số phòng" prefWidth="130" />
+            <TableColumn fx:id="colReportDate" text="Ngày báo cáo" prefWidth="160" />
+            <TableColumn fx:id="colNote" text="Ghi chú" prefWidth="200" />
+            <TableColumn fx:id="colHandledBy" text="Tên người sửa" prefWidth="180" />
+            <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="180" />
+        </columns>
+    </TableView>
+</VBox>

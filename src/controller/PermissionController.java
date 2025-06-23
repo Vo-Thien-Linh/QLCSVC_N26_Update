@@ -226,7 +226,13 @@ public class PermissionController implements Initializable {
         rows.add(new PermissionRow("Mượn phòng", roles, true));
         rows.add(new PermissionRow("Xem", roles, false));
 
+ //     Tính năng báo cáo sự cố
+        rows.add(new PermissionRow("Báo cáo sự cố", roles, true));
+        rows.add(new PermissionRow("Xem", roles, false));
 
+        //     Tính năng xử lý sự cố
+        rows.add(new PermissionRow("Xử lý sự cố", roles, true));
+        rows.add(new PermissionRow("Xem", roles, false));
 
         tbPermission.setItems(rows);
     }
