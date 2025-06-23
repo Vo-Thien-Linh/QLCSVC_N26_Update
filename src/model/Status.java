@@ -4,7 +4,6 @@ public enum Status {
     ACTIVE("Hoạt động"),
     INACTIVE("Dừng hoạt động"),
     MAINTENANCE("Bảo trì");
-
     private final String label;
 
     Status(String label) {

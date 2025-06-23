@@ -265,7 +265,7 @@ public class ManagerRoomRepository {
                     borrowRoom.setId(borrowRoomId);
                     borrowRoom.setRoomId(rs.getString("room_id"));
                     borrowRoom.setRoomNumber(rs.getString("room_number"));
-                    borrowRoom.setBorrower(new User(null, rs.getString("fullname")));
+                    borrowRoom.setBorrower(new User(null, rs.getString("fullname"), null, null));
                     borrowRoom.setBorrowDate(rs.getDate("borrow_date").toLocalDate());
                     borrowRoom.setStartPeriod(rs.getInt("start_period"));
                     borrowRoom.setEndPeriod(rs.getInt("end_period"));

@@ -263,12 +263,12 @@ public class BorrowRoomListController implements Initializable {
         document.add(new Paragraph("Lý do đăng ký phòng học: " + request.getBorrowReason(), fontNormal));
         document.add(Chunk.NEWLINE);
 
-        PdfPTable table = new PdfPTable(5);
+        PdfPTable table = new PdfPTable(6);
         table.setWidthPercentage(100);
         table.setSpacingBefore(10f);
         table.setSpacingAfter(10f);
 
-        String[] headers = {"STT", "NGÀY", "TIẾT", "PHÒNG", "GHI CHÚ"};
+        String[] headers = {"STT", "Lớp", "NGÀY", "TIẾT", "PHÒNG", "GHI CHÚ"};
         for (String h : headers) {
             PdfPCell cell = new PdfPCell(new Phrase(h, fontBold));
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -276,6 +276,11 @@ public class BorrowRoomListController implements Initializable {
         }
 
         table.addCell("1");
+        if(request.getBorrower().getClasses() != null){
+            table.addCell(request.getBorrower().getClasses());
+        } else if(request.getBorrower().getDepartment() != null){
+            table.addCell(request.getBorrower().getDepartment());
+        }
         table.addCell(request.getBorrowDate().toString());
         table.addCell(request.getstartPeriod() + "-" + request.getEndPeriod());
         table.addCell(request.getRoomNumber());
@@ -297,6 +302,7 @@ public class BorrowRoomListController implements Initializable {
 
         PdfPTable signTable = new PdfPTable(2);
         signTable.setWidthPercentage(100);
+        signTable.setSpacingBefore(200f);
         signTable.setWidths(new int[]{1, 1});
 
         PdfPCell cell1 = new PdfPCell(new Phrase("NGƯỜI MƯỢN", fontBold));
@@ -343,6 +349,4 @@ public class BorrowRoomListController implements Initializable {
             }
         }
     }
-
-
 }

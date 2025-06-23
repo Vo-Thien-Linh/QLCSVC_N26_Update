@@ -110,7 +110,7 @@ public class EditDeviceController {
             return;
         }
 
-        Device data = new Device(device.getId(), imageUrl, name, type, purchaseDate, supplier, price, status, selectedRoom, quantity, 0);
+        Device data = new Device(device.getId(), imageUrl, name, type, purchaseDate, supplier, price, status, selectedRoom, quantity, quantity);
         Boolean success = ManagerDeviceRepository.edit(data);
         if(success) {
             ScannerUtils.showInfo("Thông báo", "Thiết bị đã cập nhật thành công!");

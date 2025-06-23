@@ -6,13 +6,13 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.BorrowDeviceController">
     <center>
         <VBox fx:id="rootPane" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS" style="-fx-background-color: #F2F7FB">
             <children>
                 <VBox styleClass="device-filter">
                     <children>
-                        <Label style="-fx-font-weight: bold; -fx-font-size: 24px" text="Bộ lọc và Tìm kiếm">
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 24px" text="Tìm kiếm">
                             <VBox.margin>
                                 <Insets bottom="10.0" />
                             </VBox.margin>
@@ -20,9 +20,6 @@
 
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                             <children>
-                                <!-- ComboBox -->
-                                <ComboBox fx:id="cboSearchType" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-border-color: #cac9c9" />
-
                                 <!-- TextField -->
                                 <TextField fx:id="txtSearch" prefHeight="40.0" prefWidth="300.0" promptText="Nhập từ khóa" />
 
@@ -38,12 +35,12 @@
                                         </Text>
                                     </children>
                                 </StackPane>
-                                <Rectangle HBox.hgrow="ALWAYS" width="250.0"/>
+                                <Rectangle HBox.hgrow="ALWAYS" width="500.0"/>
                                 <StackPane fx:id="btnListConfirm" style="-fx-cursor: hand; -fx-pref-width: 100" styleClass="custom-button" xmlns:fx="http://javafx.com/fxml">
                                     <children>
-                                        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#00A8BE" height="50.0" width="270.0" />
-                                        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#55C5D3" height="50.0" scaleX="0.0" scaleZ="0.0" styleClass="before-layer" width="270.0" />
-                                        <Text fill="WHITE" text="Danh sách yêu cầu mượn phòng">
+                                        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#00A8BE" height="50.0" width="230.0" />
+                                        <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#55C5D3" height="50.0" scaleX="0.0" scaleZ="0.0" styleClass="before-layer" width="230.0" />
+                                        <Text fill="WHITE" text="Danh sách yêu cầu mượn">
                                             <font>
                                                 <Font name="System Bold" size="16.0" />
                                             </font>
@@ -85,17 +82,18 @@
                     </padding>
                 </VBox>
                 <VBox>
-                    <TableView fx:id="tblBorrowRoom" prefHeight="410.0" styleClass="table-view device_table" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 8, 0.6, 0, 1)">
+                    <TableView fx:id="tblBorrowDevice" prefHeight="410.0" styleClass="table-view device_table" style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 8, 0.6, 0, 1)">
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                         <columns>
-                            <TableColumn fx:id="colId" text="Mã phòng" />
-                            <TableColumn fx:id="colName" text="Tên phòng" />
-                            <TableColumn fx:id="colType" text="Loại phòng" />
-                            <TableColumn fx:id="colCapacity" text="Sức chứa" />
-                            <TableColumn fx:id="colLocation" text="Vị trí" />
-                            <TableColumn fx:id="colStatus" text="Trạng thái" />
+                            <TableColumn fx:id="colId" text="Mã thiết bị" />
+                            <TableColumn fx:id="colName" text="Tên thiết bị" />
+                            <TableColumn fx:id="colType" text="Loại thiết bị" />
+                            <TableColumn fx:id="colAvailableQuantity" text="Số lượng còn trống" />
+                            <TableColumn fx:id="colSupplier" text="Nhà sản xuất" />
+                            <TableColumn fx:id="colLocation" text="Vị trí hiện tại" />
+                            <TableColumn fx:id="colStatus" text="Tình trạng" />
                             <TableColumn fx:id="colActions" text="Hành động" />
                         </columns>
                         <placeholder>

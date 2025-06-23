@@ -33,6 +33,16 @@ CREATE TABLE permissions (
     UNIQUE(role_id, function_id, permission_type_id)
 );
 
+CREATE TABLE departments (
+     id INT PRIMARY KEY AUTO_INCREMENT,
+     name VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE classes (
+     id INT PRIMARY KEY AUTO_INCREMENT,
+     name VARCHAR(50) UNIQUE
+);
+
 -- Bảng users
 CREATE TABLE users (
     user_id VARCHAR(10) PRIMARY KEY,
@@ -45,7 +55,11 @@ CREATE TABLE users (
     status VARCHAR(20),
     deleted TINYINT(1) DEFAULT 0,
     thumbnail VARCHAR(500),
+    department_id INT,
+    class_id INT,
     role_id INT,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL ON UPDATE CASCADE,
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
 
@@ -122,7 +136,8 @@ CREATE TABLE borrow_device (
    borrow_status VARCHAR(20), -- PENDING, APPROVED, etc.
    created_at DATETIME,
    borrow_room_id INT NULL,
-   note TEXT,
+   borrow_reason TEXT,
+   reject_reason TEXT,
    FOREIGN KEY (borrow_room_id) REFERENCES borrow_room(id)
 );
 
@@ -133,6 +148,15 @@ CREATE TABLE borrow_device_detail (
   device_id VARCHAR(255),
   quantity INT,
   FOREIGN KEY (borrow_device_id) REFERENCES borrow_device(id)
+);
+
+CREATE TABLE return_device_detail (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  borrow_device_detail_id INT NOT NULL,
+  return_quantity INT NOT NULL,
+  condition_note VARCHAR(255),
+  return_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (borrow_device_detail_id) REFERENCES borrow_device_detail(id) ON DELETE CASCADE
 );
 
 
@@ -310,14 +334,21 @@ DELIMITER ;
 INSERT INTO roles (role_id, role_name) VALUES
 (3, 'Quản trị viên'),
 (5, 'Giáo viên'),
-(6, 'Bảo trì');
+(6, 'Bảo trì'),
+(7, 'Sinh viên');
+
+INSERT INTO departments (name)
+VALUES ('Khoa CNTT'), ('Phòng Kỹ thuật'), ('Phòng Đào tạo');
+
+INSERT INTO classes (name)
+VALUES ('CQ.64.CNTT'), ('CQ.65.CNTT'), ('CQ.64.KTXD');
 
 -- 2. Insert users
-INSERT INTO users (user_id, fullname, username, yearold, email, phoneNumber, password, status, deleted, thumbnail, role_id)
+INSERT INTO users (user_id, fullname, username, yearold, email, phoneNumber, password, status, deleted, thumbnail, role_id, department_id, class_id)
 VALUES
-('MTL0001', 'Nguyễn Anh Nguyên', 'nguyen34', '2000-12-09 ', 'nanh@gmail.com', '0983772722', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg', 3),
-('MTL0002', 'Vo Thien Linh', 'vothienlinh', '1999-05-15', 'vothienlinh2@gmail.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 5),
-('MTL0003', 'Nguyen Van A', 'nguyenvana', '1998-03-20', 'vana@example.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 6);
+('MTL0001', 'Nguyễn Anh Nguyên', 'nguyen34', '2000-12-09 ', 'nanh@gmail.com', '0983772722', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg', 3, null, null),
+('MTL0002', 'Vo Thien Linh', 'vothienlinh', '1999-05-15', 'vothienlinh2@gmail.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 5, 1, null),
+('MTL0003', 'Nguyen Van A', 'nguyenvana', '1998-03-20', 'vana@example.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 6, 2, null);
 
 -- 3. Insert room_types
 INSERT INTO room_types (id, type_name) VALUES
@@ -349,12 +380,9 @@ INSERT INTO room (room_id, status, room_number, seating_capacity, deleted, room_
 ('R017', 'AVAILABLE', 'A214', 8, 0, 5, 'Khu A2');
 
 INSERT INTO device_types (id, type_name) VALUES
-(1, 'Thiết bị trình chiếu và âm thanh'),
-(2, 'Máy tính'),
-(3, 'Bộ phát wifi'),
-(4, 'Ổ cắm điện'),
-(5, 'Quạt trần'),
-(6, 'Bóng đèn');
+(1,	'Thiết bị tin học')
+(2	'Thiết bị âm thanh')
+(3,	'Thiết bị điện ');
 
 -- 5. Insert devices (đồng bộ với cấu trúc mới)
 INSERT INTO devices (

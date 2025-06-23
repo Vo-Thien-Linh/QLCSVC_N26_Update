@@ -30,6 +30,8 @@ public class Device extends Facilities {
         this.selected = selected;
     }
 
+    public Device() {}
+
     public Device(String id, String deviceName, DeviceStatus status) {
         super(id, null, null);
         this.deviceName = deviceName;

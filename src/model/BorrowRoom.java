@@ -110,5 +110,12 @@ public class BorrowRoom {
     public List<BorrowDeviceDetail> getBorrowDeviceDetail() {
         return devices;
     }
+
+    public String toTooltipText() {
+        return String.format("Số phòng: %s\nNgười mượn: %s\nSố tiết: %d\nTiết: %d–%d\nMục đích: %s",
+                roomNumber, borrower.getFullname(),
+                endPeriod - startPeriod + 1,
+                startPeriod, endPeriod, borrowReason);
+    }
 }
 

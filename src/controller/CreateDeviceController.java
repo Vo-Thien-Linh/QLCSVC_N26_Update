@@ -112,17 +112,31 @@ public class CreateDeviceController {
             return;
         }
 
-        Device data = new Device(null, imageUrl, name, type, purchaseDate, supplier, price, status, selectedRoom, quantity, 0);
-        Boolean success = ManagerDeviceRepository.create(data);
-        if(success) {
-            ScannerUtils.showInfo("Thông báo", "Thiết bị đã thêm thành công!");
-            if (onDeviceAdded != null) {
-                onDeviceAdded.run();
+        Device device = managerDeviceRepository.findByNameAndRoom(name, selectedRoom.getId());
+        if(device != null){
+            int newQuantity = device.getQuantity() + quantity;
+            Boolean success = managerDeviceRepository.updateQuantity(device.getId(), newQuantity);
+            if(success){
+                ScannerUtils.showInfo("Cập nhật", "Thiết bị đã tồn tại " + "trong phòng " + selectedRoom.getRoomNumber() + ", đã cộng thêm số lượng");
+                if (onDeviceAdded != null) {
+                    onDeviceAdded.run();
+                }
+                Stage currentStage = (Stage) btnSave.getScene().getWindow();
+                currentStage.close();
             }
-            Stage currentStage = (Stage) btnSave.getScene().getWindow();
-            currentStage.close();
         } else {
-            ScannerUtils.showError("Thông báo", "Thiết bị đã thêm không thành công!");
+            Device data = new Device(null, imageUrl, name, type, purchaseDate, supplier, price, status, selectedRoom, quantity, quantity);
+            Boolean success = ManagerDeviceRepository.create(data);
+            if(success) {
+                ScannerUtils.showInfo("Thông báo", "Thiết bị đã thêm thành công!");
+                if (onDeviceAdded != null) {
+                    onDeviceAdded.run();
+                }
+                Stage currentStage = (Stage) btnSave.getScene().getWindow();
+                currentStage.close();
+            } else {
+                ScannerUtils.showError("Thông báo", "Thiết bị đã thêm không thành công!");
+            }
         }
     }
 

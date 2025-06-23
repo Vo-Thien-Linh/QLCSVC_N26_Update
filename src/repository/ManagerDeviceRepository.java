@@ -8,14 +8,13 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import config.DatabaseConnection;
-import model.Device;
-import model.DeviceStatus;
-import model.Room;
+import model.*;
 
 public class ManagerDeviceRepository {
 
@@ -72,9 +71,54 @@ public class ManagerDeviceRepository {
         return -1;
     }
 
+    public Device findByNameAndRoom(String deviceName, String roomId) {
+        String sql = "SELECT * FROM devices WHERE LOWER(device_name) = ? AND room_id = ? AND deleted = false";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, deviceName);
+            stmt.setString(2, roomId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Device device = new Device();
+                device.setId(rs.getString("id"));
+                device.setQuantity(rs.getInt("quantity"));
+                return device;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Boolean updateQuantity(String id, int quantity){
+        String sql = "UPDATE devices SET quantity = quantity + ? WHERE id = ?";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setInt(1, quantity);
+            stmt.setString(2, id);
+
+            int resultSet = stmt.executeUpdate();
+            if(resultSet > 0) {
+                return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+
     public static Boolean create(Device device) {
         int deviceTypeId = getDeviceTypeId(device.getDeviceType());
-        String query = "INSERT INTO devices (device_name, device_type_id, purchase_date, supplier, price, status, room_id, quantity, created_at, updated_at, thumbnail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO devices (device_name, device_type_id, purchase_date, supplier, price, status, room_id, quantity, created_at, updated_at, thumbnail, available_quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
 
@@ -89,6 +133,7 @@ public class ManagerDeviceRepository {
             stmt.setDate(9, Date.valueOf(device.getCreatedAt()));
             stmt.setDate(10, Date.valueOf(device.getUpdatedAt()));
             stmt.setString(11, device.getThumbnail());
+            stmt.setInt(12, device.getAvailableQuantity());
 
             int resultSet = stmt.executeUpdate();
             if(resultSet > 0) {
@@ -156,7 +201,7 @@ public class ManagerDeviceRepository {
 
     public static boolean edit(Device device) {
         int deviceTypeId = getDeviceTypeId(device.getDeviceType());
-        String query = "UPDATE devices SET device_name = ?, device_type_id = ?, purchase_date = ?, supplier = ?, price = ?, status = ?, room_id = ?, quantity = ?, updated_at = ?, thumbnail = ? WHERE id = ? AND deleted = false";
+        String query = "UPDATE devices SET device_name = ?, device_type_id = ?, purchase_date = ?, supplier = ?, price = ?, status = ?, room_id = ?, quantity = ?, updated_at = ?, thumbnail = ?, available_quantity = ? WHERE id = ? AND deleted = false";
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -170,7 +215,8 @@ public class ManagerDeviceRepository {
             stmt.setInt(8, device.getQuantity());
             stmt.setDate(9, Date.valueOf(device.getUpdatedAt()));
             stmt.setString(10, device.getThumbnail());
-            stmt.setString(11, device.getId());
+            stmt.setInt(11, device.getAvailableQuantity());
+            stmt.setString(12, device.getId());
 
             int result = stmt.executeUpdate();
             if(result > 0) {
@@ -217,7 +263,9 @@ public class ManagerDeviceRepository {
 
 //        Tìm kiếm
         if (keyword != null && !keyword.isBlank()) {
-            sql += " AND LOWER(d.device_name) LIKE ?";
+            sql += " AND (LOWER(d.device_name) LIKE ? OR LOWER(dt.type_name) LIKE ? OR LOWER(d.id) LIKE ?)";
+            params.add("%" + keyword.toLowerCase() + "%");
+            params.add("%" + keyword.toLowerCase() + "%");
             params.add("%" + keyword.toLowerCase() + "%");
         }
 
@@ -330,6 +378,74 @@ public class ManagerDeviceRepository {
         } catch (SQLException e){
             e.printStackTrace();
         }
+        return false;
+    }
+
+    public List<BorrowDevice> getDataBorrowDevices() {
+        String sql = "SELECT bd.*, d.device_name, u.user_id, u.fullname, bdd.quantity FROM borrow_device bd JOIN borrow_device_detail bdd ON bd.id = bdd.borrow_device_id JOIN devices d ON d.id = bdd.device_id JOIN Users u ON u.user_id = bd.user_id WHERE bd.borrow_room_id IS NULL AND bd.borrow_status = 'PENDING' ORDER BY bd.id DESC";
+        List<BorrowDevice> borrowDevices = new ArrayList<>();
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int borrowDeviceId =  rs.getInt("id");
+                String userId = rs.getString("user_id");
+                String fullname = rs.getString("fullname");
+                LocalDate  borrowDate = LocalDate.parse(rs.getString("borrow_date"));
+                int startPeriod = rs.getInt("start_period");
+                int endPeriod = rs.getInt("end_period");
+                BorrowStatus status = BorrowStatus.valueOf(rs.getString("borrow_status"));
+                LocalDateTime createdAt =  rs.getTimestamp("created_at").toLocalDateTime();
+                String borrowReason =  rs.getString("borrow_reason");
+                String deviceName = rs.getString("device_name");
+                int quantity = rs.getInt("quantity");
+
+                User borrower =  new User(userId, fullname, null, null);
+                BorrowDeviceDetail borrowDeviceDetail = new BorrowDeviceDetail(0, 0, new Device(null, deviceName, 0), quantity);
+                borrowDevices.add( new BorrowDevice(borrowDeviceId, borrower, borrowDate, startPeriod, endPeriod, status, createdAt, null, borrowReason, null, borrowDeviceDetail));
+            }
+
+            return borrowDevices;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Boolean approveRequest(int id){
+        String sql = "UPDATE borrow_device SET borrow_status = 'APPROVED' WHERE id = ?";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setInt(1, id);
+            int result = stmt.executeUpdate();
+            if(result > 0){
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public Boolean refuseRequest(int id, String reason){
+        String sql = "UPDATE borrow_device SET borrow_status = 'REJECTED', reject_reason = ? WHERE id = ?";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setString(1, reason);
+            stmt.setInt(2, id);
+            int result = stmt.executeUpdate();
+            if(result > 0){
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return false;
     }
 }

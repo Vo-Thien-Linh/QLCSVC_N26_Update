@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.*;
@@ -27,9 +28,11 @@ public class CreateUserController {
     @FXML private ImageView imagePreview;
     @FXML private TextField txtFullname, txtUsername, txtEmail, txtPhoneNumber;
     @FXML private ComboBox<Role> roleComboBox;
+    @FXML private ComboBox<String> cboClass, cbDepartment;
     @FXML private DatePicker datePickerImport;
     @FXML private RadioButton rbActive, rbInactive, rbMaintenance;
     @FXML private Button btnSave;
+    @FXML private VBox VbClass, VbDepartment;
 
     private ManagerUserRepository managerUserRepository = new ManagerUserRepository();
     private File selectedImageFile = null;
@@ -63,6 +66,8 @@ public class CreateUserController {
         String phoneNumber = txtPhoneNumber.getText().trim();
         String email = txtEmail.getText().trim();
         Role selectedRole = roleComboBox.getValue();
+        String selectedClass =  cboClass.getValue();
+        String selectedDepartment = cbDepartment.getValue();
         String password = PasswordGeneratorUtils.generateStrongPassword();
 
         System.out.println(password);
@@ -76,6 +81,17 @@ public class CreateUserController {
         } else if(rbMaintenance.isSelected()) {
             status = Status.MAINTENANCE;
         }
+
+        if(selectedRole.getRoleName().equals("Sinh Viên")){
+            selectedDepartment = null;
+        } else if(selectedRole.getRoleName().equals("Bảo trì") || selectedRole.getRoleName().equals("Giáo viên")){
+            selectedClass = null;
+        } else {
+            selectedClass = null;
+            selectedDepartment = null;
+        }
+
+        System.out.println(selectedClass + selectedDepartment);
 
         if (fullname.isEmpty() || username.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || yearold == null) {
             ScannerUtils.showError("Lỗi", "Vui lòng nhập đầy đủ thông tin!");
@@ -105,7 +121,7 @@ public class CreateUserController {
             return;
         }
 
-        User data = new User(null, fullname, username, imageUrl, yearold, email, phoneNumber, password, status, selectedRole);
+        User data = new User(null, fullname, username, imageUrl, yearold, email, phoneNumber, password, status, selectedRole, selectedClass, selectedDepartment);
         Boolean success = managerUserRepository.addUserAndReturnID(data);
         if(success) {
             ScannerUtils.showInfo("Thông báo", "Thêm người dùng thành công thành công!");
@@ -115,22 +131,45 @@ public class CreateUserController {
             Stage currentStage = (Stage) btnSave.getScene().getWindow();
             currentStage.close();
         } else {
-            ScannerUtils.showError("Thông báo", "Cập nhật không thành công!");
+            ScannerUtils.showError("Thông báo", "Thêm không thành công!");
         }
     }
 
     @FXML
     public void initialize() {
-        loadRoleData();
+        loadComboxData();
+        roleComboBox.setOnAction(e -> updateUnitComboBox());
+
     }
 
-    private void loadRoleData() {
-        if(roleComboBox != null){
-            List<Role> roles = managerUserRepository.getAllRoles();
-            roleComboBox.setItems(FXCollections.observableArrayList(roles));
+    private void updateUnitComboBox() {
+        String role = roleComboBox.getValue().getRoleName();
 
-            if (!roleComboBox.getItems().isEmpty()) {
+        VbClass.setDisable(true);
+        VbDepartment.setDisable(true);
+
+        if (role.equals("Sinh Viên")) {
+            VbClass.setDisable(false);
+        } else if (role.equals("Giáo viên") || role.equals("Bảo trì")) {
+            VbDepartment.setDisable(false);
+        }
+    }
+
+    private void loadComboxData() {
+        if(roleComboBox != null && cboClass != null && cbDepartment != null) {
+            List<Role> roles = managerUserRepository.getAllRoles();
+            List<String> classes = managerUserRepository.getAllClass();
+            List<String> departments = managerUserRepository.getAllDepartment();
+
+            roleComboBox.setItems(FXCollections.observableArrayList(roles));
+            cboClass.setItems(FXCollections.observableArrayList(classes));
+            cbDepartment.setItems(FXCollections.observableArrayList(departments));
+
+            if (!roleComboBox.getItems().isEmpty() && !cboClass.getItems().isEmpty() && !cbDepartment.getItems().isEmpty()) {
                 roleComboBox.getSelectionModel().selectFirst();
+                cboClass.getSelectionModel().selectFirst();
+                cbDepartment.getSelectionModel().selectFirst();
+                updateUnitComboBox();
             }
         }
     }

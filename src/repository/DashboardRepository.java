@@ -139,7 +139,9 @@ public class DashboardRepository {
 
 //        Tìm kiếm
         if (keyword != null && !keyword.isBlank()) {
-            sql += " AND LOWER(d.device_name) LIKE ?";
+            sql += " AND (LOWER(d.device_name) LIKE ? OR LOWER(dt.type_name) LIKE ? OR LOWER(d.id) LIKE ?)";
+            params.add("%" + keyword.toLowerCase() + "%");
+            params.add("%" + keyword.toLowerCase() + "%");
             params.add("%" + keyword.toLowerCase() + "%");
         }
 

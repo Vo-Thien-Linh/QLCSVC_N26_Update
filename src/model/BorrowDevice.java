@@ -5,28 +5,32 @@ import java.time.LocalDateTime;
 
 public class BorrowDevice {
     private int id;
-    private String userId;
+    private User borrower;
     private LocalDate borrowDate;
     private int startPeriod;
     private int endPeriod;
-    private BorrowStatus borrowStatus; // PENDING, APPROVED, etc.
+    private BorrowStatus borrowStatus;
     private LocalDateTime createdAt;
-    private Integer borrowRoomId; // nullable
-    private String note;
+    private Integer borrowRoomId;
+    private String borrowReason;// nullable
+    private String rejectReason;
+    private BorrowDeviceDetail borrowDeviceDetail;
 
     public BorrowDevice() {}
 
-    public BorrowDevice(int id, String userId, LocalDate borrowDate, int startPeriod, int endPeriod,
-                        BorrowStatus borrowStatus, LocalDateTime createdAt, Integer borrowRoomId, String note) {
+    public BorrowDevice(int id, User borrower, LocalDate borrowDate, int startPeriod, int endPeriod,
+                        BorrowStatus borrowStatus, LocalDateTime createdAt, Integer borrowRoomId, String borrowReason, String rejectReason,  BorrowDeviceDetail borrowDeviceDetail) {
         this.id = id;
-        this.userId = userId;
+        this.borrower = borrower;
         this.borrowDate = borrowDate;
         this.startPeriod = startPeriod;
         this.endPeriod = endPeriod;
         this.borrowStatus = borrowStatus;
         this.createdAt = createdAt;
         this.borrowRoomId = borrowRoomId;
-        this.note = note;
+        this.borrowReason = borrowReason;
+        this.rejectReason = rejectReason;
+        this.borrowDeviceDetail = borrowDeviceDetail;
     }
 
     // Getters & Setters
@@ -39,12 +43,12 @@ public class BorrowDevice {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public User getBorrower() {
+        return borrower;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setBorrower(User borrower) {
+        this.borrower = borrower;
     }
 
     public LocalDate getBorrowDate() {
@@ -95,11 +99,27 @@ public class BorrowDevice {
         this.borrowRoomId = borrowRoomId;
     }
 
-    public String getNote() {
-        return note;
+    public String getBorrowReason() {
+        return borrowReason;
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public String  getRejectReason() {
+        return rejectReason;
+    }
+
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
+
+    public void setBorrowReason(String borrowReason) {
+        this.borrowReason = borrowReason;
+    }
+
+    public BorrowDeviceDetail getBorrowDeviceDetail() {
+        return borrowDeviceDetail;
+    }
+
+    public void setBorrowDeviceDetail(BorrowDeviceDetail borrowDeviceDetail) {
+        this.borrowDeviceDetail = borrowDeviceDetail;
     }
 }

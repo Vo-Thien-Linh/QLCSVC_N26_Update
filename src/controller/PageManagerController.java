@@ -2,21 +2,26 @@ package controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
+import model.User;
 import model.UserSession;
+import repository.ManagerUserRepository;
 import repository.PermissionRepository;
 import view.*;
 
@@ -67,19 +72,29 @@ public class PageManagerController implements Initializable {
     private Button btnBorrowClassroom;
 
     @FXML
+    private Button btnSchedule;
+
+    @FXML
     private ImageView imgAvatar;
 
     @FXML
     private HBox userBox;
 
+    @FXML
+    private Label lblUsername;
+
 
 
     private List<Button> navButtons = new ArrayList<>();
     private PermissionRepository permissionRepository = new PermissionRepository();
+    private ManagerUserRepository  managerUserRepository = new ManagerUserRepository();
+    private User infoUser = managerUserRepository.getUser(UserSession.getUserId());
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Add all buttons to navButtons list
+        lblUsername.setText(infoUser.getFullname());
+        imgAvatar.setImage(new Image(infoUser.getThumbnail(), true));
+
         navButtons.add(btnDashboard);
         navButtons.add(btnDevice);
         navButtons.add(btnRoom);
@@ -91,6 +106,7 @@ public class PageManagerController implements Initializable {
         navButtons.add(btnSetting);
         navButtons.add(btnBorrowEquipment);
         navButtons.add(btnBorrowClassroom);
+        navButtons.add(btnSchedule);
 
 
         Map<Button, String> buttonFunctionMap = new LinkedHashMap<>();
@@ -102,6 +118,7 @@ public class PageManagerController implements Initializable {
         buttonFunctionMap.put(btnStatistical, "Thống kê");
         buttonFunctionMap.put(btnBorrowEquipment, "Mượn thiết bị");
         buttonFunctionMap.put(btnBorrowClassroom, "Mượn thiết bị");
+        buttonFunctionMap.put(btnSchedule, "Lịch");
 
         // Phân quyền hiển thị button
         int roleId = UserSession.getRoleId();
@@ -176,7 +193,11 @@ public class PageManagerController implements Initializable {
             highlightButton(btnBorrowClassroom);
         });
 
-        // Initialize with dashboard view
+        btnSchedule.setOnAction(e -> {
+            switchView(RoomScheduleView.getView());
+            highlightButton(btnSchedule);
+        });
+
         for (Map.Entry<Button, String> entry : buttonFunctionMap.entrySet()) {
             System.out.println(entry.getValue());
             boolean canView = permissionRepository.isAllowed(roleId, entry.getValue(), "Xem");
@@ -200,9 +221,10 @@ public class PageManagerController implements Initializable {
             case "Quản lý phòng" -> RoomManagerView.getView();
             case "Quản lý người dùng" -> UserView.getView();
             case "Nhóm quyền" -> PermissionView.getView();
-            case "Thống kê" -> new Label("📊 Đây là Thống kê");
-            case "Mượn thiết bị" -> new Label("📦 Đây là mượn thiết bị");
-            case "Mượn phòng" -> new Label("🏫 Đây là mượn phòng");
+            case "Thống kê" -> StatisticalView.getView();
+            case "Mượn thiết bị" -> BorrowDeviceView.getView();
+            case "Mượn phòng" -> BorrowRoomView.getView();
+            case "Lịch" -> RoomScheduleView.getView();
             case "Cài đặt" -> new Label("⚙️ Đây là Cài đặt");
             default -> new Label("❓ Chức năng không tồn tại");
         };
@@ -225,11 +247,9 @@ public class PageManagerController implements Initializable {
         MenuItem profileItem = new MenuItem("Thông tin cá nhân");
         profileItem.setGraphic(userIcon);
         profileItem.getStyleClass().add("manager_menu-item");
-
-        SVGPath settingsIcon = createIcon("M19.43 12.98c.04-.32.07-.66.07-1s-.03-.68-.07-1l2.11-1.65a.5.5 0 0 0 .12-.66l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.04 7.04 0 0 0-1.5-.88l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.43l-.38 2.65a7.04 7.04 0 0 0-1.5.88l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.66L4.57 11c-.04.32-.07.66-.07 1s.03.68.07 1l-2.11 1.65a.5.5 0 0 0-.12.66l2 3.46a.5.5 0 0 0 .61.22l2.49-1c.46.36.96.66 1.5.88l.38 2.65A.5.5 0 0 0 10 22h4a.5.5 0 0 0 .5-.43l.38-2.65c.54-.22 1.04-.52 1.5-.88l2.49 1a.5.5 0 0 0 .61-.22l2-3.46a.5.5 0 0 0-.12-.66L19.43 12.98z", Color.BLACK);
-        MenuItem settingsItem = new MenuItem("Cài đặt");
-        settingsItem.setGraphic(settingsIcon);
-        settingsItem.getStyleClass().add("manager_menu-item");
+        profileItem.setOnAction(e -> {
+            showUserDetailsDialog(infoUser);
+        });
 
         SVGPath logoutIcon = createIcon("M16 13v-2H7V8l-5 4 5 4v-3h9z M20 3H10v2h10v14H10v2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z", Color.BLACK);
         MenuItem logoutItem = new MenuItem("Đăng xuất");
@@ -238,11 +258,11 @@ public class PageManagerController implements Initializable {
         logoutItem.setOnAction(e -> handleLogout());
 
 
-        contextMenu.getItems().addAll(profileItem, settingsItem, logoutItem);
+        contextMenu.getItems().addAll(profileItem, logoutItem);
 
         // Sự kiện click hiện menu
         userBox.setOnMouseClicked(event -> {
-            contextMenu.show(userBox, Side.BOTTOM, 80, 0);
+            contextMenu.show(userBox, Side.BOTTOM, 100, 0);
         });
 
     }
@@ -289,11 +309,9 @@ public class PageManagerController implements Initializable {
         }
     }
     private void handleLogout() {
-        // Xóa session
         UserSession.clearSession();
 
         try {
-            // Tải lại giao diện đăng nhập
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login/index.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) userBox.getScene().getWindow(); // Lấy Stage từ userBox
@@ -304,4 +322,37 @@ public class PageManagerController implements Initializable {
             e.printStackTrace();
         }
     }
+
+    public void showUserDetailsDialog(User user) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Thông tin người dùng");
+
+        dialog.getDialogPane().setPrefWidth(400);
+        dialog.getDialogPane().setPrefHeight(300);
+
+        VBox content = new VBox(15);
+        content.setPadding(new Insets(20));
+        content.setStyle("-fx-background-color: white;");
+
+        Label lblTitle = new Label("Thông tin người dùng");
+        lblTitle.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        Label lblFullname = new Label("Họ tên: " + user.getFullname());
+        Label lblEmail = new Label("Email: " + user.getEmail());
+        Label lblPhone = new Label("SĐT: " + user.getPhoneNumber());
+        Label lblRole = new Label("Vai trò: " + user.getRole());
+
+        // Style chung cho label thông tin
+        for (Label label : List.of(lblFullname, lblEmail, lblPhone, lblRole)) {
+            label.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+        }
+
+        content.getChildren().addAll(lblTitle, lblFullname, lblEmail, lblPhone, lblRole);
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+        dialog.showAndWait();
+    }
+
+
 }

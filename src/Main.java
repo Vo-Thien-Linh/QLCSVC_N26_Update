@@ -1,26 +1,26 @@
-//import javafx.application.Application;
-//import javafx.scene.Scene;
-//import javafx.stage.Stage;
-//import view.PageManagerView;
-//
-//public class Main extends Application {
-//    @Override
-//    public void start(Stage primaryStage) {
-//        PageManagerView root = new PageManagerView();
-//        Scene scene = new Scene(root);
-//        scene.getStylesheets().add(getClass().getResource("/public/css/style.css").toExternalForm());
-//        primaryStage.setTitle("Quản lý thiết bị - Admin");
-//        primaryStage.setScene(scene);
-//
-//        // 👉 Set full screen khi khởi động
-//        primaryStage.setMaximized(true); // Dạng cửa sổ tối đa
-//        // Hoặc dùng full screen thật:
-//        // primaryStage.setFullScreen(true);
-//
-//        primaryStage.show();
-//    }
-//
-//    public static void main(String[] args) {
-//        launch(args);
-//    }
-//}
+import javafx.application.Application;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
+import view.PageManagerView;
+
+public class Main extends Application {
+    @Override
+    public void start(Stage primaryStage) {
+        PageManagerView pageManagerView = new PageManagerView();
+        Parent root = pageManagerView.getView();
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Quản lý thiết bị - Admin");
+        primaryStage.setScene(scene);
+
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/img/logo-icon.png")));
+        primaryStage.setMaximized(true);
+
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}

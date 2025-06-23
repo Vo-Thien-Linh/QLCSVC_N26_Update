@@ -112,7 +112,12 @@ public class ManagerRoomController implements Initializable {
         });
 
         btnSearch.setOnMouseClicked(event -> {
-            keyword = txtSearch.getText().trim();
+            keyword = txtSearch.getText();
+            loadPage(0);
+        });
+
+        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            keyword = newValue.trim();
             loadPage(0);
         });
 
@@ -157,17 +162,6 @@ public class ManagerRoomController implements Initializable {
         cboChangeStatus.setManaged(canEdit);
         cboChangeStatus.setVisible(canEdit);
         colActions.setVisible(canEdit || canDelete);
-
-        System.out.println("Permission check - Can Edit: " + canEdit + ", Can Delete: " + canDelete + ", colActions visible: " + colActions.isVisible());
-        if (!canCreate) {
-            System.out.println("btnAddNew is hidden due to lack of create permission.");
-        }
-        if (!canEdit) {
-            System.out.println("btnApply and cboChangeStatus are hidden due to lack of edit permission.");
-        }
-        if (!canEdit && !canDelete) {
-            System.out.println("colActions is hidden due to lack of edit/delete permissions.");
-        }
     }
 
     private void updateStatus(String newValue) {
@@ -184,7 +178,6 @@ public class ManagerRoomController implements Initializable {
         int skip = pageIndex * limitItem;
         List<Room> rooms = managerRoomRepository.filterAndSearch(status, keyword, limitItem, skip);
         if (rooms == null) {
-            System.out.println("No rooms found or error occurred while fetching rooms.");
             return;
         }
         int totalPages = (int) Math.ceil((double) managerRoomRepository.countRooms(status, keyword) / limitItem);
@@ -283,11 +276,8 @@ public class ManagerRoomController implements Initializable {
                     return new TableCell<Room, Void>() {
                         private final SVGPath editIcon = new SVGPath();
                         private final SVGPath deleteIcon = new SVGPath();
-                        private final SVGPath scheduleIcon = new SVGPath();
                         private final HBox actionBox = new HBox(10);
                         private final StackPane editWrapper;
-                        private final StackPane scheduleWrapper;
-
                         {
                             // Icon chỉnh sửa
                             editIcon.setContent("M2 22q-0.825 0-1.412-0.588Q0 20.825 0 20V4q0-0.825 0.588-1.412Q1.175 2 2 2h10.8L11.4 3.4H2v16h16v-7.95L19.4 10V20q0 0.825-0.588 1.412Q18.225 22 17.4 22H2Zm9-9Zm-5 5v-4.25L17.15 2.6q0.3-0.3 0.675-0.45T18.55 2q0.4 0 0.775 0.15t0.675 0.45l1.4 1.4q0.275 0.3 0.425 0.675T22 5.95q0 0.4-0.15 0.775t-0.45 0.675L11 18H6Zm13.4-13.4-1.4-1.4 1.4 1.4ZM10 14h1.4l5.8-5.8-0.7-0.7-0.725-0.7L10 12.6V14Zm6.5-6.5-0.725-0.7 0.725 0.7 0.7 0.7-0.7-0.7Z");
@@ -301,16 +291,9 @@ public class ManagerRoomController implements Initializable {
                             deleteIcon.setFill(Color.web("#F44336"));
                             deleteIcon.setCursor(Cursor.HAND);
 
-                            // Icon lịch
-                            scheduleIcon.setContent("M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V8h14v12z");
-                            scheduleIcon.setFill(Color.web("#2196F3"));
-                            scheduleWrapper = new StackPane(scheduleIcon);
-                            scheduleWrapper.setPrefSize(24, 24);
-                            scheduleWrapper.setStyle("-fx-cursor: hand;");
 
                             editWrapper.setOnMouseClicked(event -> {
                                 Room room = getTableView().getItems().get(getIndex());
-                                System.out.println("Edit icon clicked for room: " + room.getRoomNumber());
                                 try {
                                     EditRoomController.showEditRoomWindow(room, () -> loadPage(pagination.getCurrentPageIndex()));
                                 } catch (IOException e) {
@@ -321,7 +304,6 @@ public class ManagerRoomController implements Initializable {
 
                             deleteIcon.setOnMouseClicked(event -> {
                                 Room room = getTableView().getItems().get(getIndex());
-                                System.out.println("Delete icon clicked for room: " + room.getRoomNumber());
                                 if (ScannerUtils.showConfirm("Xác nhận xóa", "Phòng học: " + room.getRoomNumber())) {
                                     boolean success = managerRoomRepository.delete(room.getId());
                                     if (success) {
@@ -333,29 +315,11 @@ public class ManagerRoomController implements Initializable {
                                 }
                             });
 
-                            scheduleWrapper.setOnMouseClicked(event -> {
-                                Room room = getTableView().getItems().get(getIndex());
-                                System.out.println("Schedule icon clicked for room: " + room.getRoomNumber());
-                                try {
-                                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SChedule/Schedule.fxml"));
-                                    Parent root = loader.load();
-                                    RoomScheduleController controller = loader.getController();
-                                    controller.setRoomId(room.getId());
-                                    Stage stage = new Stage();
-                                    stage.setTitle("Lịch mượn phòng: " + room.getRoomNumber());
-                                    stage.setScene(new Scene(root));
-                                    stage.show();
-                                } catch (IOException e) {
-                                    ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ lịch!");
-                                    e.printStackTrace();
-                                }
-                            });
 
                             actionBox.setAlignment(Pos.CENTER);
                             if (canEdit) {
                                 actionBox.getChildren().add(editWrapper);
                             }
-                            actionBox.getChildren().add(scheduleWrapper); // Thêm icon lịch
                             if (canDelete) {
                                 actionBox.getChildren().add(deleteIcon);
                             }
@@ -366,22 +330,8 @@ public class ManagerRoomController implements Initializable {
                             super.updateItem(item, empty);
                             if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
                                 setGraphic(null);
-                                System.out.println("Table cell is empty, no icons displayed.");
                             } else {
-                                Room room = getTableView().getItems().get(getIndex());
                                 setGraphic(actionBox);
-                                if (canEdit) {
-                                    System.out.println("Adding edit icon for room: " + room.getRoomNumber());
-                                } else {
-                                    System.out.println("Edit icon not added due to lack of edit permission.");
-                                }
-                                System.out.println("Adding schedule icon for room: " + room.getRoomNumber());
-                                if (canDelete) {
-                                    System.out.println("Adding delete icon for room: " + room.getRoomNumber());
-                                } else {
-                                    System.out.println("Delete icon not added due to lack of delete permission.");
-                                }
-                                System.out.println("Displaying action icons for room: " + room.getRoomNumber());
                             }
                         }
                     };
@@ -389,9 +339,6 @@ public class ManagerRoomController implements Initializable {
             });
             tblRooms.setItems(FXCollections.observableArrayList(rooms));
             tblRooms.setSelectionModel(null);
-            System.out.println("Loaded " + rooms.size() + " rooms into TableView.");
-        } else {
-            System.out.println("One or more TableView components are null. Check FXML file.");
         }
     }
 }

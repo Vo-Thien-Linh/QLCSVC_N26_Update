@@ -1,3 +1,4 @@
+/*button*/
 .button-sidebar {
     -fx-text-fill: #b7c0cd;
     -fx-font-size: 16px;
@@ -124,6 +125,9 @@
     -fx-text-fill: white;
 }
 
+/*end button*/
+
+/*table*/
 .table-view {
     -fx-background-color: white;
     -fx-table-cell-border-color: transparent;
@@ -167,7 +171,7 @@
 
 
 .table-view .column-header-background {
-    -fx-background-color: #1a326a;
+    -fx-background-color: #12385e;
     -fx-border-color: transparent;
     -fx-border-width: 0;
 }
@@ -200,6 +204,32 @@
     -fx-background-color: #dee2e6;
     -fx-font-weight: bold;
 }
+
+.scheduleTable.table-view .table-cell {
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 1px 1px 0;
+    -fx-border-style: solid;
+    -fx-alignment: center;
+    -fx-padding: 5px;
+}
+
+.scheduleTable.table-view .table-row-cell {
+    -fx-cell-size: 158.4px;
+}
+
+.scheduleTable.table-view .table-row-cell:odd {
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 1px 1px 0;
+}
+
+
+.scheduleTable.table-view .column-header, .table-view .filler {
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 1px 1px 0;
+    -fx-border-style: solid;
+}
+/*end table*/
 
 /*manager*/
 .context-menu {
