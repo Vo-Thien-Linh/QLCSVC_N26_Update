@@ -19,6 +19,7 @@ public class Device extends Facilities {
     private int availableQuantity;
     private boolean deleted;
     private boolean selected;
+    private String maintainedBy;
 //    private final BooleanProperty selectedForBorrow = new SimpleBooleanProperty(false);
 //    private Integer quantityToBorrow = 0;
 
@@ -174,6 +175,13 @@ public class Device extends Facilities {
         System.out.println("Value: " + price);
         System.out.println("Created At: " + getCreatedAt());
         System.out.println("Updated At: " + getUpdatedAt());
+    }
+    public String getMaintainedBy() {
+        return maintainedBy;
+    }
+
+    public void setMaintainedBy(String maintainedBy) {
+        this.maintainedBy = maintainedBy;
     }
 }
 

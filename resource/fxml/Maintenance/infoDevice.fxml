@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="799.0" prefWidth="1351.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.InfoDeviceController">
+    <bottom>
+        <HBox alignment="CENTER" prefHeight="60.0" prefWidth="1209.0" spacing="10">
+            <ComboBox fx:id="maintainerComboBox" prefWidth="200.0" promptText="Chọn người bảo trì" />
+            <Button mnemonicParsing="false" onAction="#confirmMaintenance" style="-fx-background-radius: 20; -fx-padding: 10px 24px; -fx-background-color: #4CAF50;" text="Xác nhận" textFill="WHITE">
+                <font>
+                    <Font name="Calibri Bold" size="14.0" />
+                </font>
+                <cursor>
+                    <Cursor fx:constant="HAND" />
+                </cursor>
+            </Button>
+        </HBox>
+    </bottom>
+    <top>
+        <VBox alignment="CENTER" prefHeight="63.0" prefWidth="1211.0">
+            <children>
+                <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="98.0" prefWidth="1264.0" text="Thông tin các thiết bị chưa được bảo trì" textFill="#1b861e">
+                    <font>
+                        <Font name="Cambria Bold" size="23.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <TableView fx:id="deviceTable" prefHeight="599.0" prefWidth="1211.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="deviceIdColumn" prefWidth="75.0" text="ID Thiết bị" />
+                <TableColumn fx:id="deviceNameColumn" prefWidth="129.0" text="Tên thiết bị" />
+                <TableColumn fx:id="deviceTypeColumn" prefWidth="150.0" text="Loại thiết bị" />
+                <TableColumn fx:id="purchaseDateColumn" prefWidth="120.0" text="Ngày mua" />
+                <TableColumn fx:id="supplierColumn" prefWidth="134.0" text="Nhà cung cấp" />
+                <TableColumn fx:id="priceColumn" prefWidth="96.0" text="Giá" />
+                <TableColumn fx:id="statusColumn" prefWidth="87.0" text="Trạng thái" />
+                <TableColumn fx:id="roomColumn" prefWidth="117.0" text="Phòng" />
+                <TableColumn fx:id="quantityColumn" prefWidth="131.0" text="Số lượng" />
+                <TableColumn fx:id="availableQuantityColumn" prefWidth="157.0" text="Số lượng khả dụng" />
+                <TableColumn fx:id="maintainedByNameColumn" prefWidth="154.0" text="Người bảo trì" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

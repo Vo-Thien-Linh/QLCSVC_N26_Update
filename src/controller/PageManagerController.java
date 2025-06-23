@@ -139,7 +139,7 @@ public class PageManagerController implements Initializable {
         });
 
         btnMaintenance.setOnAction(e -> {
-            switchView(new Label("🔧 Đây là Quản lý bảo trì"));
+            loadMaintenanceView();
             highlightButton(btnMaintenance);
         });
 
@@ -281,7 +281,7 @@ public class PageManagerController implements Initializable {
                     contentPath = "/fxml/borrow-device/index.fxml.fxml"; // Mượn thiết bị
                     break;
                 case 6: // Bảo trì
-                    contentPath = "/fxml/statistical/index.fxml.fxml"; // Thống kê
+                    contentPath = "/fxml/Maintenance/ManagerMaintenance.fxml"; // Thống kê
                     break;
                 default:
                     contentPath = "/fxml/login/index.fxml"; // Fallback
@@ -313,6 +313,21 @@ public class PageManagerController implements Initializable {
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+    private void loadMaintenanceView() {
+        System.out.println("Chuyển đến Quản lý bảo trì cho user: " + UserSession.getCurrentUserId());
+        try {
+            String resourcePath = "/fxml/Maintenance/ManagerMaintenance.fxml";
+            System.out.println("Đang tải: " + resourcePath + ", Tồn tại: " + (getClass().getResource(resourcePath) != null));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
+            Parent maintenanceView = loader.load();
+            contentPane.getChildren().setAll(maintenanceView);
+            System.out.println("Đã tải ManagerMaintenance.fxml thành công");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi khi tải ManagerMaintenance.fxml: " + e.getMessage());
+            contentPane.getChildren().setAll(new Label(" Lỗi tải ManagerMaintenance.fxml: " + e.getMessage()));
         }
     }
 }
