@@ -351,9 +351,9 @@ VALUES ('CQ.64.CNTT'), ('CQ.65.CNTT'), ('CQ.64.KTXD');
 -- 2. Insert users
 INSERT INTO users (user_id, fullname, username, yearold, email, phoneNumber, password, status, deleted, thumbnail, role_id, department_id, class_id)
 VALUES
-('MTL0001', 'Nguyễn Anh Nguyên', 'nguyen34', '2000-12-09 ', 'nanh@gmail.com', '0983772722', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg', 3, null, null),
-('MTL0002', 'Vo Thien Linh', 'vothienlinh', '1999-05-15', 'vothienlinh2@gmail.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 5, 1, null),
-('MTL0003', 'Nguyen Van A', 'nguyenvana', '1998-03-20', 'vana@example.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 6, 2, null);
+('MTL0001', 'Nguyễn Anh Nguyên', 'nguyen34', '2000-12-09 ', 'nanhnguyen6789@gmail.com', '0983772722', '6f6c9c051e1146b2d54e5d728fdc95758165dc0bd2f1115e13361b9efff56a89', 'ACTIVE', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg', 3, null, null),
+('MTL0002', 'Vo Thien Linh', 'vothienlinh', '1999-05-15', 'vothienlinh2@gmail.com', '0912345678', '99807a342496af67d7b5dee46e9c5ae32e994d2a7ebd9228871ee872daebe9ec', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 5, 1, null),
+('MTL0003', 'Bùi Minh Trọng', 'bmtrong', '2005-04-30', 'buiminhtrong53@gmail.com', '0964095072', 'ac945979f3379d0e9b89b74ef50cf367ac78b44a549b68ba2bbfa985959dd821', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 6, 2, null);
 
 
 
@@ -387,9 +387,12 @@ INSERT INTO room (room_id, status, room_number, seating_capacity, deleted, room_
 ('R017', 'AVAILABLE', 'A214', 8, 0, 5, 'Khu A2');
 
 INSERT INTO device_types (id, type_name) VALUES
-(1,	'Thiết bị tin học')
-(2	'Thiết bị âm thanh')
-(3,	'Thiết bị điện ');
+(1, 'Thiết bị trình chiếu và âm thanh'),
+(2, 'Máy tính'),
+(3, 'Bộ phát wifi'),
+(4, 'Ổ cắm điện'),
+(5, 'Quạt trần'),
+(6, 'Bóng đèn');
 
 -- 5. Insert devices
 INSERT INTO devices (
@@ -439,15 +442,12 @@ INSERT INTO device_borrow_requests (lecturer_user, device_id, request_date, due_
 VALUES
 ('MTL0001', (SELECT id FROM devices WHERE device_name = 'micro' LIMIT 1), '2025-04-21 14:00:00', '2025-04-21 16:00:00', 'PENDING'),
 ('MTL0003', (SELECT id FROM devices WHERE device_name = 'Bộ phát wifi' LIMIT 1), '2025-04-20 08:00:00', '2025-04-20 10:00:00', 'APPROVED');
-<<<<<<< Updated upstream
 
 -- 7. Insert incident (Cập nhật với cột note)
 INSERT INTO incident (reported_by, room_id, description, report_date, status, note)
 VALUES
 ('MTL0001', 'R001', 'Broken projector in room A101', '2025-04-20 09:00:00', 'SENT', 'Kiểm tra máy chiếu không hoạt động'),
 ('MTL0002', 'R002', 'Light flickering in room A102', '2025-06-01 10:00:00', 'SENT', 'Bóng đèn cần thay thế');
-=======
->>>>>>> Stashed changes
 
 -- 7. Insert incident (Cập nhật với cột note)
 INSERT INTO incident (reported_by, device_id, room_id, description, report_date, status, note)
@@ -472,15 +472,10 @@ INSERT INTO functions (id, name) VALUES
 (6, 'Thống kê'),
 (7, 'Mượn thiết bị'),
 (8, 'Mượn phòng'),
-<<<<<<< Updated upstream
 (9, 'Báo cáo sự cố'),
-(10, 'Xử lý sự cố');
-=======
-(9,'Lịch'),
-(10, 'Quản lý bảo trì'),
-(11, 'Báo cáo sự cố'),
+(10,'Lịch'),
+(11, 'Quản lý bảo trì'),
 (12, 'Xử lý sự cố');
->>>>>>> Stashed changes
 
 -- 10. Insert permissions
 INSERT INTO permissions (id, role_id, function_id, permission_type_id, allowed) VALUES

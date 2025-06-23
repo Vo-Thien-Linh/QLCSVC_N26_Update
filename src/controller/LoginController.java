@@ -47,7 +47,6 @@ public class LoginController {
         if (loginImage != null) {
             loginImage.setImage(new Image(getClass().getResourceAsStream("/img/house-black-silhouette-without-door (1).png")));
         }
-
         tempPasswordField.managedProperty().bind(tempPasswordField.visibleProperty());
         tempPasswordField.visibleProperty().bind(displaypassword.selectedProperty());
         PasswordField.managedProperty().bind(PasswordField.visibleProperty());
@@ -56,16 +55,12 @@ public class LoginController {
         notificationArea.setText("");
         notificationArea.setStyle("-fx-background-color: transparent;");
 
-        // Đảm bảo stage login hiện tại luôn nằm giữa màn hình và không được resize
+        // Trì hoãn đặt vị trí ở giữa và khóa kích thước
         Platform.runLater(() -> {
             Stage stage = (Stage) notificationArea.getScene().getWindow();
             if (stage != null) {
                 stage.centerOnScreen();
-
                 stage.setResizable(false); // Không cho phép thu phóng cho đăng nhập
-
-                stage.setResizable(false);
-
             } else {
                 System.err.println("Stage không được khởi tạo trong Platform.runLater!");
             }
@@ -86,7 +81,6 @@ public class LoginController {
         try {
             User user = loginService.authenticateUser(username, password);
             if (user != null) {
-
                 UserSession.startSession(user.getUserId(), user.getRole() != null ? user.getRole().getRoleId() : 0);
                 notificationArea.setText("Đăng nhập thành công! Chào " + user.getFullname());
                 int roleId = user.getRole() != null ? user.getRole().getRoleId() : 0;
@@ -107,27 +101,6 @@ public class LoginController {
                     e.printStackTrace();
                     notificationArea.setText("Lỗi khi chuyển trang: " + e.getMessage() + ", Đường dẫn: " + fxmlPath);
                 }
-
-                UserSession.startSession(user.getUserId(), user.getRole() != null ? user.getRole().getRoleId() : 0);notificationArea.setText("Đăng nhập thành công! Chào " + user.getFullname());
-
-                String roleName = user.getRole() != null ? user.getRole().getRoleName() : "unknown";
-                String fxmlPath = "/fxml/layout/PageManagerView.fxml";
-                if ("teacher".equals(roleName)) fxmlPath = "/fxml/borrow-device/index.fxml";
-                if ("maintenance".equals(roleName)) fxmlPath = "/fxml/statistical/index.fxml";
-
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-                Parent root = loader.load();
-
-                // ✅ Tạo Stage mới để tránh kế thừa trạng thái giao diện cũ
-                Stage newStage = new Stage();
-                newStage.setTitle("Trang chủ");
-                newStage.setScene(new Scene(root));
-                newStage.setMaximized(true); // Toàn màn hình
-                newStage.show();
-
-                // ✅ Đóng Stage đăng nhập hiện tại
-                Stage currentStage = (Stage) notificationArea.getScene().getWindow();
-                currentStage.close();
             } else {
                 notificationArea.setText("Đăng nhập thất bại! Tên đăng nhập hoặc mật khẩu không đúng.");
                 System.out.println("Đăng nhập thất bại - Username: " + username + ", Password: " + password);
@@ -150,23 +123,14 @@ public class LoginController {
             if (getClass().getResource("/fxml/login/forgot.fxml") == null) {
                 throw new IOException("File forgot.fxml không được tìm thấy tại /fxml/login/forgot.fxml");
             }
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login/forgot.fxml"));
             Parent root = loader.load();
-
             Stage stage = new Stage();
-
-            Stage stage = new Stage(); // Mở stage mới
-
             stage.setScene(new Scene(root));
             stage.centerOnScreen();
             stage.setResizable(false);
             stage.setTitle("Quên mật khẩu");
             stage.show();
-
-
-            // Đóng login stage hiện tại
-
             Stage currentStage = (Stage) notificationArea.getScene().getWindow();
             if (currentStage != null) {
                 currentStage.close();
@@ -174,6 +138,7 @@ public class LoginController {
         } catch (IOException e) {
             e.printStackTrace();
             notificationArea.setText("Lỗi khi chuyển đến trang quên mật khẩu: " + e.getMessage());
+            System.err.println("Lỗi chi tiết: " + e.getMessage());
         }
     }
 }
