@@ -15,7 +15,7 @@ import java.util.Map;
 public class BorrowRoomRepository {
     public List<String> roomTypeData(){
         List<String> datas = new ArrayList<>();
-        String sql = "SELECT * FROM room_types";
+        String sql = "SELECT * FROM room_types WHERE type_name != 'Kho thiết bị'";
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)){
 
@@ -54,7 +54,7 @@ public class BorrowRoomRepository {
 
     public List<Room> filterAndSearch(String typeName, String keyword, int limit, int skip){
         List<Room> datas = new ArrayList<>();
-        String sql = "SELECT room.*, room_types.type_name FROM room JOIN room_types ON room.room_type_id = room_types.id WHERE room.status = 'AVAILABLE' AND deleted = false";
+        String sql = "SELECT room.*, room_types.type_name FROM room JOIN room_types ON room.room_type_id = room_types.id WHERE room.status = 'AVAILABLE' AND room.deleted = false AND room_types.type_name != 'Kho thiết bị'";
         List<Object> params = new ArrayList<>();
 
 //        Lọc theo loại phòng
@@ -65,7 +65,8 @@ public class BorrowRoomRepository {
 
 //        Tìm kiếm
         if(keyword != null && !keyword.isBlank()){
-            sql += " AND LOWER(room.room_number) LIKE ?";
+            sql += " AND LOWER(room.room_number) LIKE ? OR LOWER(room_types.type_name) LIKE ?";
+            params.add("%"+keyword.toLowerCase()+"%");
             params.add("%"+keyword.toLowerCase()+"%");
         }
 
@@ -99,7 +100,7 @@ public class BorrowRoomRepository {
     }
 
     public int countRoom(String typeName, String keyword){
-        String sql = "SELECT COUNT(*) FROM room JOIN room_types ON room.room_type_id = room_types.id WHERE room.status = 'AVAILABLE' AND deleted = false";
+        String sql = "SELECT COUNT(*) FROM room JOIN room_types ON room.room_type_id = room_types.id WHERE room.status = 'AVAILABLE' AND room.deleted = false AND room_types.type_name != 'Kho thiết bị'";
         List<Object> params = new ArrayList<>();
 
 //        Lọc theo loại phòng
@@ -204,7 +205,7 @@ public class BorrowRoomRepository {
                 ResultSet rs = stmt.getGeneratedKeys();
                 if (rs.next()) {
                     Integer borrowRoomId = rs.getInt(1);
-                    BorrowDevice borrowDevice = new BorrowDevice(0, borrowRoom.getBorrower().getUserId(), borrowRoom.getBorrowDate(), borrowRoom.getstartPeriod(), borrowRoom.getEndPeriod(), BorrowStatus.PENDING, null, borrowRoomId, borrowRoom.getBorrowReason());
+                    BorrowDevice borrowDevice = new BorrowDevice(0, borrowRoom.getBorrower(), borrowRoom.getBorrowDate(), borrowRoom.getstartPeriod(), borrowRoom.getEndPeriod(), BorrowStatus.PENDING, null, borrowRoomId, borrowRoom.getBorrowReason(), null, null);
                     List<BorrowDeviceDetail> devices = borrowRoom.getBorrowDeviceDetail();
                     if (devices != null && !devices.isEmpty()) {
                         return createBorrowDevice(borrowDevice, devices);
@@ -224,11 +225,11 @@ public class BorrowRoomRepository {
     }
 
     public Boolean createBorrowDevice(BorrowDevice borrowDevice, List<BorrowDeviceDetail> borrowDevices) {
-        String sql = "INSERT INTO borrow_device (user_id, borrow_date, start_period, end_period, borrow_status, created_at, borrow_room_id, note) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)";
+        String sql = "INSERT INTO borrow_device (user_id, borrow_date, start_period, end_period, borrow_status, created_at, borrow_room_id, borrow_reason) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 
-            stmt.setString(1, borrowDevice.getUserId());
+            stmt.setString(1, borrowDevice.getBorrower().getUserId());
             stmt.setDate(2,  Date.valueOf(borrowDevice.getBorrowDate()));
             stmt.setInt(3, borrowDevice.getStartPeriod());
             stmt.setInt(4, borrowDevice.getEndPeriod());
@@ -238,7 +239,7 @@ public class BorrowRoomRepository {
             } else {
                 stmt.setNull(6, java.sql.Types.INTEGER);
             }
-            stmt.setString(7, borrowDevice.getNote());
+            stmt.setString(7, borrowDevice.getBorrowReason());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
@@ -318,19 +319,23 @@ public class BorrowRoomRepository {
             SELECT 
                 br.*, 
                 u.fullname, 
+                c.name AS className,
+                dt.name AS departmentName,
                 r.room_number,
                 d.device_name,
                 d.id AS device_id,
                 d.available_quantity,
+                bdd.id AS borrowDeviceDetailId,
                 bdd.quantity
             FROM borrow_room br 
             JOIN Users u ON br.borrower_id = u.user_id 
+            LEFT JOIN classes c ON u.class_id = c.id
+            LEFT JOIN departments dt ON u.department_id = dt.id
             JOIN room r ON br.room_id = r.room_id 
             LEFT JOIN borrow_device bd ON br.id = bd.borrow_room_id
             LEFT JOIN borrow_device_detail bdd ON bd.id =  bdd.borrow_device_id
             LEFT JOIN devices d ON bdd.device_id = d.id
-            WHERE br.status != 'CANCELLED' AND borrower_id = ? AND br.created_at >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
-                                                               
+            WHERE br.status != 'CANCELLED' AND br.borrower_id = ? AND br.created_at >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)                                              
             ORDER BY br.id DESC
         """;
         try(Connection conn = DatabaseConnection.getConnection();
@@ -346,7 +351,7 @@ public class BorrowRoomRepository {
                     borrowRoom.setId(borrowRoomId);
                     borrowRoom.setRoomId(rs.getString("room_id"));
                     borrowRoom.setRoomNumber(rs.getString("room_number"));
-                    borrowRoom.setBorrower(new User(null, rs.getString("fullname")));
+                    borrowRoom.setBorrower(new User(null, rs.getString("fullname"), rs.getString("className"), rs.getString("departmentName")));
                     borrowRoom.setBorrowDate(rs.getDate("borrow_date").toLocalDate());
                     borrowRoom.setStartPeriod(rs.getInt("start_period"));
                     borrowRoom.setEndPeriod(rs.getInt("end_period"));
@@ -359,6 +364,7 @@ public class BorrowRoomRepository {
                 String deviceId = rs.getString("device_id");
                 if(!rs.wasNull()) {
                     BorrowDeviceDetail borrowDeviceDetail = new BorrowDeviceDetail();
+                    borrowDeviceDetail.setId(rs.getInt("borrowDeviceDetailId"));
                     borrowDeviceDetail.setDevice(new Device(deviceId, rs.getString("device_name"), rs.getInt("available_quantity")));
                     borrowDeviceDetail.setQuantity(rs.getInt("quantity"));
                     requestMap.get(borrowRoomId).addDevice(borrowDeviceDetail);
@@ -388,5 +394,101 @@ public class BorrowRoomRepository {
         }
         return false;
     }
+
+    public List<BorrowRoom> getBorrowedRoomsApproved() {
+        Map<Integer, BorrowRoom> requestMap = new LinkedHashMap<>();
+        String sql = """
+            SELECT 
+                br.*, 
+                u.fullname, 
+                c.name AS className,
+                dt.name AS departmentName,
+                r.room_number,
+                d.device_name,
+                d.id AS device_id,
+                d.available_quantity,
+                bdd.quantity
+            FROM borrow_room br 
+            JOIN Users u ON br.borrower_id = u.user_id 
+            LEFT JOIN classes c ON u.class_id = c.id
+            LEFT JOIN departments dt ON u.department_id = dt.id
+            JOIN room r ON br.room_id = r.room_id 
+            LEFT JOIN borrow_device bd ON br.id = bd.borrow_room_id
+            LEFT JOIN borrow_device_detail bdd ON bd.id =  bdd.borrow_device_id
+            LEFT JOIN devices d ON bdd.device_id = d.id
+            WHERE br.status = 'APPROVED' AND br.borrower_id = ?                                             
+        """;
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setString(1, UserSession.getUserId());
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int borrowRoomId =  rs.getInt("id");
+                if(!requestMap.containsKey(borrowRoomId)) {
+                    BorrowRoom  borrowRoom = new BorrowRoom();
+                    borrowRoom.setId(borrowRoomId);
+                    borrowRoom.setRoomId(rs.getString("room_id"));
+                    borrowRoom.setRoomNumber(rs.getString("room_number"));
+                    borrowRoom.setBorrower(new User(null, rs.getString("fullname"), rs.getString("className"), rs.getString("departmentName")));
+                    borrowRoom.setBorrowDate(rs.getDate("borrow_date").toLocalDate());
+                    borrowRoom.setStartPeriod(rs.getInt("start_period"));
+                    borrowRoom.setEndPeriod(rs.getInt("end_period"));
+                    borrowRoom.setBorrowReason(rs.getString("borrow_reason"));
+                    borrowRoom.setRejectReason(rs.getString("reject_reason"));
+                    borrowRoom.setStatus(BorrowStatus.valueOf(rs.getString("status")));
+                    requestMap.put(borrowRoomId, borrowRoom);
+                }
+
+                String deviceId = rs.getString("device_id");
+                if(!rs.wasNull()) {
+                    BorrowDeviceDetail borrowDeviceDetail = new BorrowDeviceDetail();
+                    borrowDeviceDetail.setDevice(new Device(deviceId, rs.getString("device_name"), rs.getInt("available_quantity")));
+                    borrowDeviceDetail.setQuantity(rs.getInt("quantity"));
+                    requestMap.get(borrowRoomId).addDevice(borrowDeviceDetail);
+                }
+            }
+
+            return new ArrayList<>(requestMap.values());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean returnRoom(int borrowRoomId, String note) {
+        String sql = "INSERT INTO return_room (borrow_room_id, return_note) VALUES (?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, borrowRoomId);
+            stmt.setString(2, note);
+
+            int result = stmt.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateBorrowRoomStatus(int borrowRoomId) {
+        String sql = "UPDATE borrow_room SET status = 'RETURNED' WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, borrowRoomId);
+            int result = stmt.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
 }

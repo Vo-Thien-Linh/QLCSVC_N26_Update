@@ -90,16 +90,16 @@ public class StatisticalRepository {
         List<UsageStat> stats = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder("""
-                    SELECT d.device_name,
-                           DATE_FORMAT(u.used_at, '%Y-%m') AS usage_month,
-                           COUNT(*) AS usage_count
-                    FROM usage_logs u
-                    JOIN devices d ON u.device_id = d.id
-                    JOIN room r ON d.room_id = r.room_id
-                    WHERE YEAR(u.used_at) = ?
-                """);
+            SELECT d.device_name,
+                   DATE_FORMAT(br.created_at, '%Y-%m') AS usage_month,
+                   COUNT(*) AS usage_count
+            FROM borrow_device_detail bdd
+            JOIN borrow_device br ON bdd.borrow_device_id = br.id
+            JOIN devices d ON bdd.device_id = d.id
+            JOIN room r ON d.room_id = r.room_id
+            WHERE YEAR(br.created_at) = ? AND br.borrow_status = 'APPROVED'
+        """);
 
-        // Nếu có lọc theo phòng, thêm điều kiện
         if (roomNumber != null && !roomNumber.equalsIgnoreCase("Tất cả")) {
             sql.append(" AND r.room_number = ? ");
         }
@@ -130,6 +130,7 @@ public class StatisticalRepository {
 
         return stats;
     }
+
 
     public Map<DeviceStatus, Integer> getDeviceStatusCount() {
         Map<DeviceStatus, Integer> result = new HashMap<>();

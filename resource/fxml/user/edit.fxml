@@ -17,9 +17,9 @@
 
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.image.ImageView?>
-<BorderPane stylesheets="/css/style.css" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="640.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.EditUserController">
+<BorderPane stylesheets="/css/style.css" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.EditUserController">
     <center>
-        <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0" BorderPane.alignment="CENTER">
+        <VBox prefWidth="100.0" spacing="15.0" BorderPane.alignment="CENTER">
             <children>
                 <VBox spacing="5.0">
                     <children>
@@ -86,6 +86,30 @@
                         <ComboBox fx:id="roleComboBox" promptText="Chọn vai trò" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-border-color: #cac9c9"/>
                     </children>
                 </VBox>
+
+                <HBox spacing="50.0">
+                    <VBox spacing="5.0" fx:id="VbClass">
+                        <children>
+                            <Label text="Lớp">
+                                <font>
+                                    <Font name="System Bold" size="12.0" />
+                                </font>
+                            </Label>
+                            <ComboBox fx:id="cboClass" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-border-color: #cac9c9"/>
+                        </children>
+                    </VBox>
+
+                    <VBox spacing="5.0" fx:id="VbDepartment">
+                        <children>
+                            <Label text="Phòng ban">
+                                <font>
+                                    <Font name="System Bold" size="12.0" />
+                                </font>
+                            </Label>
+                            <ComboBox fx:id="cbDepartment" style="-fx-background-color: white; -fx-border-radius: 5px; -fx-border-color: #cac9c9"/>
+                        </children>
+                    </VBox>
+                </HBox>
 
                 <VBox spacing="5.0">
                     <children>

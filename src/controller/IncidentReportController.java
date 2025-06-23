@@ -27,13 +27,13 @@ public class IncidentReportController {
 
     @FXML private TableView<IncidentReport> tblBorrowedRooms;
     @FXML private TableColumn<IncidentReport, String> colIdReport;
-    @FXML private TableColumn<IncidentReport, String> colRoomNumber; // Thay: colRoomNumber đã đúng, giữ nguyên
+    @FXML private TableColumn<IncidentReport, String> colRoomNumber;
     @FXML private TableColumn<IncidentReport, String> colBorrowDate;
     @FXML private TableColumn<IncidentReport, String> colBorrower;
     @FXML private TableColumn<IncidentReport, String> colDescription;
+    @FXML private TableColumn<IncidentReport, String> colStartPeriod;
+    @FXML private TableColumn<IncidentReport, String> colEndPeriod;
     @FXML private TableColumn<IncidentReport, String> colAction;
-    @FXML private TableColumn<IncidentReport, String> colStartPeriod; // Thêm: Cột tiết bắt đầu
-    @FXML private TableColumn<IncidentReport, String> colEndPeriod;   // Thêm: Cột tiết kết thúc
     @FXML private Button btnViewReports;
 
     @FXML
@@ -45,8 +45,8 @@ public class IncidentReportController {
         tblBorrowedRooms.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 IncidentReport selected = tblBorrowedRooms.getSelectionModel().getSelectedItem();
-                if (selected != null && selected.getRoomNumber() != null) { // Thay: getRoomId thành getRoomNumber
-                    openReportForm(selected.getRoomNumber()); // Thay: roomId thành roomNumber
+                if (selected != null && selected.getRoomNumber() != null) {
+                    openReportForm(selected.getRoomNumber());
                 }
             }
         });
@@ -54,46 +54,35 @@ public class IncidentReportController {
 
     private void setupTableColumns() {
         colIdReport.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getIdReport() != null ? cellData.getValue().getIdReport() : "Chưa báo cáo"));
-        colRoomNumber.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRoomNumber() != null ? cellData.getValue().getRoomNumber() : "")); // Thay: Sử dụng getRoomNumber
+        colRoomNumber.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRoomNumber() != null ? cellData.getValue().getRoomNumber() : ""));
         colBorrowDate.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getBorrowDate() != null ? cellData.getValue().getBorrowDate().toLocalDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : ""));
         colBorrower.setCellValueFactory(cellData -> new SimpleStringProperty(
                 cellData.getValue().getBorrowerName() != null ? cellData.getValue().getBorrowerName() : ""));
-        colDescription.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription() != null ? cellData.getValue().getDescription() : ""));
+        colDescription.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription() != null ? cellData.getValue().getDescription() : "Chưa có mô tả"));
+        colStartPeriod.setCellValueFactory(cellData -> {
+            Integer start = cellData.getValue().getStartPeriod();
+            return new SimpleStringProperty(start != null ? start.toString() : "N/A");
+        });
+        colStartPeriod.setPrefWidth(100);
+        colEndPeriod.setCellValueFactory(cellData -> {
+            Integer end = cellData.getValue().getEndPeriod();
+            return new SimpleStringProperty(end != null ? end.toString() : "N/A");
+        });
+        colEndPeriod.setPrefWidth(100);
 
         colAction.setCellFactory(tc -> new TableCell<IncidentReport, String>() {
             private final Button btnReport = new Button("📝");
 
             {
-                // Thiết lập giao diện cho nút
-                btnReport.setStyle("-fx-background-color: #4CAF50; " +
-                        "-fx-text-fill: white; " +
-                        "-fx-background-radius: 5px; " +
-                        "-fx-padding: 5px 10px; " +
-                        "-fx-cursor: hand;");
+                btnReport.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5px; -fx-padding: 5px 10px; -fx-cursor: hand;");
                 btnReport.setTooltip(new Tooltip("Báo cáo sự cố"));
-
-                // Hiệu ứng khi di chuột
-                btnReport.setOnMouseEntered(event -> {
-                    btnReport.setStyle("-fx-background-color: #45a049; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 5px; " +
-                            "-fx-padding: 5px 10px; " +
-                            "-fx-cursor: hand;");
-                });
-                btnReport.setOnMouseExited(event -> {
-                    btnReport.setStyle("-fx-background-color: #4CAF50; " +
-                            "-fx-text-fill: white; " +
-                            "-fx-background-radius: 5px; " +
-                            "-fx-padding: 5px 10px; " +
-                            "-fx-cursor: hand;");
-                });
-
-                // Sự kiện nhấp chuột
+                btnReport.setOnMouseEntered(event -> btnReport.setStyle("-fx-background-color: #45a049; -fx-text-fill: white; -fx-background-radius: 5px; -fx-padding: 5px 10px; -fx-cursor: hand;"));
+                btnReport.setOnMouseExited(event -> btnReport.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5px; -fx-padding: 5px 10px; -fx-cursor: hand;"));
                 btnReport.setOnAction(event -> {
                     IncidentReport report = getTableView().getItems().get(getIndex());
-                    if (report != null && report.getRoomNumber() != null) { // Thay: getRoomId thành getRoomNumber
-                        openReportForm(report.getRoomNumber()); // Thay: roomId thành roomNumber
+                    if (report != null && report.getRoomNumber() != null) {
+                        openReportForm(report.getRoomNumber());
                     }
                 });
             }
@@ -104,22 +93,6 @@ public class IncidentReportController {
                 setGraphic(empty ? null : btnReport);
             }
         });
-
-        // Thêm: Cột tiết bắt đầu
-        colStartPeriod.setCellValueFactory(cellData -> {
-            Integer start = cellData.getValue().getStartPeriod();
-            return new SimpleStringProperty(start != null ? start.toString() : "N/A");
-        });
-        colStartPeriod.setPrefWidth(100); // Thêm: Đặt độ rộng cột
-
-        // Thêm: Cột tiết kết thúc
-        colEndPeriod.setCellValueFactory(cellData -> {
-            Integer end = cellData.getValue().getEndPeriod();
-            return new SimpleStringProperty(end != null ? end.toString() : "N/A");
-        });
-        colEndPeriod.setPrefWidth(100); // Thêm: Đặt độ rộng cột
-
-        tblBorrowedRooms.setPlaceholder(new Label("Không có phòng nào đang mượn."));
     }
 
     private void loadIncidentReportsForBorrowedRooms() {
@@ -130,25 +103,24 @@ public class IncidentReportController {
             userId = "MTL0001";
         }
 
-        String sql = "SELECT r.room_id, r.room_number, br.borrow_date, u.fullname AS borrower_name, i.id_report, i.description, " + // Thay: room_id thành room_number
-                "br.start_period, br.end_period " + // Thêm: Lấy start_period và end_period
+        String sql = "SELECT r.room_id, r.room_number, br.borrow_date, u.fullname AS borrower_name, i.id_report, i.description, " +
+                "br.start_period, br.end_period " +
                 "FROM room r " +
                 "JOIN borrow_room br ON r.room_id = br.room_id " +
-                "LEFT JOIN incident i ON r.room_id = i.room_id AND i.reported_by = ? " +
+                "LEFT JOIN incident i ON r.room_id = i.room_id AND i.reported_by = ? AND i.status = 'SENT' " +
                 "LEFT JOIN users u ON br.borrower_id = u.user_id " +
                 "WHERE br.borrower_id = ? AND br.status = 'APPROVED'";
-
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, userId);
             stmt.setString(2, userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String roomNumber = rs.getString("room_number"); // Thay: room_id thành room_number
+                String roomNumber = rs.getString("room_number");
                 IncidentReport report = new IncidentReport(
                         rs.getString("id_report"),
                         null,
-                        roomNumber, // Thay: roomId thành roomNumber
+                        roomNumber,
                         null,
                         rs.getString("description"),
                         null
@@ -156,8 +128,8 @@ public class IncidentReportController {
                 report.setBorrowDate(rs.getObject("borrow_date", LocalDateTime.class));
                 String borrowerName = rs.getString("borrower_name");
                 report.setBorrowerName(borrowerName != null ? borrowerName : userId);
-                report.setStartPeriod(rs.getInt("start_period")); // Thêm: Gán tiết bắt đầu
-                report.setEndPeriod(rs.getInt("end_period"));   // Thêm: Gán tiết kết thúc
+                report.setStartPeriod(rs.getInt("start_period"));
+                report.setEndPeriod(rs.getInt("end_period"));
                 reports.add(report);
             }
             System.out.println("Loaded " + reports.size() + " borrowed rooms for user: " + userId);
@@ -178,7 +150,7 @@ public class IncidentReportController {
             userId = "MTL0001";
         }
 
-        String sql = "SELECT i.id_report, r.room_number, i.report_date, i.description, i.status " + // Thay: room_number đã đúng
+        String sql = "SELECT i.id_report, r.room_number, i.report_date, i.description, i.status " +
                 "FROM incident i " +
                 "JOIN room r ON i.room_id = r.room_id " +
                 "WHERE i.reported_by = ? " +
@@ -192,15 +164,14 @@ public class IncidentReportController {
                 reports.add(new IncidentReport(
                         rs.getString("id_report"),
                         null,
-                        rs.getString("room_number"), // Thay: room_id thành room_number
+                        rs.getString("room_number"),
                         rs.getObject("report_date", LocalDateTime.class),
                         rs.getString("description"),
                         IncidentStatus.valueOf(rs.getString("status"))
                 ));
             }
             System.out.println("Loaded " + reports.size() + " reports for user: " + userId);
-        } catch (SQLException e) {
-            ScannerUtils.showError("Lỗi cơ sở dữ liệu", "Đã xảy ra lỗi khi tải dữ liệu: " + e.getMessage());
+        } catch (SQLException e) {ScannerUtils.showError("Lỗi cơ sở dữ liệu", "Đã xảy ra lỗi khi tải dữ liệu: " + e.getMessage());
             System.err.println("SQL Error: " + e.getMessage());
             e.printStackTrace();
         }
@@ -226,12 +197,12 @@ public class IncidentReportController {
         }
     }
 
-    private void openReportForm(String roomNumber) { // Thay: roomId thành roomNumber
+    private void openReportForm(String roomNumber) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Maintenance/Form.fxml"));
             Parent root = loader.load();
             IncidentReportFormController controller = loader.getController();
-            controller.setRoomNumber(roomNumber); // Thay: setRoomId thành setRoomNumber
+            controller.setRoomNumber(roomNumber);
             Stage stage = new Stage();
             stage.setTitle("Báo cáo sự cố");
             stage.setScene(new Scene(root, 500, 400));

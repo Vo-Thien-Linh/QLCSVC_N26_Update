@@ -23,13 +23,13 @@ public class ResolvedIncidentsController implements Initializable {
     @FXML
     private TableColumn<IncidentReport, String> colIdReport;
     @FXML
-    private TableColumn<IncidentReport, String> colRoomNumber; // Thay: colRoomNumber đã đúng, giữ nguyên
+    private TableColumn<IncidentReport, String> colRoomNumber;
     @FXML
     private TableColumn<IncidentReport, LocalDateTime> colReportDate;
     @FXML
-    private TableColumn<IncidentReport, String> colNote;
+    private TableColumn<IncidentReport, String> colDescription;
     @FXML
-    private TableColumn<IncidentReport, String> colHandledBy; // Hiển thị tên nhân viên
+    private TableColumn<IncidentReport, String> colHandledBy;
     @FXML
     private TableColumn<IncidentReport, String> colStatus;
 
@@ -37,40 +37,40 @@ public class ResolvedIncidentsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Thiết lập các cột với lambda để sử dụng getter trực tiếp
+        setupTableColumns();
+        loadResolvedIncidentData();
+    }
+
+    private void setupTableColumns() {
         colIdReport.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getIdReport()));
-        colRoomNumber.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRoomNumber() != null ? cellData.getValue().getRoomNumber() : "N/A")); // Thay: Sử dụng getRoomNumber
+        colRoomNumber.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRoomNumber() != null ? cellData.getValue().getRoomNumber() : "N/A"));
         colReportDate.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getReportDate()));
-        colNote.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNote()));
+        colDescription.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription() != null ? cellData.getValue().getDescription() : "Chưa có mô tả"));
         colHandledBy.setCellValueFactory(cellData -> {
             String handledById = cellData.getValue().getHandledBy();
             return new SimpleStringProperty(handledById != null ? getFullNameFromUserId(handledById) : "Chưa xử lý");
         });
         colStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatusDisplayName()));
-
-        // Tải dữ liệu
-        loadResolvedIncidentData();
     }
 
     private void loadResolvedIncidentData() {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT i.id_report, i.reported_by, r.room_number, i.description, i.report_date, i.handled_by, i.status, i.note " + // Thay: room_id thành room_number
+             ResultSet rs = stmt.executeQuery("SELECT i.id_report, i.reported_by, r.room_number, i.description, i.report_date, i.handled_by, i.status " +
                      "FROM incident i " +
-                     "JOIN room r ON i.room_id = r.room_id " + // Giữ join để lấy room_number
+                     "JOIN room r ON i.room_id = r.room_id " +
                      "WHERE i.status = 'RESOLVED'")) {
 
             resolvedIncidentList.clear();
             while (rs.next()) {
-                IncidentReport incident = new IncidentReport(
-                        rs.getString("id_report"),
-                        rs.getString("handled_by"), // Lưu mã nhân viên
-                        rs.getString("room_number"), // Thay: room_id thành room_number
+                IncidentReport incident = new IncidentReport(rs.getString("id_report"),
+                        rs.getString("handled_by"),
+                        rs.getString("room_number"),
                         rs.getObject("report_date", LocalDateTime.class),
                         rs.getString("description"),
                         IncidentStatus.valueOf(rs.getString("status"))
                 );
-                incident.setNote(rs.getString("note"));
+                System.out.println("Loaded resolved incident " + rs.getString("id_report") + ", Description: " + rs.getString("description"));
                 resolvedIncidentList.add(incident);
             }
             tblResolvedIncidents.setItems(resolvedIncidentList);

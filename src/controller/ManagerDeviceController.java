@@ -4,6 +4,7 @@ import javafx.animation.ScaleTransition;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,6 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -92,6 +94,36 @@ public class ManagerDeviceController implements Initializable {
         }
     }
 
+    @FXML
+    private void handleActionBrowse(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/device/browse.fxml"));
+            Parent root = loader.load();
+            Stage addNewStage = new Stage();
+            addNewStage.setTitle("Duyệt yêu cầu");
+            addNewStage.setScene(new Scene(root));
+            addNewStage.show();
+        } catch (IOException e) {
+            ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ thêm mới!");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleActionReturnHistory(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/device/return-history.fxml"));
+            Parent root = loader.load();
+            Stage addNewStage = new Stage();
+            addNewStage.setTitle("Lịch sử");
+            addNewStage.setScene(new Scene(root));
+            addNewStage.show();
+        } catch (IOException e) {
+            ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ!");
+            e.printStackTrace();
+        }
+    }
+
     public void initialize(URL location, ResourceBundle resources) {
         setupButton();
         dataDumpCbo();
@@ -103,6 +135,11 @@ public class ManagerDeviceController implements Initializable {
 
         btnSearch.setOnMouseClicked(event -> {
             keyword = txtSearch.getText();
+            loadPage(0);
+        });
+
+        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            keyword = newValue.trim();
             loadPage(0);
         });
 
@@ -440,4 +477,5 @@ public class ManagerDeviceController implements Initializable {
             tblDevices.setSelectionModel(null);
         }
     }
+
 }

@@ -123,15 +123,6 @@
                             </ImageView>
                         </graphic>
                     </Button>
-                    <Button fx:id="btnSetting" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Cài đặt">
-                        <graphic>
-                            <ImageView>
-                                <image>
-                                    <Image url="@/img/settings (1).png" />
-                                </image>
-                            </ImageView>
-                        </graphic>
-                    </Button>
                     <Button fx:id="btnBorrowEquipment" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Mượn thiết bị">
                         <graphic>
                             <ImageView>
@@ -146,6 +137,15 @@
                             <ImageView>
                                 <image>
                                     <Image url="@/img/settings (1).png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnSchedule" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Lịch">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/calendar.png" />
                                 </image>
                             </ImageView>
                         </graphic>

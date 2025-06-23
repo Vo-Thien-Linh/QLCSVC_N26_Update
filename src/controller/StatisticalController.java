@@ -193,9 +193,8 @@ public class StatisticalController implements Initializable {
             }
         });
 
-        List<UsageStat> stats = statisticalRepository.getUsageStatsByYear(year, roomNumber); // chú ý thứ tự tham số
+        List<UsageStat> stats = statisticalRepository.getUsageStatsByYear(year, roomNumber);
 
-        // Map thiết bị -> tháng -> count
         Map<String, Map<String, Integer>> deviceMonthCountMap = new HashMap<>();
 
         int maxCount = 0;
@@ -203,7 +202,7 @@ public class StatisticalController implements Initializable {
         // Gom dữ liệu lại
         for (UsageStat stat : stats) {
             String device = stat.getDeviceName();
-            String month = stat.getUsageMonth().substring(5); // lấy tháng dạng "01", "02", ...
+            String month = stat.getUsageMonth().substring(5);
             int count = (int) stat.getUsageCount();
 
             deviceMonthCountMap.putIfAbsent(device, new HashMap<>());
@@ -214,7 +213,6 @@ public class StatisticalController implements Initializable {
             }
         }
 
-        // Tạo series cho từng thiết bị, đủ 12 tháng, nếu thiếu thì cho count=0
         for (String device : deviceMonthCountMap.keySet()) {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
             series.setName(device);
@@ -228,7 +226,6 @@ public class StatisticalController implements Initializable {
 
                 series.getData().add(dataPoint);
 
-                // Gắn tooltip và style sau khi node có sẵn
                 dataPoint.nodeProperty().addListener((obs, oldNode, newNode) -> {
                     if (newNode != null) {
                         Tooltip.install(newNode, new Tooltip(device + " (" + year + "-" + month + "): " + count));

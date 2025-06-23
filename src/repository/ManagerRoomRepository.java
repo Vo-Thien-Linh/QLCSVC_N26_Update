@@ -3,10 +3,7 @@ package repository;
 import config.DatabaseConnection;
 import model.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -265,7 +262,7 @@ public class ManagerRoomRepository {
                     borrowRoom.setId(borrowRoomId);
                     borrowRoom.setRoomId(rs.getString("room_id"));
                     borrowRoom.setRoomNumber(rs.getString("room_number"));
-                    borrowRoom.setBorrower(new User(null, rs.getString("fullname")));
+                    borrowRoom.setBorrower(new User(null, rs.getString("fullname"), null, null));
                     borrowRoom.setBorrowDate(rs.getDate("borrow_date").toLocalDate());
                     borrowRoom.setStartPeriod(rs.getInt("start_period"));
                     borrowRoom.setEndPeriod(rs.getInt("end_period"));
@@ -339,4 +336,84 @@ public class ManagerRoomRepository {
 
         return false;
     }
+
+    public List<RoomReturnHistory> getRoomReturnHistory() {
+        Map<Integer, RoomReturnHistory> requestMap = new LinkedHashMap<>();
+        String sql = """
+        SELECT 
+            br.*, 
+            u.fullname, 
+            r.room_number,
+            d.device_name,
+            d.id AS device_id,
+            d.available_quantity,
+            bdd.quantity,
+            rdd.return_quantity,
+            rr.return_note,
+            rr.return_time
+        FROM borrow_room br 
+        JOIN Users u ON br.borrower_id = u.user_id 
+        JOIN room r ON br.room_id = r.room_id 
+        LEFT JOIN borrow_device bd ON br.id = bd.borrow_room_id
+        LEFT JOIN borrow_device_detail bdd ON bd.id =  bdd.borrow_device_id
+        LEFT JOIN devices d ON bdd.device_id = d.id
+        LEFT JOIN return_device_detail rdd ON bdd.id = rdd.borrow_device_detail_id
+        LEFT JOIN return_room rr ON br.id = rr.borrow_room_id
+        WHERE br.status = 'RETURNED'
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int borrowRoomId = rs.getInt("id");
+
+                RoomReturnHistory roomReturnHistory = requestMap.get(borrowRoomId);
+                if (roomReturnHistory == null) {
+                    BorrowRoom borrowRoom = new BorrowRoom();
+                    borrowRoom.setId(borrowRoomId);
+                    borrowRoom.setRoomId(rs.getString("room_id"));
+                    borrowRoom.setRoomNumber(rs.getString("room_number"));
+                    borrowRoom.setBorrower(new User(null, rs.getString("fullname"), null, null));
+                    borrowRoom.setBorrowDate(rs.getDate("borrow_date").toLocalDate());
+                    borrowRoom.setStartPeriod(rs.getInt("start_period"));
+                    borrowRoom.setEndPeriod(rs.getInt("end_period"));
+                    borrowRoom.setBorrowReason(rs.getString("borrow_reason"));
+                    borrowRoom.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    borrowRoom.setStatus(BorrowStatus.valueOf(rs.getString("status")));
+
+                    roomReturnHistory = new RoomReturnHistory();
+                    roomReturnHistory.setBorrowRoom(borrowRoom);
+                    roomReturnHistory.setReturnQuantity(rs.getInt("return_quantity"));
+                    roomReturnHistory.setConditionNote(rs.getString("return_note"));
+
+                    Timestamp returnTime = rs.getTimestamp("return_time");
+                    if (returnTime != null) {
+                        roomReturnHistory.setReturnTime(returnTime.toLocalDateTime());
+                    }
+
+                    requestMap.put(borrowRoomId, roomReturnHistory);
+                }
+
+                String deviceId = rs.getString("device_id");
+                if (deviceId != null) {
+                    BorrowDeviceDetail borrowDeviceDetail = new BorrowDeviceDetail();
+                    borrowDeviceDetail.setDevice(new Device(deviceId, rs.getString("device_name"), rs.getInt("available_quantity")));
+                    borrowDeviceDetail.setQuantity(rs.getInt("quantity"));
+                    requestMap.get(borrowRoomId).getBorrowRoom().addDevice(borrowDeviceDetail);
+
+                }
+            }
+
+            return new ArrayList<>(requestMap.values());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
 }

@@ -28,7 +28,7 @@ public class IncidentHandlingController implements Initializable {
     @FXML
     private TableColumn<IncidentReport, LocalDateTime> colReportDate;
     @FXML
-    private TableColumn<IncidentReport, String> colNote;
+    private TableColumn<IncidentReport, String> colDescription;
     @FXML
     private TableColumn<IncidentReport, String> colHandledBy;
     @FXML
@@ -44,32 +44,28 @@ public class IncidentHandlingController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Thiết lập các cột với lambda để sử dụng getter trực tiếp
+        setupTableColumns();
+        loadIncidentData();
+        btnConfirmRepair.setOnAction(event -> confirmRepair());
+        btnViewHistory.setOnAction(event -> showMaintenanceHistory());
+    }
+
+    private void setupTableColumns() {
         colIdReport.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getIdReport()));
         colRoomNumber.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRoomNumber() != null ? cellData.getValue().getRoomNumber() : "N/A"));
         colReportDate.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getReportDate()));
-        colNote.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNote()));
+        colDescription.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription() != null ? cellData.getValue().getDescription() : "Chưa có mô tả"));
         colHandledBy.setCellValueFactory(cellData -> {
             String handledById = cellData.getValue().getHandledBy();
             return new SimpleStringProperty(handledById != null ? getFullNameFromUserId(handledById) : "Chưa xử lý");
         });
         colStatus.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatusDisplayName()));
-
-        // Tải dữ liệu
-        loadIncidentData();
-
-        // Hành động cho nút "Xác nhận sửa"
-        btnConfirmRepair.setOnAction(event -> confirmRepair());
-
-        // Hành động cho nút "Xem Lịch sử Xử lý"
-        btnViewHistory.setOnAction(event -> showMaintenanceHistory());
     }
 
     private void loadIncidentData() {
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT i.id_report, i.reported_by, r.room_number, i.description, i.report_date, i.handled_by, i.status, i.note " +
-                     "FROM incident i " +
+             ResultSet rs = stmt.executeQuery("SELECT i.id_report, i.reported_by, r.room_number, i.description, i.report_date, i.handled_by, i.status " +"FROM incident i " +
                      "JOIN room r ON i.room_id = r.room_id " +
                      "WHERE i.status = 'SENT'")) {
 
@@ -83,7 +79,7 @@ public class IncidentHandlingController implements Initializable {
                         rs.getString("description"),
                         IncidentStatus.valueOf(rs.getString("status"))
                 );
-                incident.setNote(rs.getString("note"));
+                System.out.println("Loaded incident " + rs.getString("id_report") + ", Description: " + rs.getString("description"));
                 incidentList.add(incident);
             }
             tblIncidents.setItems(incidentList);
@@ -134,8 +130,7 @@ public class IncidentHandlingController implements Initializable {
 
                 try (Connection conn = DatabaseConnection.getConnection();
                      PreparedStatement pstmt = conn.prepareStatement("UPDATE incident SET status = ?, handled_by = ? WHERE id_report = ?")) {
-                    pstmt.setString(1, IncidentStatus.RESOLVED.name());
-                    pstmt.setString(2, currentStaffId);
+                    pstmt.setString(1, IncidentStatus.RESOLVED.name());pstmt.setString(2, currentStaffId);
                     pstmt.setString(3, selectedIncident.getIdReport());
                     int rowsAffected = pstmt.executeUpdate();
                     if (rowsAffected > 0) {
@@ -147,7 +142,7 @@ public class IncidentHandlingController implements Initializable {
                         alert.setHeaderText(null);
                         alert.setContentText("Sự cố đã được xác nhận sửa thành công!");
                         alert.showAndWait();
-                        loadIncidentData(); // Tải lại chỉ các sự cố SENT
+                        loadIncidentData();
                     } else {
                         lblMessage.setText("Không thể cập nhật sự cố!");
                     }
@@ -180,11 +175,7 @@ public class IncidentHandlingController implements Initializable {
         ObservableList<IncidentReport> historyList = FXCollections.observableArrayList();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
-                     "SELECT i.id_report, r.room_number, i.report_date, i.note, i.handled_by, i.status, " +
-                             "COALESCE((SELECT br.start_period FROM borrow_room br WHERE br.room_id = i.room_id AND br.status = 'APPROVED' " +
-                             "ORDER BY br.borrow_date DESC LIMIT 1), NULL) AS start_period, " +
-                             "COALESCE((SELECT br.end_period FROM borrow_room br WHERE br.room_id = i.room_id AND br.status = 'APPROVED' " +
-                             "ORDER BY br.borrow_date DESC LIMIT 1), NULL) AS end_period " +
+                     "SELECT i.id_report, r.room_number, i.report_date, i.handled_by, i.status, i.description " +
                              "FROM incident i " +
                              "JOIN room r ON i.room_id = r.room_id " +
                              "WHERE i.handled_by = ? AND i.status = 'RESOLVED'")) {
@@ -196,12 +187,10 @@ public class IncidentHandlingController implements Initializable {
                         rs.getString("handled_by"),
                         rs.getString("room_number"),
                         rs.getObject("report_date", LocalDateTime.class),
-                        "", // description không cần thiết cho lịch sử
+                        rs.getString("description"),
                         IncidentStatus.valueOf(rs.getString("status"))
                 );
-                incident.setNote(rs.getString("note"));
-                incident.setStartPeriod(rs.getInt("start_period"));
-                incident.setEndPeriod(rs.getInt("end_period"));
+                System.out.println("History incident " + rs.getString("id_report") + ", Description: " + rs.getString("description"));
                 historyList.add(incident);
             }
 
@@ -222,32 +211,25 @@ public class IncidentHandlingController implements Initializable {
                 histIdReport.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getIdReport()));
                 TableColumn<IncidentReport, String> histRoomNumber = new TableColumn<>("Số phòng");
                 histRoomNumber.setPrefWidth(130);
-                histRoomNumber.setCellValueFactory(cellData -> new SimpleStringProperty(
-                        cellData.getValue().getRoomNumber() != null ? cellData.getValue().getRoomNumber() : "N/A"));
+                histRoomNumber.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getRoomNumber() != null ? cellData.getValue().getRoomNumber() : "N/A"));
                 TableColumn<IncidentReport, LocalDateTime> histReportDate = new TableColumn<>("Ngày báo cáo");
                 histReportDate.setPrefWidth(160);
                 histReportDate.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getReportDate()));
-                TableColumn<IncidentReport, String> histNote = new TableColumn<>("Ghi chú");
-                histNote.setPrefWidth(350);
-                histNote.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getNote() != null ? cellData.getValue().getNote() : "Chưa có ghi chú"));
-                TableColumn<IncidentReport, String> histStartPeriod = new TableColumn<>("Tiết bắt đầu");
-                histStartPeriod.setPrefWidth(100);
-                histStartPeriod.setCellValueFactory(cellData -> new SimpleStringProperty(
-                        cellData.getValue().getStartPeriod() != null ? cellData.getValue().getStartPeriod().toString() : "N/A"));
-                TableColumn<IncidentReport, String> histEndPeriod = new TableColumn<>("Tiết kết thúc");
-                histEndPeriod.setPrefWidth(100);
-                histEndPeriod.setCellValueFactory(cellData -> new SimpleStringProperty(
-                        cellData.getValue().getEndPeriod() != null ? cellData.getValue().getEndPeriod().toString() : "N/A"));
+                TableColumn<IncidentReport, String> histDescription = new TableColumn<>("Mô tả"); // Thay note bằng description
+                histDescription.setPrefWidth(350);
+                histDescription.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDescription() != null ? cellData.getValue().getDescription() : "Chưa có mô tả"));
+                TableColumn<IncidentReport, String> histHandledBy = new TableColumn<>("Người xử lý");
+                histHandledBy.setPrefWidth(150);
+                histHandledBy.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getHandledBy() != null ? getFullNameFromUserId(cellData.getValue().getHandledBy()) : "Chưa xử lý"));
 
-                historyTable.getColumns().addAll(histIdReport, histRoomNumber, histReportDate, histNote, histStartPeriod, histEndPeriod);
-                historyTable.setPrefWidth(980);
+                historyTable.getColumns().addAll(histIdReport, histRoomNumber, histReportDate, histDescription, histHandledBy);
+                historyTable.setPrefWidth(910);
                 historyTable.setPrefHeight(450);
                 historyTable.setItems(historyList);
 
                 dialog.getDialogPane().setContent(historyTable);
                 dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-                dialog.showAndWait();
-            }
+                dialog.showAndWait();}
         } catch (SQLException e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);

@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< Updated upstream
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12" style="-fx-background-color: #F2F7FB; -fx-padding: 30 40 30 40;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ResolvedIncidentsController">
+    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Sự cố đã xử lý" />
+
+    <TableView fx:id="tblResolvedIncidents" prefHeight="350" style="-fx-background-color: transparent; -fx-border-color: #e0e0e0; -fx-border-radius: 6px;" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colIdReport" prefWidth="120" text="Mã báo cáo" />
+            <TableColumn fx:id="colRoomNumber" prefWidth="130" text="Số phòng" />
+            <TableColumn fx:id="colReportDate" prefWidth="160" text="Ngày báo cáo" />
+            <TableColumn fx:id="colDescription" prefWidth="420.0" text="Mô tả sự cố" />
+            <TableColumn fx:id="colHandledBy" prefWidth="180" text="Tên người sửa" />
+            <TableColumn fx:id="colStatus" prefWidth="180" text="Trạng thái" />
+=======
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -23,6 +39,7 @@
             <TableColumn fx:id="colNote" text="Ghi chú" prefWidth="200" />
             <TableColumn fx:id="colHandledBy" text="Tên người sửa" prefWidth="180" />
             <TableColumn fx:id="colStatus" text="Trạng thái" prefWidth="180" />
+>>>>>>> Stashed changes
         </columns>
     </TableView>
 </VBox>

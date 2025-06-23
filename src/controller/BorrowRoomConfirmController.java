@@ -46,6 +46,11 @@ public class BorrowRoomConfirmController implements Initializable {
             return;
         }
 
+        if (dateBorrow.isBefore(LocalDate.now())) {
+            ScannerUtils.showError("Lỗi", "Ngày mượn không được nhỏ hơn ngày hiện tại");
+            return;
+        }
+
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         if (startPeriodText.isEmpty() || endPeriodText.isEmpty()) {
             ScannerUtils.showError("Lỗi", "Vui lòng nhập đầy đủ tiết bắt đầu và kết thúc.");
@@ -84,12 +89,11 @@ public class BorrowRoomConfirmController implements Initializable {
                 return;
             }
 
-            User borrower = new User(UserSession.getUserId(), null);
+            User borrower = new User(UserSession.getUserId(), null, null, null);
             BorrowRoom data = new BorrowRoom(0, roomId, null, borrower, dateBorrow, startPeriod, endPeriod, reason,null, null, borrowDevicesDetail);
             Boolean success = borrowRoomRepository.createBorrowRoom(data);
             if(success){
                 ScannerUtils.showInfo("Thông báo", "Gửi yêu cầu mượn phòng thành công! Vui lòng chờ xét duyệt");
-
                 Stage stage = (Stage) confirmButton.getScene().getWindow();
                 stage.close();
             } else {

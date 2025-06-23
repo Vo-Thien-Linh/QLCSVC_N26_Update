@@ -6,20 +6,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class PageManagerView extends Application {
-    @Override
-    public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/layout/PageManagerView.fxml"));
-        Parent root = loader.load();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setMaximized(true);
-        stage.show();
-
-    }
-
-    public static void main(String[] args) {
-        launch(args);
+public class PageManagerView {
+    public static Parent getView() {
+        try {
+            return FXMLLoader.load(DeviceView.class.getResource("/fxml/layout/PageManagerView.fxml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< Updated upstream
+=======
 
+>>>>>>> Stashed changes
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="12" style="-fx-background-color: #F2F7FB; -fx-padding: 30 40 30 40;" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.IncidentReportController">
+<<<<<<< Updated upstream
+    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Báo cáo sự cố từ phòng đã mượn" />
+
+    <TableView fx:id="tblBorrowedRooms" prefHeight="350" style="-fx-background-color: white; -fx-border-color: #b0bec5; -fx-border-width: 1px; -fx-border-style: solid; -fx-border-radius: 6; -fx-background-radius: 6;" VBox.vgrow="ALWAYS">
+=======
 
     <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Báo cáo sự cố từ phòng đã mượn" />
 
     <TableView fx:id="tblBorrowedRooms" prefHeight="350" style="-fx-background-color: white;                       -fx-border-color: #b0bec5;                       -fx-border-width: 1px;                       -fx-border-style: solid;                       -fx-border-radius: 6;                       -fx-background-radius: 6;" VBox.vgrow="ALWAYS">
+>>>>>>> Stashed changes
         <columns>
             <TableColumn fx:id="colIdReport" prefWidth="120" text="Mã báo cáo" />
             <TableColumn fx:id="colRoomNumber" prefWidth="130" text="Số phòng" />
             <TableColumn fx:id="colBorrowDate" prefWidth="160" text="Ngày mượn" />
             <TableColumn fx:id="colBorrower" prefWidth="150.0" text="Người mượn" />
             <TableColumn fx:id="colDescription" prefWidth="300.0" text="Mô tả sự cố" />
+<<<<<<< Updated upstream
+            <TableColumn fx:id="colStartPeriod" prefWidth="100" text="Tiết bắt đầu" />
+            <TableColumn fx:id="colEndPeriod" prefWidth="100" text="Tiết kết thúc" />
+=======
             <TableColumn fx:id="colStartPeriod" prefWidth="100" text="Tiết bắt đầu" /> <!-- Thêm: Cột tiết bắt đầu -->
             <TableColumn fx:id="colEndPeriod" prefWidth="100" text="Tiết kết thúc" />   <!-- Thêm: Cột tiết kết thúc -->
+>>>>>>> Stashed changes
             <TableColumn fx:id="colAction" prefWidth="120.0" style="-fx-alignment: CENTER;" text="Hành động" />
         </columns>
     </TableView>
 
     <HBox alignment="CENTER_RIGHT" spacing="10">
+<<<<<<< Updated upstream
+        <Button fx:id="btnViewReports" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 24px; -fx-border-radius: 8px; -fx-background-radius: 8px;" text="Các đơn đã gửi" />
+    </HBox>
+</VBox>
+=======
         <Button fx:id="btnViewReports" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;                        -fx-padding: 10px 24px; -fx-border-radius: 8px; -fx-background-radius: 8px;" text="Các đơn đã gửi" />
     </HBox>
 </VBox>
+>>>>>>> Stashed changes

@@ -81,6 +81,11 @@ public class DashboardController implements Initializable {
             loadPage(0);
         });
 
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            keyword = newValue.trim();
+            loadPage(0);
+        });
+
         dashboard_pagination.setPageFactory(pageIndex -> {
             loadPage(pageIndex);
             return new VBox();

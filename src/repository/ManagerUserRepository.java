@@ -34,6 +34,40 @@ public class ManagerUserRepository {
         return roles;
     }
 
+    public List<String> getAllDepartment() {
+        List<String> departments = new ArrayList<>();
+        String sql = "SELECT name FROM departments";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                departments.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return departments;
+    }
+
+    public List<String> getAllClass() {
+        List<String> classes = new ArrayList<>();
+        String sql = "SELECT name FROM classes";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                classes.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return classes;
+    }
+
     public int getRoleIdByRoleName(String roleName) {
         int roleId = -1;
 
@@ -54,10 +88,53 @@ public class ManagerUserRepository {
         return roleId;
     }
 
-    // Thêm mới người dùng
+    public int getClassId(String name){
+        String sql = "SELECT id FROM classes WHERE name = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    public int getDepartmentId(String name){
+        String sql = "SELECT id FROM departments WHERE name = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    //Thêm mới người dùng
     public Boolean addUserAndReturnID(User user) {
         int roleId = getRoleIdByRoleName(user.getRole().getRoleName());
-        String query = "INSERT INTO users (fullname, username, yearold, email, phoneNumber, password, status, role_id, thumbnail) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Integer classId = null;
+        Integer departmentId = null;
+
+        if ("Sinh Viên".equals(user.getRole().getRoleName())) {
+            classId = getClassId(user.getClasses());
+        } else if("Giáo viên".equals(user.getRole().getRoleName()) || "Bảo trì".equals(user.getRole().getRoleName())) {
+            departmentId = getDepartmentId(user.getDepartment());
+        }
+
+        String query = "INSERT INTO users (fullname, username, yearold, email, phoneNumber, password, status, role_id, thumbnail, class_id, department_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, user.getFullname());
@@ -70,6 +147,18 @@ public class ManagerUserRepository {
             stmt.setInt(8, roleId);
             stmt.setString(9, user.getThumbnail());
 
+            if (classId != null) {
+                stmt.setInt(10, classId);
+            } else {
+                stmt.setNull(10, java.sql.Types.INTEGER);
+            }
+
+            if (departmentId != null) {
+                stmt.setInt(11, departmentId);
+            } else {
+                stmt.setNull(11, java.sql.Types.INTEGER);
+            }
+
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
                 return true;
@@ -80,41 +169,7 @@ public class ManagerUserRepository {
 
         return false;
     }
-    //        public List<User> getAllUsers() {
-//        List<User> users = new ArrayList<>();
-//        String query = "SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.deleted = false";
-//
-//        try (Connection conn = DatabaseConnection.getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(query)) {
-//
-//            ResultSet rs = stmt.executeQuery();
-//            while (rs.next()) {
-//                String userId = rs.getString("user_id");
-//                String fullname = rs.getString("fullname");
-//                String username = rs.getString("username");
-//                String thumbnail = rs.getString("thumbnail");
-//                String yearold = rs.getString("yearold");
-//                String email = rs.getString("email");
-//                String phoneNumber = rs.getString("phoneNumber");
-//                String password = rs.getString("password");
-//                String statusString = rs.getString("status");
-//                String roleString = rs.getString("role_name");
-//
-//                Status status;
-//                status = Status.valueOf(statusString);
-//
-//                RoleName roleName = RoleName.valueOf(roleString);
-//                Role role = new Role();
-//                role.setRoleName(roleName);
-//
-//                users.add(new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, status, role));
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return users;
-//    }
+
     public boolean isUsernameExists(String userId, String username) {
         String query = "SELECT user_id FROM users WHERE username = ? AND user_id != ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -159,9 +214,18 @@ public class ManagerUserRepository {
 
     // Chỉnh sửa người dùng
     public Boolean edit(User manager) {
-        String query = "UPDATE users SET fullname = ?, username = ?, yearold = ?, email = ?, phoneNumber = ?, password = ?, status = ?, role_id = ?, thumbnail = ? WHERE user_id = ? AND deleted = false";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        Integer classId = null;
+        Integer departmentId = null;
+
+        if ("Sinh Viên".equals(manager.getRole().getRoleName())) {
+            classId = getClassId(manager.getClasses());
+        } else if("Giáo viên".equals(manager.getRole().getRoleName()) || "Bảo trì".equals(manager.getRole().getRoleName())) {
+            departmentId = getDepartmentId(manager.getDepartment());
+        }
+
+        String query = "UPDATE users SET fullname = ?, username = ?, yearold = ?, email = ?, phoneNumber = ?, status = ?, role_id = ?, thumbnail = ?, class_id = ?, department_id = ? WHERE user_id = ? AND deleted = false";
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)){
 
             System.out.println("Cập nhật người dùng: user_id=" + manager.getUserId() + ", password=" + manager.getPassword());
             stmt.setString(1, manager.getFullname());
@@ -169,11 +233,23 @@ public class ManagerUserRepository {
             stmt.setDate(3, Date.valueOf(manager.getYearold()));
             stmt.setString(4, manager.getEmail());
             stmt.setString(5, manager.getPhoneNumber());
-            stmt.setString(6, manager.getPassword()); // Đảm bảo cập nhật password
-            stmt.setString(7, manager.getStatus().name());
-            stmt.setInt(8, manager.getRole().getRoleId());
-            stmt.setString(9, manager.getThumbnail());
-            stmt.setString(10, manager.getUserId());
+            stmt.setString(6, manager.getStatus().name());
+            stmt.setInt(7, manager.getRole().getRoleId());
+            stmt.setString(8, manager.getThumbnail());
+
+            if (classId != null) {
+                stmt.setInt(9, classId);
+            } else {
+                stmt.setNull(9, java.sql.Types.INTEGER);
+            }
+
+            if (departmentId != null) {
+                stmt.setInt(10, departmentId);
+            } else {
+                stmt.setNull(10, java.sql.Types.INTEGER);
+            }
+
+            stmt.setString(11, manager.getUserId());
 
             int result = stmt.executeUpdate();
             System.out.println("Kết quả cập nhật: " + result + " hàng bị ảnh hưởng");
@@ -248,7 +324,7 @@ public class ManagerUserRepository {
     }
 
     public List<User> filterAndSearch(String status, String keyword, int limitItem, int skip) {
-        String sql = "SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.deleted = false";
+        String sql = "SELECT u.*, r.role_name, c.name AS className, d.name AS departmentName FROM users u JOIN roles r ON u.role_id = r.role_id LEFT JOIN classes c ON u.class_id = c.id LEFT JOIN departments d ON u.department_id = d.id WHERE u.deleted = false";
         List<Object> params = new ArrayList<>();
 
         if (status != null && !status.equals("Tất cả")) {
@@ -257,7 +333,8 @@ public class ManagerUserRepository {
         }
 
         if (keyword != null && !keyword.isBlank()) {
-            sql += " AND LOWER(u.fullname) LIKE ?";
+            sql += " AND LOWER(u.user_id) LIKE ? OR LOWER(u.fullname) LIKE ?";
+            params.add("%" + keyword.toLowerCase() + "%");
             params.add("%" + keyword.toLowerCase() + "%");
         }
 
@@ -286,12 +363,14 @@ public class ManagerUserRepository {
                 String password = rs.getString("password");
                 String statusString = rs.getString("status");
                 String roleString = rs.getString("role_name");
+                String className =  rs.getString("className");
+                String departmentName =  rs.getString("departmentName");
 
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role();
                 role.setRoleName(roleString);
 
-                list.add(new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role));
+                list.add(new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role,  className, departmentName));
             }
             return list;
         } catch (SQLException e) {
@@ -332,7 +411,7 @@ public class ManagerUserRepository {
     }
 
     public User getUser(String userId) {
-        String sql = "SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.deleted = false AND user_id = ?";
+        String sql = "SELECT u.*, r.role_name, c.name AS className, d.name AS departmentName FROM users u JOIN roles r ON u.role_id = r.role_id LEFT JOIN classes c ON u.class_id = c.id LEFT JOIN departments d ON u.department_id = d.id WHERE u.deleted = false AND user_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -350,13 +429,17 @@ public class ManagerUserRepository {
                 String phoneNumber = rs.getString("phoneNumber");
                 String password = rs.getString("password");
                 String statusString = rs.getString("status");
+                int roleId = rs.getInt("role_id");
                 String roleString = rs.getString("role_name");
+                String className =  rs.getString("className");
+                String departmentName =  rs.getString("departmentName");
 
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role();
+                role.setRoleId(roleId);
                 role.setRoleName(roleString);
 
-                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role);
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role,   className, departmentName);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -389,7 +472,7 @@ public class ManagerUserRepository {
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role(roleId, roleString);
 
-                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role);
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, null, null);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -422,7 +505,7 @@ public class ManagerUserRepository {
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role(roleId, roleString);
 
-                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role);
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, null, null);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -515,5 +598,20 @@ public class ManagerUserRepository {
                 throw new SQLException("Không có hàng nào được cập nhật, kiểm tra device_id hoặc quyền truy cập.");
             }
         }
+
+    public Boolean updatePassword(String id, String password){
+        String sql = "UPDATE users SET password = ? WHERE user_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, password);
+            stmt.setString(2, id);
+            int rs = stmt.executeUpdate();
+            return rs > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

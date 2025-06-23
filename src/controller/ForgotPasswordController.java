@@ -159,13 +159,15 @@ public class ForgotPasswordController {
                     user.getYearold(),
                     user.getEmail(),
                     user.getPhoneNumber(),
-                    hashedPassword, // Sử dụng trực tiếp hashedPassword
+                    hashedPassword,
                     user.getStatus(),
-                    user.getRole()
+                    user.getRole(),
+                    null,
+                    null
             );
             System.out.println("Mật khẩu trong bản sao: " + updatedUser.getPassword());
 
-            if (userRepository.edit(updatedUser)) {
+            if (userRepository.updatePassword(user.getUserId(), hashedPassword)) {
                 notificationArea.setText("Đổi mật khẩu thành công!");
                 verificationCodes.remove(email);
                 new Thread(() -> {

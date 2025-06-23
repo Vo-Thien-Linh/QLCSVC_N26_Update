@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import model.BorrowDevice;
 import model.BorrowDeviceDetail;
 import model.BorrowRoom;
 import model.Room;
@@ -26,6 +27,8 @@ import utils.ScannerUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -93,7 +96,12 @@ public class BrowseBorrowRoomController implements Initializable {
         });
 
         colBorrowDate.setCellValueFactory(new PropertyValueFactory<>("borrowDate"));
-        colDateSent.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        colDateSent.setCellValueFactory(cellData -> {
+            BorrowRoom borrowRoom = cellData.getValue();
+            LocalDateTime dateTime = borrowRoom.getCreatedAt();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return new ReadOnlyStringWrapper(dateTime.format(formatter));
+        });
         colHour.setCellValueFactory(cellData -> {
             BorrowRoom borrowRoom = cellData.getValue();
             int start = borrowRoom.getstartPeriod();
@@ -153,11 +161,6 @@ public class BrowseBorrowRoomController implements Initializable {
                         browseButton.setOnAction(event -> {
                             if(ScannerUtils.showConfirm("Xác nhận", "Bạn có chắc chắn muốn duyệt yêu cầu này không!")){
                                 BorrowRoom borrowRoom = getTableView().getItems().get(getIndex());
-
-                                for (BorrowDeviceDetail detail : borrowRoom.getBorrowDeviceDetail()) {
-                                    int availableQuantity = detail.getDevice().getAvailableQuantity() -  detail.getQuantity();
-                                    managerRoomRepository.updateAvailableQuantity(detail.getDevice().getId(), availableQuantity);
-                                }
 
                                 Boolean success = managerRoomRepository.approveRequest(borrowRoom.getId());
                                 if(success){

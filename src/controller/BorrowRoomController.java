@@ -65,6 +65,11 @@ public class BorrowRoomController implements Initializable {
             loadPage(0);
         });
 
+        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            keyword = newValue.trim();
+            loadPage(0);
+        });
+
         pagination.setPageFactory(pageIndex -> {
             loadPage(pageIndex);
             return new VBox();

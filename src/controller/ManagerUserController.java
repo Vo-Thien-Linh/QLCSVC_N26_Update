@@ -23,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -47,7 +48,7 @@ public class ManagerUserController implements Initializable {
     @FXML private StackPane btnAddNew;
     @FXML private TableColumn<User, Void> colActions;
     @FXML private TableColumn<User, Boolean> colCheck;
-    @FXML private TableColumn<User, String> colId, colImage, colFullname, colUsername, colYearold, colEmail, colPhoneNumber, colStatus, colRole;
+    @FXML private TableColumn<User, String> colId, colImage, colFullname, colUsername, colYearold, colEmail, colPhoneNumber, colStatus, colRole, colUnit;
 
     private PermissionRepository permissionRepository = new PermissionRepository();
     private ManagerUserRepository managerUserRepository = new ManagerUserRepository();
@@ -83,6 +84,7 @@ public class ManagerUserController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupButton();
         dataDumpCbo();
+        formatHeaderLabel();
         cboSearchType.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             updateStatus(newVal);
             loadPage(0);
@@ -90,6 +92,11 @@ public class ManagerUserController implements Initializable {
 
         btnSearch.setOnMouseClicked(event -> {
             keyword = txtSearch.getText();
+            loadPage(0);
+        });
+
+        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            keyword = newValue.trim();
             loadPage(0);
         });
 
@@ -124,6 +131,27 @@ public class ManagerUserController implements Initializable {
 
         loadPage(0);
         permisson();
+    }
+
+    private void formatHeaderLabel(){
+        Label username = new Label("Tên đăng\nnhập");
+        username.setWrapText(true);
+        username.setMinHeight(50);
+        username.setAlignment(Pos.CENTER);
+        username.setMaxWidth(Double.MAX_VALUE);
+        colUsername.setGraphic(username);
+
+        Label date = new Label("Ngày tháng\nnăm sinh");
+        date.setWrapText(true);
+        date.setAlignment(Pos.CENTER);
+        date.setMaxWidth(Double.MAX_VALUE);
+        colYearold.setGraphic(date);
+
+        Label unit = new Label("Lớp / Phòng\nban");
+        unit.setWrapText(true);
+        unit.setAlignment(Pos.CENTER);
+        unit.setMaxWidth(Double.MAX_VALUE);
+        colUnit.setGraphic(unit);
     }
 
     private void permisson(){
@@ -272,12 +300,67 @@ public void loadUserData(List<User> users) {
             colUsername.setCellValueFactory(new PropertyValueFactory<>("username"));
             colYearold.setCellValueFactory(new PropertyValueFactory<>("yearold"));
             colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+            colEmail.setCellFactory(column -> {
+                return new TableCell<User, String>() {
+                    private final Text text = new Text();
+
+                    {
+                        text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+                        text.setLineSpacing(2);
+                        setGraphic(text);
+                        setAlignment(Pos.CENTER);
+                    }
+
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            text.setText("");
+                        } else {
+                            text.setText(item);
+                        }
+                    }
+                };
+            });
             colPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
             colStatus.setCellValueFactory(cellData ->
                     new ReadOnlyStringWrapper(cellData.getValue().getStatus().toString()));
+            colStatus.setCellFactory(column -> {
+                return new TableCell<User, String>() {
+                    private final Text text = new Text();
+
+                    {
+                        text.wrappingWidthProperty().bind(column.widthProperty().subtract(10));
+                        text.setLineSpacing(2);
+                        setGraphic(text);
+                        setAlignment(Pos.CENTER);
+                    }
+
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            text.setText("");
+                        } else {
+                            text.setText(item);
+                        }
+                    }
+                };
+            });
             colRole.setCellValueFactory(cellData ->
                     new ReadOnlyStringWrapper(cellData.getValue().getRole().getRoleName().toString()));
+            colUnit.setCellValueFactory(cellData -> {
+                User user = cellData.getValue();
+                String role = cellData.getValue().getRole().getRoleName();
 
+                if ("Sinh Viên".equals(role)) {
+                    return new ReadOnlyStringWrapper(user.getClasses());
+                } else if ("Giáo viên".equals(role) || "Bảo trì".equals(role)) {
+                    return new ReadOnlyStringWrapper(user.getDepartment());
+                } else {
+                    return new ReadOnlyStringWrapper("");
+                }
+            });
             colActions.setCellFactory(new Callback<TableColumn<User, Void>, TableCell<User, Void>>() {
                 @Override
                 public TableCell<User, Void> call(final TableColumn<User, Void> param) {

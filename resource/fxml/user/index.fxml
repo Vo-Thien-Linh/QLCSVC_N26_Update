@@ -120,12 +120,13 @@
                             <TableColumn fx:id="colId" text="Mã người dùng" />
                             <TableColumn fx:id="colImage" text="Hình ảnh" />
                             <TableColumn fx:id="colFullname" text="Họ và tên" />
-                            <TableColumn fx:id="colUsername" text="Tên đăng nhập" />
-                            <TableColumn fx:id="colYearold" text="Ngày tháng năm sinh" />
+                            <TableColumn fx:id="colUsername" />
+                            <TableColumn fx:id="colYearold" />
                             <TableColumn fx:id="colEmail" prefWidth="100.0" text="Email" />
                             <TableColumn fx:id="colPhoneNumber" text="Số điện thoại" />
                             <TableColumn fx:id="colStatus" text="Trạng thái" />
                             <TableColumn fx:id="colRole" text="Vai trò" />
+                            <TableColumn fx:id="colUnit" />
                             <TableColumn fx:id="colActions" text="Hành động" />
                         </columns>
                         <columnResizePolicy>
