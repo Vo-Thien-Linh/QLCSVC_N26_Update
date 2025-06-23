@@ -448,4 +448,52 @@ public class ManagerDeviceRepository {
 
         return false;
     }
+
+    public List<DeviceReturnHistory> getReturnHistory() {
+        String sql = """
+            SELECT bd.*, d.device_name, u.user_id, u.fullname, bdd.quantity, rdd.return_quantity, rdd.condition_note, rdd.return_time 
+            FROM borrow_device bd 
+            JOIN borrow_device_detail bdd ON bd.id = bdd.borrow_device_id 
+            JOIN devices d ON d.id = bdd.device_id 
+            JOIN Users u ON u.user_id = bd.user_id 
+            JOIN return_device_detail rdd ON  bdd.id = rdd.borrow_device_detail_id
+            WHERE bd.borrow_room_id IS NULL AND bd.borrow_status = 'RETURNED' 
+        """;
+        List<DeviceReturnHistory> data = new ArrayList<>();
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int borrowDeviceId =  rs.getInt("id");
+                String userId = rs.getString("user_id");
+                String fullname = rs.getString("fullname");
+                LocalDate  borrowDate = LocalDate.parse(rs.getString("borrow_date"));
+                int startPeriod = rs.getInt("start_period");
+                int endPeriod = rs.getInt("end_period");
+                BorrowStatus status = BorrowStatus.valueOf(rs.getString("borrow_status"));
+                LocalDateTime createdAt =  rs.getTimestamp("created_at").toLocalDateTime();
+                String borrowReason =  rs.getString("borrow_reason");
+                String deviceName = rs.getString("device_name");
+                int quantity = rs.getInt("quantity");
+
+                User borrower =  new User(userId, fullname, null, null);
+                BorrowDeviceDetail borrowDeviceDetail = new BorrowDeviceDetail(0, 0, new Device(null, deviceName, 0), quantity);
+                BorrowDevice borrowDevice = new BorrowDevice(borrowDeviceId, borrower, borrowDate, startPeriod, endPeriod, status, createdAt, null, borrowReason, null, borrowDeviceDetail);
+
+                DeviceReturnHistory deviceReturnHistory = new DeviceReturnHistory();
+                deviceReturnHistory.setBorrowDevice(borrowDevice);
+                deviceReturnHistory.setReturnQuantity(rs.getInt("return_quantity"));
+                deviceReturnHistory.setConditionNote(rs.getString("condition_note"));
+                deviceReturnHistory.setReturnTime(rs.getTimestamp("return_time").toLocalDateTime());
+                data.add(deviceReturnHistory);
+            }
+
+            return data;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

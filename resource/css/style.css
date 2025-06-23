@@ -137,6 +137,18 @@
     -fx-text-fill: white;
 }
 
+.btnReturnHistory{
+    -fx-background-color: #64B5F6 ;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.btnReturnHistory:hover{
+    -fx-background-color: #90CAF9;
+    -fx-text-fill: white;
+}
+
+
 /*end button*/
 
 /*table*/
@@ -402,11 +414,6 @@
     -fx-font-size: 18px; /* Điều chỉnh kích thước chữ */
 }
 /*end pagination*/
-
-
-
-
-
 
 
 

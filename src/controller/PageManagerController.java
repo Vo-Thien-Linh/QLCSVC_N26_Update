@@ -69,7 +69,14 @@ public class PageManagerController implements Initializable {
     private Button btnBorrowClassroom;
 
     @FXML
+    private Button btnIncidentReport;
+
+    @FXML
+    private Button btnHandleIncident;
+
+    @FXML
     private Button btnSchedule;
+
 
     @FXML
     private ImageView imgAvatar;
@@ -79,7 +86,6 @@ public class PageManagerController implements Initializable {
 
     @FXML
     private Label lblUsername;
-
 
 
     private List<Button> navButtons = new ArrayList<>();
@@ -103,10 +109,11 @@ public class PageManagerController implements Initializable {
         navButtons.add(btnBorrowEquipment);
         navButtons.add(btnBorrowClassroom);
         navButtons.add(btnSchedule);
-
+        navButtons.add(btnIncidentReport);
+        navButtons.add(btnHandleIncident);
 
         Map<Button, String> buttonFunctionMap = new LinkedHashMap<>();
-        buttonFunctionMap.put(btnDashboard, "Tổng quản");
+        buttonFunctionMap.put(btnDashboard, "Tổng quan");
         buttonFunctionMap.put(btnDevice, "Quản lý thiết bị");
         buttonFunctionMap.put(btnRoom, "Quản lý phòng");
         buttonFunctionMap.put(btnMaintenance, "Quản lý bảo trì");
@@ -114,8 +121,15 @@ public class PageManagerController implements Initializable {
         buttonFunctionMap.put(btnGroupPermission, "Nhóm quyền");
         buttonFunctionMap.put(btnStatistical, "Thống kê");
         buttonFunctionMap.put(btnBorrowEquipment, "Mượn thiết bị");
-        buttonFunctionMap.put(btnBorrowClassroom, "Mượn thiết bị");
         buttonFunctionMap.put(btnSchedule, "Lịch");
+        buttonFunctionMap.put(btnBorrowClassroom, "Mượn phòng");
+        buttonFunctionMap.put(btnIncidentReport, "Báo cáo sự cố");
+        buttonFunctionMap.put(btnHandleIncident, "Xử lý sự cố"); // Thêm chức năng mới
+        buttonFunctionMap.put(btnBorrowClassroom, "Mượn phòng");
+        buttonFunctionMap.put(btnSchedule, "Lịch");
+        buttonFunctionMap.put(btnIncidentReport, "Báo cáo sự cố");
+        buttonFunctionMap.put(btnHandleIncident, "Xử lý sự cố");
+
 
         // Phân quyền hiển thị button
         int roleId = UserSession.getRoleId();
@@ -183,9 +197,24 @@ public class PageManagerController implements Initializable {
             switchView(RoomScheduleView.getView());
             highlightButton(btnSchedule);
         });
+        btnIncidentReport.setOnAction(e -> {
+            switchView(IncidentReportView.getView());
+            highlightButton(btnIncidentReport);
+        });
 
+        btnIncidentReport.setOnAction(e -> {
+            switchView(IncidentReportView.getView());
+            highlightButton(btnIncidentReport);
+        });
+
+
+        btnHandleIncident.setOnAction(e -> { // Thêm sự kiện cho nút xử lý sự cố
+            switchView(IncidentHandlingView.getView());
+            highlightButton(btnHandleIncident);
+        });
+
+        // Initialize with dashboard view
         for (Map.Entry<Button, String> entry : buttonFunctionMap.entrySet()) {
-            System.out.println(entry.getValue());
             boolean canView = permissionRepository.isAllowed(roleId, entry.getValue(), "Xem");
             if (canView) {
                 switchView(getViewByFunction(entry.getValue()));
@@ -202,7 +231,7 @@ public class PageManagerController implements Initializable {
 
     private Node getViewByFunction(String functionName) {
         return switch (functionName) {
-            case "Tổng quản" -> DashboardView.getView();
+            case "Tổng quan" -> DashboardView.getView();
             case "Quản lý thiết bị" -> DeviceView.getView();
             case "Quản lý phòng" -> RoomManagerView.getView();
             case "Quản lý bảo trì" -> new Label("⚙️ Đây là quản lí bảo trì");
@@ -212,6 +241,8 @@ public class PageManagerController implements Initializable {
             case "Mượn thiết bị" -> BorrowDeviceView.getView();
             case "Mượn phòng" -> BorrowRoomView.getView();
             case "Lịch" -> RoomScheduleView.getView();
+            case "Báo cáo sự cố" -> IncidentReportView.getView();
+            case "Xử lý sự cố" -> IncidentHandlingView.getView();
             case "Cài đặt" -> new Label("⚙️ Đây là Cài đặt");
             default -> new Label("❓ Chức năng không tồn tại");
         };
@@ -244,14 +275,13 @@ public class PageManagerController implements Initializable {
         logoutItem.getStyleClass().add("manager_menu-item");
         logoutItem.setOnAction(e -> handleLogout());
 
-
         contextMenu.getItems().addAll(profileItem, logoutItem);
+
 
         // Sự kiện click hiện menu
         userBox.setOnMouseClicked(event -> {
             contextMenu.show(userBox, Side.BOTTOM, 100, 0);
         });
-
     }
 
     private void switchView(Node view) {

@@ -27,6 +27,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import model.Room;
+import model.RoomReturnHistory;
 import model.RoomStatus;
 import model.UserSession;
 import repository.ManagerRoomRepository;
@@ -98,6 +99,21 @@ public class ManagerRoomController implements Initializable {
             addNewStage.show();
         } catch (IOException e) {
             ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ thêm mới!");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleActionReturnHistory(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/room/ReturnHistory.fxml"));
+            Parent root = loader.load();
+            Stage addNewStage = new Stage();
+            addNewStage.setTitle("Lịch sử");
+            addNewStage.setScene(new Scene(root));
+            addNewStage.show();
+        } catch (IOException e) {
+            ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ!");
             e.printStackTrace();
         }
     }
@@ -314,7 +330,6 @@ public class ManagerRoomController implements Initializable {
                                     }
                                 }
                             });
-
 
                             actionBox.setAlignment(Pos.CENTER);
                             if (canEdit) {

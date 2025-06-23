@@ -325,6 +325,7 @@ public class BorrowRoomRepository {
                 d.device_name,
                 d.id AS device_id,
                 d.available_quantity,
+                bdd.id AS borrowDeviceDetailId,
                 bdd.quantity
             FROM borrow_room br 
             JOIN Users u ON br.borrower_id = u.user_id 
@@ -363,6 +364,7 @@ public class BorrowRoomRepository {
                 String deviceId = rs.getString("device_id");
                 if(!rs.wasNull()) {
                     BorrowDeviceDetail borrowDeviceDetail = new BorrowDeviceDetail();
+                    borrowDeviceDetail.setId(rs.getInt("borrowDeviceDetailId"));
                     borrowDeviceDetail.setDevice(new Device(deviceId, rs.getString("device_name"), rs.getInt("available_quantity")));
                     borrowDeviceDetail.setQuantity(rs.getInt("quantity"));
                     requestMap.get(borrowRoomId).addDevice(borrowDeviceDetail);
@@ -455,4 +457,38 @@ public class BorrowRoomRepository {
 
         return null;
     }
+
+    public boolean returnRoom(int borrowRoomId, String note) {
+        String sql = "INSERT INTO return_room (borrow_room_id, return_note) VALUES (?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, borrowRoomId);
+            stmt.setString(2, note);
+
+            int result = stmt.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateBorrowRoomStatus(int borrowRoomId) {
+        String sql = "UPDATE borrow_room SET status = 'RETURNED' WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, borrowRoomId);
+            int result = stmt.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 }

@@ -38,11 +38,13 @@
                                         </Text>
                                     </children>
                                 </StackPane>
-                                <Rectangle width="450.0"/>
+                                <Rectangle width="300.0"/>
                                 <Button fx:id="btnApproveBorrowRequest" lineSpacing="1.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="137.0" text="Duyệt đơn mượn" wrapText="true" styleClass="btnApproveBorrowRequest" onAction="#handleActionBrowse">
-                                    <HBox.margin>
-                                        <Insets right="-25.0" />
-                                    </HBox.margin>
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Button>
+                                <Button fx:id="btnReturnHistory" lineSpacing="1.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="137.0" text="Lịch sử trả" wrapText="true" styleClass="btnReturnHistory" onAction="#handleActionReturnHistory">
                                     <font>
                                         <Font name="System Bold" size="14.0" />
                                     </font>

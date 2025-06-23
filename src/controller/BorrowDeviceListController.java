@@ -176,7 +176,7 @@ public class BorrowDeviceListController implements Initializable {
         // Xử lý khi xác nhận
         dialog.setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                if(ScannerUtils.showConfirm("Xác nhận", "Bạn có chắc chắn muốn trả phòng không?")){
+                if(ScannerUtils.showConfirm("Xác nhận", "Bạn có chắc chắn muốn trả thiết bị không?")){
                     int returnedQty = spinner.getValue();
                     String note = noteArea.getText().trim();
 

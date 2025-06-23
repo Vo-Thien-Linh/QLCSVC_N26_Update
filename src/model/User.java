@@ -26,6 +26,8 @@ public class User {
         this.selected = selected;
     }
 
+    public User(){}
+
     public User(String id, String fullName, String classes, String department) {
         this.user_id = id;
         this.fullname = fullName;
@@ -54,6 +56,10 @@ public class User {
 
     public String getFullname() {
         return fullname;
+    }
+
+    public void  setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public String getUsername() {

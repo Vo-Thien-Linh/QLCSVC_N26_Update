@@ -69,7 +69,6 @@ CREATE TABLE room_types (
     type_name VARCHAR(100) NOT NULL
 );
 
-
 -- Bảng room
 CREATE TABLE room (
     room_id VARCHAR(10) PRIMARY KEY,
@@ -77,15 +76,15 @@ CREATE TABLE room (
     room_number VARCHAR(10) UNIQUE NOT NULL,
     seating_capacity INT NOT NULL,
     deleted TINYINT DEFAULT 0,
-	room_type_id INT,
-	location VARCHAR(100),
+    room_type_id INT,
+    location VARCHAR(100),
     FOREIGN KEY (room_type_id) REFERENCES room_types(id)
 );
 
--- bảng device_types
-CREATE TABLE device_types(
-     id INT AUTO_INCREMENT PRIMARY KEY,
-     type_name VARCHAR(500)
+-- Bảng device_types
+CREATE TABLE device_types (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    type_name VARCHAR(500)
 );
 
 -- Bảng devices
@@ -95,36 +94,42 @@ CREATE TABLE devices (
     device_type_id INT NOT NULL,
     purchase_date DATE,
     supplier VARCHAR(255),
-    price DECIMAL(15, 2), -- Đổi từ value thành price
-    status ENUM('AVAILABLE', 'UNAVAILABLE', 'UNDER_MAINTENANCE', 'BROKEN', 'DISCARDED') DEFAULT 'AVAILABLE', -- Đồng bộ với DeviceStatus
+    price DECIMAL(15, 2),
+    status ENUM('AVAILABLE', 'UNAVAILABLE', 'UNDER_MAINTENANCE', 'BROKEN', 'DISCARDED') DEFAULT 'AVAILABLE',
     room_id VARCHAR(255),
     quantity INT DEFAULT 1,
-	available_quantity  INT DEFAULT 1,
+    available_quantity INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted BOOLEAN DEFAULT FALSE,
-    thumbnail varchar(500),
+    thumbnail VARCHAR(500),
     FOREIGN KEY (room_id) REFERENCES room(room_id),
     FOREIGN KEY (device_type_id) REFERENCES device_types(id)
 );
 
--- Tạo bảng borrow_room
+-- Bảng borrow_room
 CREATE TABLE borrow_room (
-     id INT AUTO_INCREMENT PRIMARY KEY,
-     room_id VARCHAR(255) NOT NULL,
-     borrower_id VARCHAR(255) NOT NULL,
-     borrow_date DATE NOT NULL,
-     start_period INT NOT NULL,
-     end_period INT NOT NULL,
-     status VARCHAR(50) NOT NULL,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-     borrow_reason TEXT,
-     reject_reason TEXT,
-     FOREIGN KEY (borrower_id) REFERENCES users(user_id),
-     FOREIGN KEY (room_id) REFERENCES room(room_id)
-
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    room_id VARCHAR(255) NOT NULL,
+    borrower_id VARCHAR(255) NOT NULL,
+    borrow_date DATE NOT NULL,
+    start_period INT NOT NULL,
+    end_period INT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    borrow_reason TEXT,
+    reject_reason TEXT,
+    FOREIGN KEY (borrower_id) REFERENCES users(user_id),
+    FOREIGN KEY (room_id) REFERENCES room(room_id)
 );
 
+CREATE TABLE return_room (
+     id INT PRIMARY KEY AUTO_INCREMENT,
+     borrow_room_id INT NOT NULL,
+     return_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+     return_note TEXT,
+     FOREIGN KEY (borrow_room_id) REFERENCES borrow_room(id)
+);
 
 -- Bảng borrow_device
 CREATE TABLE borrow_device (
@@ -143,11 +148,11 @@ CREATE TABLE borrow_device (
 
 -- Bảng borrow_device_detail
 CREATE TABLE borrow_device_detail (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  borrow_device_id INT,
-  device_id VARCHAR(255),
-  quantity INT,
-  FOREIGN KEY (borrow_device_id) REFERENCES borrow_device(id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    borrow_device_id INT,
+    device_id VARCHAR(255),
+    quantity INT,
+    FOREIGN KEY (borrow_device_id) REFERENCES borrow_device(id)
 );
 
 CREATE TABLE return_device_detail (
@@ -158,7 +163,6 @@ CREATE TABLE return_device_detail (
   return_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (borrow_device_detail_id) REFERENCES borrow_device_detail(id) ON DELETE CASCADE
 );
-
 
 -- Bảng usage_logs
 CREATE TABLE usage_logs (
@@ -175,9 +179,9 @@ CREATE TABLE device_borrow_requests (
     device_id VARCHAR(10) NOT NULL,
     request_date DATETIME NOT NULL,
     due_date DATETIME NOT NULL,
-    borrowing_request ENUM('PENDING', 'APPROVED', 'REJECTED', 'COMPLETED', 'CANCELLED') NOT NULL, -- Đồng bộ với BorrowingRequestStatus
+    borrowing_request ENUM('PENDING', 'APPROVED', 'REJECTED', 'COMPLETED', 'CANCELLED') NOT NULL,
     FOREIGN KEY (lecturer_user) REFERENCES users(user_id),
-    FOREIGN KEY (device_id) REFERENCES devices(id), -- Sửa tham chiếu từ devices(device_id) thành devices(id)
+    FOREIGN KEY (device_id) REFERENCES devices(id),
     CHECK (due_date > request_date)
 );
 
@@ -194,7 +198,7 @@ CREATE TABLE borrowing_room_request (
     CHECK (due_date > request_date)
 );
 
--- Bảng incident
+-- Bảng incident (Cập nhật với cột note)
 CREATE TABLE incident (
     id_report VARCHAR(10) PRIMARY KEY,
     reported_by VARCHAR(10) NOT NULL,
@@ -203,9 +207,10 @@ CREATE TABLE incident (
     description TEXT NOT NULL,
     report_date DATETIME NOT NULL,
     handled_by VARCHAR(10),
-    status ENUM('PENDING', 'IN_PROGRESS', 'RESOLVED') NOT NULL,
+    status ENUM('SENT', 'RESOLVED') NOT NULL,
+    note VARCHAR(255), -- Thêm cột ghi chú
     FOREIGN KEY (reported_by) REFERENCES users(user_id),
-    FOREIGN KEY (device_id) REFERENCES devices(id), -- Sửa tham chiếu từ devices(device_id) thành devices(id)
+    FOREIGN KEY (device_id) REFERENCES devices(id),
     FOREIGN KEY (room_id) REFERENCES room(room_id),
     FOREIGN KEY (handled_by) REFERENCES users(user_id),
     CHECK ((device_id IS NOT NULL OR room_id IS NOT NULL))
@@ -224,7 +229,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- Trigger cho bảng devices (giữ nguyên từ định nghĩa đầu tiên)
+-- Trigger cho bảng devices
 DELIMITER //
 CREATE TRIGGER before_insert_devices
 BEFORE INSERT ON devices
@@ -252,7 +257,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- Trigger cho bảng device_borrow_requests (đổi tên từ before_insert_borrowing_device_request)
+-- Trigger cho bảng device_borrow_requests
 DELIMITER //
 CREATE TRIGGER before_insert_device_borrow_requests
 BEFORE INSERT ON device_borrow_requests
@@ -350,14 +355,16 @@ VALUES
 ('MTL0002', 'Vo Thien Linh', 'vothienlinh', '1999-05-15', 'vothienlinh2@gmail.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 5, 1, null),
 ('MTL0003', 'Nguyen Van A', 'nguyenvana', '1998-03-20', 'vana@example.com', '0912345678', 'c985809daeefd685a992c96fd7f64c0ab6c50e9ad97f89859e6b46a8e562c99c', 'ACTIVE', 0, "https://res.cloudinary.com/dtuhfcdph/image/upload/v1745922241/bfmj6ald6mw73zrddcn5.jpg", 6, 2, null);
 
+
+
 -- 3. Insert room_types
 INSERT INTO room_types (id, type_name) VALUES
-	(1, 'Phòng học lý thuyết'),
-	(2, 'Phòng thí nghiệm'),
-	(3, 'Phòng máy tính'),
-	(4, 'Phòng họp'),
-	(5, 'Phòng đa năng'),
-	(6, 'Kho thiết bị');
+(1, 'Phòng học lý thuyết'),
+(2, 'Phòng thí nghiệm'),
+(3, 'Phòng máy tính'),
+(4, 'Phòng họp'),
+(5, 'Phòng đa năng'),
+(6, 'Kho thiết bị');
 
 -- 4. Insert rooms
 INSERT INTO room (room_id, status, room_number, seating_capacity, deleted, room_type_id, location) VALUES
@@ -384,7 +391,7 @@ INSERT INTO device_types (id, type_name) VALUES
 (2	'Thiết bị âm thanh')
 (3,	'Thiết bị điện ');
 
--- 5. Insert devices (đồng bộ với cấu trúc mới)
+-- 5. Insert devices
 INSERT INTO devices (
     id, device_name, device_type_id, purchase_date, supplier, price, status,
     room_id, quantity, available_quantity, created_at, updated_at, deleted, thumbnail
@@ -404,7 +411,7 @@ INSERT INTO devices (
 ('D013', 'Loa', 1, '2021-05-11', 'fe', 120000000.00, 'UNDER_MAINTENANCE', 'R003', 3, 3, '2025-05-18 00:00:00', '2025-05-18 21:00:21', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747557414/ocraqs2yv9lb8r2lknn0.jpg'),
 ('D014', 'Máy tính', 2, '2016-05-04', 'lind', 19000000.00, 'UNAVAILABLE', 'R008', 20, 20, '2025-05-22 00:00:00', '2025-05-22 13:09:29', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894064/jppih1urlvit6p8u6oit.jpg'),
 ('D015', 'Bộ phát wifi', 3, '2021-04-28', 'kfc', 1000000.00, 'BROKEN', 'R009', 1, 1, '2025-05-22 00:00:00', '2025-05-22 14:27:35', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894288/xn2wuh5rzzpxxslgrbbt.jpg'),
-('D016', 'Ô cắm điện', 4, '2022-05-03', 'xyz', 200000.00, 'BROKEN', 'R012', 3, 3, '2025-05-22 00:00:00', '2025-05-22 14:27:35', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894389/vs1uvoyzuv3wp7homn3n.jpg'),
+('D016', 'Ổ cắm điện', 4, '2022-05-03', 'xyz', 200000.00, 'BROKEN', 'R012', 3, 3, '2025-05-22 00:00:00', '2025-05-22 14:27:35', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747894389/vs1uvoyzuv3wp7homn3n.jpg'),
 ('D017', 'Quạt trần', 5, '2018-05-11', 'denis', 2000000.00, 'AVAILABLE', 'R015', 6, 6, '2025-05-22 00:00:00', '2025-05-22 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747897818/d9ngbxibhoxuxxmxyrrp.jpg'),
 ('D018', 'Bóng đèn', 6, '2019-04-29', 'dass', 400000.00, 'UNDER_MAINTENANCE', 'R014', 6, 6, '2025-05-22 00:00:00', '2025-05-30 10:01:48', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1747898017/lgzhdj9bwoww3gnq46er.jpg'),
 ('D019', 'Bộ phát wifi', 3, '2013-04-29', 'rebe', 500000.00, 'AVAILABLE', 'R017', 2, 2, '2025-05-25 00:00:00', '2025-05-29 00:00:00', 0, 'https://res.cloudinary.com/dtuhfcdph/image/upload/v1748142113/h4tpgqxhvblyocm8kogq.jpg'),
@@ -427,32 +434,32 @@ INSERT INTO borrow_room (
     (14, 'R001', 'MTL0001', '2025-06-02', 6, 7, 'CANCELLED', '2025-06-03 14:52:15', NULL),
     (15, 'R001', 'MTL0001', '2025-06-02', 6, 6, 'PENDING', '2025-06-03 14:56:52', NULL);
 
-
-
--- Insert borrow_device
--- INSERT INTO borrow_device (id, borrow_room_id, device_id, quantity)
--- VALUES
---     (3, 2, 'D005', 2),
---     (4, 2, 'D010', 1);
-
-
--- 6. Insert device_borrow_requests (đồng bộ với cấu trúc mới)
--- INSERT INTO device_borrow_requests (lecturer_user, device_id, request_date, due_date, borrowing_request)
--- VALUES
--- ('MTL0001', (SELECT id FROM devices WHERE device_name = 'micro'), '2025-04-21 14:00:00', '2025-04-21 16:00:00', 'PENDING'),
--- ('MTL0003', (SELECT id FROM devices WHERE device_name = 'Bộ phát wifi'), '2025-04-20 08:00:00', '2025-04-20 10:00:00', 'APPROVED');
-
--- 7. Insert incident
-INSERT INTO incident (reported_by, room_id, description, report_date, status)
+-- 6. Insert device_borrow_requests
+INSERT INTO device_borrow_requests (lecturer_user, device_id, request_date, due_date, borrowing_request)
 VALUES
-('MTL0001', (SELECT room_id FROM room WHERE room_number = 'A101'), 'Broken projector in room A101', '2025-04-20 09:00:00', 'PENDING');
+('MTL0001', (SELECT id FROM devices WHERE device_name = 'micro' LIMIT 1), '2025-04-21 14:00:00', '2025-04-21 16:00:00', 'PENDING'),
+('MTL0003', (SELECT id FROM devices WHERE device_name = 'Bộ phát wifi' LIMIT 1), '2025-04-20 08:00:00', '2025-04-20 10:00:00', 'APPROVED');
+<<<<<<< Updated upstream
 
+-- 7. Insert incident (Cập nhật với cột note)
+INSERT INTO incident (reported_by, room_id, description, report_date, status, note)
+VALUES
+('MTL0001', 'R001', 'Broken projector in room A101', '2025-04-20 09:00:00', 'SENT', 'Kiểm tra máy chiếu không hoạt động'),
+('MTL0002', 'R002', 'Light flickering in room A102', '2025-06-01 10:00:00', 'SENT', 'Bóng đèn cần thay thế');
+=======
+>>>>>>> Stashed changes
+
+-- 7. Insert incident (Cập nhật với cột note)
+INSERT INTO incident (reported_by, device_id, room_id, description, report_date, status, note)
+VALUES
+    ('MTL0001', 'D003', 'R001', 'Broken projector in room A101', '2025-04-20 09:00:00', 'SENT', 'Kiểm tra máy chiếu không hoạt động'),
+    ('MTL0002', 'D018', 'R002', 'Light flickering in room A102', '2025-06-01 10:00:00', 'SENT', 'Bóng đèn cần thay thế');
 -- 8. Insert permission_types
 INSERT INTO permission_types (id, name) VALUES
 (1, "Thêm mới"),
 (2, "Chỉnh sửa"),
 (3, "Xóa"),
-(4, "xem"),
+(4, "Xem"),
 (5, "Phân quyền");
 
 -- 9. Insert functions
@@ -464,7 +471,16 @@ INSERT INTO functions (id, name) VALUES
 (5, 'Nhóm quyền'),
 (6, 'Thống kê'),
 (7, 'Mượn thiết bị'),
-(8, 'Mượn phòng');
+(8, 'Mượn phòng'),
+<<<<<<< Updated upstream
+(9, 'Báo cáo sự cố'),
+(10, 'Xử lý sự cố');
+=======
+(9,'Lịch'),
+(10, 'Quản lý bảo trì'),
+(11, 'Báo cáo sự cố'),
+(12, 'Xử lý sự cố');
+>>>>>>> Stashed changes
 
 -- 10. Insert permissions
 INSERT INTO permissions (id, role_id, function_id, permission_type_id, allowed) VALUES
@@ -530,7 +546,13 @@ INSERT INTO permissions (id, role_id, function_id, permission_type_id, allowed) 
 (2927, 3, 7, 4, 0),
 (2928, 5, 8, 4, 1),
 (2929, 6, 8, 4, 0),
-(2930, 3, 8, 4, 0);
+(2930, 3, 8, 4, 0),
+(2931, 5, 9, 4, 1),
+(2932, 6, 9, 4, 0),
+(2933, 3, 9, 4, 1),
+(2934, 5, 10, 4, 0),
+(2935, 6, 10, 4, 1),
+(2936, 3, 10, 4, 0);
 
 -- 11. Insert usage_logs
 INSERT INTO usage_logs (id, device_id, used_at) VALUES

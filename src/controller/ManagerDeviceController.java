@@ -4,6 +4,7 @@ import javafx.animation.ScaleTransition;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -104,6 +105,21 @@ public class ManagerDeviceController implements Initializable {
             addNewStage.show();
         } catch (IOException e) {
             ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ thêm mới!");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleActionReturnHistory(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/device/return-history.fxml"));
+            Parent root = loader.load();
+            Stage addNewStage = new Stage();
+            addNewStage.setTitle("Lịch sử");
+            addNewStage.setScene(new Scene(root));
+            addNewStage.show();
+        } catch (IOException e) {
+            ScannerUtils.showError("Lỗi", "Không thể mở cửa sổ!");
             e.printStackTrace();
         }
     }

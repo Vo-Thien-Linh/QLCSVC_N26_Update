@@ -8,9 +8,11 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -20,6 +22,7 @@ import javafx.stage.Stage;
 import model.BorrowDevice;
 import model.BorrowDeviceDetail;
 import model.BorrowRoom;
+import repository.BorrowDeviceRepository;
 import repository.BorrowRoomRepository;
 import utils.ScannerUtils;
 
@@ -28,7 +31,9 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class BorrowRoomListController implements Initializable {
@@ -37,6 +42,7 @@ public class BorrowRoomListController implements Initializable {
     @FXML private TableColumn<BorrowRoom, Void> colAction;
 
     private BorrowRoomRepository borrowRoomRepository = new BorrowRoomRepository();
+    private BorrowDeviceRepository borrowDeviceRepository = new BorrowDeviceRepository();
 
     public void initialize(URL location, ResourceBundle resources) {
         loadBorrowRoom();
@@ -58,6 +64,7 @@ public class BorrowRoomListController implements Initializable {
             private final Button btnCancel = new Button("Hủy yêu cầu");
             private final Button btnDetail = new Button("Chi tiết");
             private final Button btnReason = new Button("Lý do");
+            private final Button btnReturn = new Button("Trả phòng");
 
             {
                 btnCancel.setOnAction(event -> {
@@ -91,10 +98,16 @@ public class BorrowRoomListController implements Initializable {
                     alert.showAndWait();
                 });
 
-                // Tuỳ chỉnh style nếu muốn
+                btnReturn.setOnAction(event -> {
+                    BorrowRoom request = getTableView().getItems().get(getIndex());
+
+                    showReturnDialog(request);
+                });
+
                 btnCancel.getStyleClass().add("btn-cancel");
                 btnDetail.getStyleClass().add("btn-detail");
                 btnReason.getStyleClass().add("btn-reason");
+                btnReturn.getStyleClass().add("btn-return");
             }
 
             @Override
@@ -108,7 +121,10 @@ public class BorrowRoomListController implements Initializable {
                 BorrowRoom br = getTableView().getItems().get(getIndex());
                 switch (br.getStatus()) {
                     case PENDING -> setGraphic(btnCancel);
-                    case APPROVED -> setGraphic(btnDetail);
+                    case APPROVED -> {
+                        HBox actionBox = new HBox(5, btnDetail, btnReturn);
+                        setGraphic(actionBox);
+                    }
                     case REJECTED -> setGraphic(btnReason);
                     default -> setGraphic(null);
                 }
@@ -118,6 +134,109 @@ public class BorrowRoomListController implements Initializable {
 
         tblBorrowList.setItems(FXCollections.observableArrayList(datas));
         tblBorrowList.setSelectionModel(null);
+    }
+
+    private void showReturnDialog(BorrowRoom request) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Trả phòng");
+        dialog.getDialogPane().setMinWidth(500);
+        dialog.getDialogPane().setMinHeight(400);
+
+        VBox content = new VBox(12);
+        content.setPadding(new Insets(20));
+        content.setStyle("-fx-background-color: #f9f9f9;");
+
+        Label roomLabel = new Label("🏠 Phòng: " + request.getRoomNumber());
+        roomLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+
+        Label purposeLabel = new Label("📋 Mục đích mượn: " + request.getBorrowReason());
+        purposeLabel.setStyle("-fx-font-size: 13px;");
+
+        Label deviceListLabel = new Label("📦 Thiết bị đã mượn trong phòng:");
+        deviceListLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
+
+        VBox deviceListBox = new VBox(8);
+        deviceListBox.setPadding(new Insets(10));
+
+        Map<BorrowDeviceDetail, Spinner<Integer>> returnMap = new HashMap<>();
+
+        if (request.getBorrowDeviceDetail().size() > 0) {
+            for (BorrowDeviceDetail detail : request.getBorrowDeviceDetail()) {
+                VBox deviceBox = new VBox(4);
+
+                Label deviceLabel = new Label("🔧 " + detail.getDevice().getDeviceName() + " (đã mượn: " + detail.getQuantity() + ")");
+                Spinner<Integer> spinner = new Spinner<>(1, detail.getQuantity(), detail.getQuantity());
+                spinner.setEditable(true);
+
+                returnMap.put(detail, spinner);
+                deviceBox.getChildren().addAll(deviceLabel, spinner);
+                deviceListBox.getChildren().add(deviceBox);
+            }
+
+        } else {
+            Label deviceLabel = new Label("Không có thiết bị nào được mượn.");
+            deviceLabel.setWrapText(true);
+            deviceListBox.getChildren().add(deviceLabel);
+        }
+
+        ScrollPane scrollPane = new ScrollPane(deviceListBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefHeight(150);
+        scrollPane.setStyle("-fx-background: #ffffff; -fx-border-color: #cccccc; -fx-border-radius: 5; -fx-background-radius: 5;");
+
+
+        Label noteLabel = new Label("📝 Ghi chú khi trả phòng:");
+        TextArea noteArea = new TextArea();
+        noteArea.setPromptText("Ví dụ: 1 thiết bị bị hỏng, phòng sử dụng sạch sẽ...");
+        noteArea.setWrapText(true);
+        noteArea.setPrefRowCount(3);
+
+        content.getChildren().addAll(
+                roomLabel,
+                purposeLabel,
+                deviceListLabel,
+                scrollPane,
+                noteLabel,
+                noteArea
+        );
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                if (ScannerUtils.showConfirm("Xác nhận trả phòng", "Bạn có chắc chắn muốn trả phòng không?")) {
+                    String note = noteArea.getText().trim();
+                    if (note.isEmpty()) {
+                        ScannerUtils.showError("Thông báo", "Vui lòng nhập ghi chú");
+                        return null;
+                    }
+
+
+                    for (Map.Entry<BorrowDeviceDetail, Spinner<Integer>> entry : returnMap.entrySet()) {
+                        BorrowDeviceDetail detail = entry.getKey();
+                        int returnedQty = entry.getValue().getValue();
+
+                        int brokenQty = detail.getQuantity() - returnedQty;
+
+                        borrowDeviceRepository.updateDeviceReturn(detail.getId(), returnedQty, note);
+                        borrowDeviceRepository.updateDeviceAvailableQuantity(detail.getDevice().getId(), brokenQty);
+                    }
+
+                    // Trả phòng
+                    boolean success = borrowRoomRepository.returnRoom(request.getId(), note);
+                    if (success) {
+                        borrowRoomRepository.updateBorrowRoomStatus(request.getId());
+                        ScannerUtils.showInfo("Thông báo", "Trả phòng thành công");
+                        dialog.close();
+                        loadBorrowRoom();
+                    } else {
+                        ScannerUtils.showError("Lỗi", "Không thể trả phòng. Vui lòng thử lại.");
+                    }
+                }
+            }
+            return null;
+        });
+        dialog.showAndWait();
     }
 
     public void showBorrowRoomDetail(BorrowRoom request) {
