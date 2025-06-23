@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import model.User;
 import model.UserSession;
 import service.LoginService;
+import utils.PasswordEncryptionUtils;
 
 import java.io.IOException;
 
@@ -69,7 +70,6 @@ public class LoginController {
 
     @FXML
     protected void onHelloButtonClick() {
-        System.out.println("Button Đăng nhập được nhấn");
         String username = userField.getText();
         String password = PasswordField.getText();
 
@@ -85,8 +85,8 @@ public class LoginController {
                 notificationArea.setText("Đăng nhập thành công! Chào " + user.getFullname());
                 String roleName = user.getRole() != null ? user.getRole().getRoleName() : "unknown";
                 String fxmlPath = "/fxml/layout/PageManagerView.fxml";
-                if ("teacher".equals(roleName)) fxmlPath = "/fxml/borrow-device/index.fxml.fxml";
-                if ("maintenance".equals(roleName)) fxmlPath = "/fxml/statistical/index.fxml.fxml";
+                if ("teacher".equals(roleName)) fxmlPath = "/fxml/layout/TeacherView.fxml";
+                if ("maintenance".equals(roleName)) fxmlPath = "/fxml/layout/MaintenanceView.fxml";
 
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
@@ -104,7 +104,6 @@ public class LoginController {
                 }
             } else {
                 notificationArea.setText("Đăng nhập thất bại! Tên đăng nhập hoặc mật khẩu không đúng.");
-                System.out.println("Đăng nhập thất bại - Username: " + username + ", Password: " + password);
             }
         } catch (Exception e) {
             e.printStackTrace();

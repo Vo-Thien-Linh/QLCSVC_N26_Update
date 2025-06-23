@@ -2,8 +2,8 @@ package model;
 
 
 public class UserSession {
-    private static String userId;
-    private static int roleId;
+    private static String userId = "MTL0002";
+    private static int roleId = 5;
 
 
     public static void startSession(String id, int role) {

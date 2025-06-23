@@ -125,6 +125,18 @@
     -fx-text-fill: white;
 }
 
+.btn-return{
+    -fx-background-color: #2ED8B6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.btn-return:hover{
+    -fx-background-color: #59E0C5;
+    -fx-text-fill: white;
+}
+
 /*end button*/
 
 /*table*/

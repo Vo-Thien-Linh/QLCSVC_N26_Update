@@ -146,26 +146,8 @@ public class ForgotPasswordController {
             String hashedPassword = PasswordEncryptionUtils.hashPassword(newPassword);
             System.out.println("Mật khẩu cũ: " + oldPassword + ", Mật khẩu mới (trước khi set): " + hashedPassword);
 
-            // Cập nhật trực tiếp đối tượng user
-            user.setPassword(hashedPassword);
-            System.out.println("Mật khẩu sau khi set: " + user.getPassword());
 
-            // Tạo bản sao với giá trị mới
-            User updatedUser = new User(
-                    user.getUserId(),
-                    user.getFullname(),
-                    user.getUsername(),
-                    user.getThumbnail(),
-                    user.getYearold(),
-                    user.getEmail(),
-                    user.getPhoneNumber(),
-                    hashedPassword, // Sử dụng trực tiếp hashedPassword
-                    user.getStatus(),
-                    user.getRole()
-            );
-            System.out.println("Mật khẩu trong bản sao: " + updatedUser.getPassword());
-
-            if (userRepository.edit(updatedUser)) {
+            if (userRepository.updatePassword(user.getUserId(), hashedPassword)) {
                 notificationArea.setText("Đổi mật khẩu thành công!");
                 verificationCodes.remove(email);
                 new Thread(() -> {

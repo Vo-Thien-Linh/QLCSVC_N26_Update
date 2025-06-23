@@ -132,7 +132,7 @@ public class BorrowDeviceController implements Initializable {
         }
     }
 
-    private void loadPage(int pageIndex) {
+    public void loadPage(int pageIndex) {
         int skip = pageIndex * limitItem;
         List<Device> devices = borrowDeviceRepository.search(keyword, limitItem, skip);
         int totalPages = (int) Math.ceil((double) borrowDeviceRepository.countDevices(keyword) / limitItem);

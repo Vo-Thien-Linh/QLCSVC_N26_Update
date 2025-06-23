@@ -63,9 +63,6 @@ public class PageManagerController implements Initializable {
     private Button btnStatistical;
 
     @FXML
-    private Button btnSetting;
-
-    @FXML
     private Button btnBorrowEquipment;
 
     @FXML
@@ -103,7 +100,6 @@ public class PageManagerController implements Initializable {
         navButtons.add(btnGroupPermission);
         navButtons.add(btnPermission);
         navButtons.add(btnStatistical);
-        navButtons.add(btnSetting);
         navButtons.add(btnBorrowEquipment);
         navButtons.add(btnBorrowClassroom);
         navButtons.add(btnSchedule);
@@ -113,6 +109,7 @@ public class PageManagerController implements Initializable {
         buttonFunctionMap.put(btnDashboard, "Tổng quản");
         buttonFunctionMap.put(btnDevice, "Quản lý thiết bị");
         buttonFunctionMap.put(btnRoom, "Quản lý phòng");
+        buttonFunctionMap.put(btnMaintenance, "Quản lý bảo trì");
         buttonFunctionMap.put(btnUser, "Quản lý người dùng");
         buttonFunctionMap.put(btnGroupPermission, "Nhóm quyền");
         buttonFunctionMap.put(btnStatistical, "Thống kê");
@@ -132,7 +129,6 @@ public class PageManagerController implements Initializable {
         btnPermission.setManaged(canPermission);
         btnPermission.setVisible(canPermission);
 
-        // Set up button actions
         btnDashboard.setOnAction(e -> {
             switchView(DashboardView.getView());
             highlightButton(btnDashboard);
@@ -146,11 +142,6 @@ public class PageManagerController implements Initializable {
         btnRoom.setOnAction(e -> {
             switchView(RoomManagerView.getView());
             highlightButton(btnRoom);
-        });
-
-        btnMaintenance.setOnAction(e -> {
-            switchView(new Label("🔧 Đây là Quản lý bảo trì"));
-            highlightButton(btnMaintenance);
         });
 
         btnMaintenance.setOnAction(e -> {
@@ -176,11 +167,6 @@ public class PageManagerController implements Initializable {
         btnStatistical.setOnAction(e -> {
             switchView(StatisticalView.getView());
             highlightButton(btnStatistical);
-        });
-
-        btnSetting.setOnAction(e -> {
-            switchView(new Label("⚙️ Đây là Cài đặt"));
-            highlightButton(btnSetting);
         });
 
         btnBorrowEquipment.setOnAction(e -> {
@@ -219,6 +205,7 @@ public class PageManagerController implements Initializable {
             case "Tổng quản" -> DashboardView.getView();
             case "Quản lý thiết bị" -> DeviceView.getView();
             case "Quản lý phòng" -> RoomManagerView.getView();
+            case "Quản lý bảo trì" -> new Label("⚙️ Đây là quản lí bảo trì");
             case "Quản lý người dùng" -> UserView.getView();
             case "Nhóm quyền" -> PermissionView.getView();
             case "Thống kê" -> StatisticalView.getView();

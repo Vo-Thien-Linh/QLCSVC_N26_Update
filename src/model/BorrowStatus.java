@@ -4,7 +4,8 @@ public enum BorrowStatus {
     PENDING("Chờ duyệt"),
     APPROVED("Đã duyệt"),
     CANCELLED ("Hủy bỏ"),
-    REJECTED("Bị từ chối");
+    REJECTED("Bị từ chối"),
+    RETURNED("Đã trả");
 
     private final String label;
 

@@ -101,6 +101,6 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = password; // Đảm bảo gán giá trị mới
+        this.password = password;
     }
 }

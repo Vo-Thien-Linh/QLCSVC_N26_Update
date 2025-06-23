@@ -144,24 +144,27 @@ public class RoomScheduleController implements Initializable {
         shiftColumn.setPrefWidth(100);
         shiftColumn.setMinWidth(100);
         shiftColumn.setMaxWidth(100);
-        scheduleTable.setFixedCellSize(168.4);
-        scheduleTable.setItems(rows);
-        scheduleTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY );
-        scheduleTable.setSelectionModel(null);
-        scheduleTable.getColumns().clear();
-        scheduleTable.getColumns().addAll(
-                shiftColumn,
-                createDayColumn("Thứ 2", 0, weekDates[0]),
-                createDayColumn("Thứ 3", 1, weekDates[1]),
-                createDayColumn("Thứ 4", 2, weekDates[2]),
-                createDayColumn("Thứ 5", 3, weekDates[3]),
-                createDayColumn("Thứ 6", 4, weekDates[4]),
-                createDayColumn("Thứ 7", 5, weekDates[5]),
-                createDayColumn("Chủ nhật", 6, weekDates[6])
-        );
+        Platform.runLater(() -> {
 
+            scheduleTable.setFixedCellSize(168.4);
+            scheduleTable.setItems(rows);
+            scheduleTable.setSelectionModel(null);
+            scheduleTable.getColumns().clear();
+            scheduleTable.getColumns().add(shiftColumn);
+            scheduleTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            scheduleTable.getColumns().addAll(
+                    createDayColumn("Thứ 2", 0, weekDates[0]),
+                    createDayColumn("Thứ 3", 1, weekDates[1]),
+                    createDayColumn("Thứ 4", 2, weekDates[2]),
+                    createDayColumn("Thứ 5", 3, weekDates[3]),
+                    createDayColumn("Thứ 6", 4, weekDates[4]),
+                    createDayColumn("Thứ 7", 5, weekDates[5]),
+                    createDayColumn("Chủ nhật", 6, weekDates[6])
+            );
 
-
+            scheduleTable.refresh();
+            scheduleTable.layout();
+        });
     }
 
     private TableColumn<Schedule, BorrowRoom> createDayColumn(String title, int dayIndex, LocalDate date) {

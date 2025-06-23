@@ -512,4 +512,20 @@ public class ManagerUserRepository {
         }
         return null;
     }
+
+    public Boolean updatePassword(String id, String password){
+        String sql = "UPDATE users SET password = ? WHERE user_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, password);
+            stmt.setString(2, id);
+            int rs = stmt.executeUpdate();
+            return rs > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
