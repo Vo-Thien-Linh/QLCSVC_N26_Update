@@ -122,7 +122,7 @@ public class ManagerUserRepository {
         return -1;
     }
 
-    //Thêm mới người dùng
+    // Thêm mới người dùng
     public Boolean addUserAndReturnID(User user) {
         int roleId = getRoleIdByRoleName(user.getRole().getRoleName());
         Integer classId = null;
@@ -363,14 +363,14 @@ public class ManagerUserRepository {
                 String password = rs.getString("password");
                 String statusString = rs.getString("status");
                 String roleString = rs.getString("role_name");
-                String className =  rs.getString("className");
-                String departmentName =  rs.getString("departmentName");
+                String className = rs.getString("className");
+                String departmentName = rs.getString("departmentName");
 
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role();
                 role.setRoleName(roleString);
 
-                list.add(new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role,  className, departmentName));
+                list.add(new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, className, departmentName));
             }
             return list;
         } catch (SQLException e) {
@@ -431,15 +431,15 @@ public class ManagerUserRepository {
                 String statusString = rs.getString("status");
                 int roleId = rs.getInt("role_id");
                 String roleString = rs.getString("role_name");
-                String className =  rs.getString("className");
-                String departmentName =  rs.getString("departmentName");
+                String className = rs.getString("className");
+                String departmentName = rs.getString("departmentName");
 
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role();
                 role.setRoleId(roleId);
                 role.setRoleName(roleString);
 
-                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role,   className, departmentName);
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, className, departmentName);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -448,7 +448,7 @@ public class ManagerUserRepository {
     }
 
     public User getUserByUsername(String username) {
-        String sql = "SELECT u.*, r.role_id, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.deleted = false AND u.username = ?";
+        String sql = "SELECT u.*, r.role_id, r.role_name, c.name AS className, d.name AS departmentName FROM users u JOIN roles r ON u.role_id = r.role_id LEFT JOIN classes c ON u.class_id = c.id LEFT JOIN departments d ON u.department_id = d.id WHERE u.deleted = false AND u.username = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -468,11 +468,13 @@ public class ManagerUserRepository {
                 String statusString = rs.getString("status");
                 int roleId = rs.getInt("role_id");
                 String roleString = rs.getString("role_name");
+                String className = rs.getString("className");
+                String departmentName = rs.getString("departmentName");
 
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role(roleId, roleString);
 
-                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, null, null);
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, className, departmentName);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -481,7 +483,7 @@ public class ManagerUserRepository {
     }
 
     public User getUserByEmail(String email) {
-        String sql = "SELECT u.*, r.role_id, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.deleted = false AND u.email = ?";
+        String sql = "SELECT u.*, r.role_id, r.role_name, c.name AS className, d.name AS departmentName FROM users u JOIN roles r ON u.role_id = r.role_id LEFT JOIN classes c ON u.class_id = c.id LEFT JOIN departments d ON u.department_id = d.id WHERE u.deleted = false AND u.email = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -501,17 +503,20 @@ public class ManagerUserRepository {
                 String statusString = rs.getString("status");
                 int roleId = rs.getInt("role_id");
                 String roleString = rs.getString("role_name");
+                String className = rs.getString("className");
+                String departmentName = rs.getString("departmentName");
 
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role(roleId, roleString);
 
-                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, null, null);
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, className, departmentName);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
+
     public List<User> getUsersByRole(int roleId) throws SQLException {
         String sql = "SELECT * FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.role_id = ? AND u.deleted = FALSE";
         List<User> users = new ArrayList<>();
@@ -530,7 +535,9 @@ public class ManagerUserRepository {
                         rs.getString("phoneNumber"),
                         rs.getString("password"),
                         Status.valueOf(rs.getString("status")),
-                        new Role(rs.getInt("role_id"), rs.getString("role_name"))
+                        new Role(rs.getInt("role_id"), rs.getString("role_name")),
+                        null, // classes
+                        null  // department
                 );
                 users.add(user);
             }
@@ -545,22 +552,27 @@ public class ManagerUserRepository {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new User(
-                        rs.getString("user_id"),
-                        rs.getString("fullname"),
-                        rs.getString("username"),
-                        rs.getString("thumbnail"),
-                        rs.getDate("yearold").toLocalDate(),
-                        rs.getString("email"),
-                        rs.getString("phoneNumber"),
-                        rs.getString("password"),
-                        Status.valueOf(rs.getString("status")),
-                        new Role(rs.getInt("role_id"), rs.getString("role_name"))
-                );
+                String userIdVal = rs.getString("user_id");
+                String fullname = rs.getString("fullname");
+                String username = rs.getString("username");
+                String thumbnail = rs.getString("thumbnail");
+                LocalDate yearold = rs.getDate("yearold").toLocalDate();
+                String email = rs.getString("email");
+                String phoneNumber = rs.getString("phoneNumber");
+                String password = rs.getString("password");
+                String statusString = rs.getString("status");
+                int roleId = rs.getInt("role_id");
+                String roleName = rs.getString("role_name");
+
+                Status status = Status.valueOf(statusString);
+                Role role = new Role(roleId, roleName);
+
+                return new User(userIdVal, fullname, username, thumbnail, yearold, email, phoneNumber, password, status, role, null, null);
             }
         }
         return null;
     }
+
     public void updateRoomStatus(Room room) throws SQLException {
         String sql = "UPDATE room SET status = ?, maintained_by = ? WHERE room_id = ?";
         System.out.println("Thực hiện cập nhật trạng thái phòng: room_id=" + room.getId() + ", status=" + room.getStatus() + ", maintained_by=" + room.getMaintainedBy());
@@ -582,14 +594,7 @@ public class ManagerUserRepository {
         System.out.println("Thực hiện cập nhật trạng thái thiết bị: id=" + device.getId() + ", status=" + device.getStatus() + ", maintained_by=" + device.getMaintainedBy());
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Lấy tên của enum và loại bỏ khoảng trắng thừa (nếu có)
-            String statusToSet = device.getStatus().name().trim();
-
-            // **THÊM DÒNG NÀY ĐỂ KIỂM TRA GIÁ TRỊ CUỐI CÙNG ĐƯỢC GỬI ĐI**
-            System.out.println("Giá trị status cuối cùng gửi đi: '" + statusToSet + "'");
-
-            stmt.setString(1, statusToSet); // Sử dụng giá trị đã được trim
+            stmt.setString(1, device.getStatus().name());
             stmt.setString(2, device.getMaintainedBy());
             stmt.setString(3, device.getId());
             int rowsAffected = stmt.executeUpdate();
@@ -598,6 +603,7 @@ public class ManagerUserRepository {
                 throw new SQLException("Không có hàng nào được cập nhật, kiểm tra device_id hoặc quyền truy cập.");
             }
         }
+    }
 
     public Boolean updatePassword(String id, String password){
         String sql = "UPDATE users SET password = ? WHERE user_id = ?";

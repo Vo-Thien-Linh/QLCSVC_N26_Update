@@ -27,4 +27,3 @@ public class UserSession {
     public static String getCurrentUserId() { return currentUserId;
     }
 }
-}
