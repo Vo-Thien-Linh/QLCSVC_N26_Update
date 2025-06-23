@@ -68,8 +68,6 @@ public class ManagerUserRepository {
         return classes;
     }
 
-
-
     public int getRoleIdByRoleName(String roleName) {
         int roleId = -1;
 
@@ -161,7 +159,6 @@ public class ManagerUserRepository {
                 stmt.setNull(11, java.sql.Types.INTEGER);
             }
 
-
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
                 return true;
@@ -215,7 +212,7 @@ public class ManagerUserRepository {
         return false;
     }
 
-    //	Chỉnh sửa người dùng
+    // Chỉnh sửa người dùng
     public Boolean edit(User manager) {
         Integer classId = null;
         Integer departmentId = null;
@@ -230,6 +227,7 @@ public class ManagerUserRepository {
         try(Connection conn = DatabaseConnection.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
 
+            System.out.println("Cập nhật người dùng: user_id=" + manager.getUserId() + ", password=" + manager.getPassword());
             stmt.setString(1, manager.getFullname());
             stmt.setString(2, manager.getUsername());
             stmt.setDate(3, Date.valueOf(manager.getYearold()));
@@ -254,59 +252,58 @@ public class ManagerUserRepository {
             stmt.setString(11, manager.getUserId());
 
             int result = stmt.executeUpdate();
+            System.out.println("Kết quả cập nhật: " + result + " hàng bị ảnh hưởng");
 
-            if(result > 0) {
+            if (result > 0) {
                 return true;
             } else {
+                System.out.println("Không có hàng nào được cập nhật. Kiểm tra điều kiện WHERE.");
                 return false;
             }
         } catch (SQLException e) {
+            System.err.println("Lỗi SQL khi cập nhật: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
-    //	xóa người dùng
+    // Xóa người dùng
     public Boolean delete(String userId) {
         String query = "UPDATE users SET deleted = true WHERE user_id = ?";
-        try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, userId);
 
-            int result = stmt .executeUpdate();
-            if(result > 0) {
+            int result = stmt.executeUpdate();
+            if (result > 0) {
                 return true;
             } else {
                 return false;
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-
-        return false;
     }
-
 
     public Boolean changeStatus(List<String> ids, String status) {
         String placeholders = ids.stream().map(id -> "?").collect(Collectors.joining(", "));
         String sql = "UPDATE users set";
 
         boolean isDelete = status.equals("Xóa");
-        if(isDelete){
+        if (isDelete) {
             sql += " deleted = true";
         } else {
             sql += " status = ?";
         }
         sql += " WHERE user_id IN (" + placeholders + ")";
 
-        try(Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)){
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             int index = 1;
-            if(!isDelete){
+            if (!isDelete) {
                 stmt.setString(index++, status);
             }
 
@@ -315,28 +312,26 @@ public class ManagerUserRepository {
             }
 
             int result = stmt.executeUpdate();
-            if(result > 0){
+            if (result > 0) {
                 return true;
             } else {
                 return false;
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     public List<User> filterAndSearch(String status, String keyword, int limitItem, int skip) {
         String sql = "SELECT u.*, r.role_name, c.name AS className, d.name AS departmentName FROM users u JOIN roles r ON u.role_id = r.role_id LEFT JOIN classes c ON u.class_id = c.id LEFT JOIN departments d ON u.department_id = d.id WHERE u.deleted = false";
         List<Object> params = new ArrayList<>();
 
-//        Lọc theo trạng thái
         if (status != null && !status.equals("Tất cả")) {
             sql += " AND u.status = ?";
             params.add(status);
         }
 
-//        Tìm kiếm
         if (keyword != null && !keyword.isBlank()) {
             sql += " AND LOWER(u.user_id) LIKE ? OR LOWER(u.fullname) LIKE ?";
             params.add("%" + keyword.toLowerCase() + "%");
@@ -344,8 +339,6 @@ public class ManagerUserRepository {
         }
 
         sql += " ORDER BY u.user_id DESC";
-
-//        Phân trang
         sql += " LIMIT ? OFFSET ?";
         params.add(limitItem);
         params.add(skip);
@@ -373,21 +366,17 @@ public class ManagerUserRepository {
                 String className =  rs.getString("className");
                 String departmentName =  rs.getString("departmentName");
 
-                Status statusUser;
-                statusUser = Status.valueOf(statusString);
-
+                Status statusUser = Status.valueOf(statusString);
                 Role role = new Role();
                 role.setRoleName(roleString);
 
                 list.add(new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role,  className, departmentName));
             }
-
             return list;
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
-
-        return null;
     }
 
     public int countDevices(String status, String keyword) {
@@ -415,11 +404,9 @@ public class ManagerUserRepository {
             if (rs.next()) {
                 return rs.getInt(1);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return 0;
     }
 
@@ -447,22 +434,19 @@ public class ManagerUserRepository {
                 String className =  rs.getString("className");
                 String departmentName =  rs.getString("departmentName");
 
-                Status statusUser;
-                statusUser = Status.valueOf(statusString);
-
+                Status statusUser = Status.valueOf(statusString);
                 Role role = new Role();
                 role.setRoleId(roleId);
                 role.setRoleName(roleString);
 
                 return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role,   className, departmentName);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return null;
     }
+
     public User getUserByUsername(String username) {
         String sql = "SELECT u.*, r.role_id, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.deleted = false AND u.username = ?";
 
@@ -488,7 +472,40 @@ public class ManagerUserRepository {
                 Status statusUser = Status.valueOf(statusString);
                 Role role = new Role(roleId, roleString);
 
-                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role);
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, null, null);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public User getUserByEmail(String email) {
+        String sql = "SELECT u.*, r.role_id, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.deleted = false AND u.email = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String userId = rs.getString("user_id");
+                String fullname = rs.getString("fullname");
+                String username = rs.getString("username");
+                String thumbnail = rs.getString("thumbnail");
+                LocalDate yearold = rs.getDate("yearold").toLocalDate();
+                String phoneNumber = rs.getString("phoneNumber");
+                String password = rs.getString("password");
+                String statusString = rs.getString("status");
+                int roleId = rs.getInt("role_id");
+                String roleString = rs.getString("role_name");
+
+                Status statusUser = Status.valueOf(statusString);
+                Role role = new Role(roleId, roleString);
+
+                return new User(userId, fullname, username, thumbnail, yearold, email, phoneNumber, password, statusUser, role, null, null);
             }
         } catch (SQLException e) {
             e.printStackTrace();
