@@ -61,7 +61,11 @@ public class LoginController {
             Stage stage = (Stage) notificationArea.getScene().getWindow();
             if (stage != null) {
                 stage.centerOnScreen();
+
+                stage.setResizable(false); // Không cho phép thu phóng cho đăng nhập
+
                 stage.setResizable(false);
+
             } else {
                 System.err.println("Stage không được khởi tạo trong Platform.runLater!");
             }
@@ -82,6 +86,28 @@ public class LoginController {
         try {
             User user = loginService.authenticateUser(username, password);
             if (user != null) {
+
+                UserSession.startSession(user.getUserId(), user.getRole() != null ? user.getRole().getRoleId() : 0);
+                notificationArea.setText("Đăng nhập thành công! Chào " + user.getFullname());
+                int roleId = user.getRole() != null ? user.getRole().getRoleId() : 0;
+                String fxmlPath = "/fxml/layout/PageManagerView.fxml"; // Giao diện chính cho tất cả vai trò
+                System.out.println("Đang chuyển đến giao diện: roleId=" + roleId + ", fxmlPath=" + fxmlPath + ", Tồn tại: " + (getClass().getResource(fxmlPath) != null));
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                    Parent root = loader.load();
+                    Stage stage = (Stage) notificationArea.getScene().getWindow();
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.setMaximized(true);
+                    stage.setResizable(true);
+                    System.out.println("Giao diện sau đăng nhập: Role ID = " + roleId + ", Path = " + fxmlPath + ", Maximized = " + stage.isMaximized() + ", Resizable = " + stage.isResizable());
+                    stage.setTitle("Trang chủ");
+                    stage.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    notificationArea.setText("Lỗi khi chuyển trang: " + e.getMessage() + ", Đường dẫn: " + fxmlPath);
+                }
+
                 UserSession.startSession(user.getUserId(), user.getRole() != null ? user.getRole().getRoleId() : 0);notificationArea.setText("Đăng nhập thành công! Chào " + user.getFullname());
 
                 String roleName = user.getRole() != null ? user.getRole().getRoleName() : "unknown";
@@ -102,7 +128,6 @@ public class LoginController {
                 // ✅ Đóng Stage đăng nhập hiện tại
                 Stage currentStage = (Stage) notificationArea.getScene().getWindow();
                 currentStage.close();
-
             } else {
                 notificationArea.setText("Đăng nhập thất bại! Tên đăng nhập hoặc mật khẩu không đúng.");
                 System.out.println("Đăng nhập thất bại - Username: " + username + ", Password: " + password);
@@ -128,14 +153,20 @@ public class LoginController {
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login/forgot.fxml"));
             Parent root = loader.load();
+
+            Stage stage = new Stage();
+
             Stage stage = new Stage(); // Mở stage mới
+
             stage.setScene(new Scene(root));
             stage.centerOnScreen();
             stage.setResizable(false);
             stage.setTitle("Quên mật khẩu");
             stage.show();
 
+
             // Đóng login stage hiện tại
+
             Stage currentStage = (Stage) notificationArea.getScene().getWindow();
             if (currentStage != null) {
                 currentStage.close();

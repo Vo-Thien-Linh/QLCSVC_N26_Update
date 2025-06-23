@@ -8,6 +8,7 @@ public class Room {
     private String room_type;
     private String location;
     private boolean selected;
+    private String maintainedBy;
 
 
     public Room() {}
@@ -83,6 +84,13 @@ public class Room {
         this.selected = selected;
     }
 
+    public String getMaintainedBy() {
+        return maintainedBy;
+    }
+
+    public void setMaintainedBy(String maintainedBy) {
+        this.maintainedBy = maintainedBy;
+    }
     public void informationDisplay() {
         System.out.println("Room ID: " + id);
         System.out.println("Status: " + status);

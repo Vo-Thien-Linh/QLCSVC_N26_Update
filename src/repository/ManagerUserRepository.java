@@ -512,6 +512,92 @@ public class ManagerUserRepository {
         }
         return null;
     }
+    public List<User> getUsersByRole(int roleId) throws SQLException {
+        String sql = "SELECT * FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.role_id = ? AND u.deleted = FALSE";
+        List<User> users = new ArrayList<>();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, roleId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                User user = new User(
+                        rs.getString("user_id"),
+                        rs.getString("fullname"),
+                        rs.getString("username"),
+                        rs.getString("thumbnail"),
+                        rs.getDate("yearold").toLocalDate(),
+                        rs.getString("email"),
+                        rs.getString("phoneNumber"),
+                        rs.getString("password"),
+                        Status.valueOf(rs.getString("status")),
+                        new Role(rs.getInt("role_id"), rs.getString("role_name"))
+                );
+                users.add(user);
+            }
+        }
+        return users;
+    }
+
+    public User getUserById(String userId) throws SQLException {
+        String sql = "SELECT * FROM users u JOIN roles r ON u.role_id = r.role_id WHERE u.user_id = ? AND u.deleted = FALSE";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getString("user_id"),
+                        rs.getString("fullname"),
+                        rs.getString("username"),
+                        rs.getString("thumbnail"),
+                        rs.getDate("yearold").toLocalDate(),
+                        rs.getString("email"),
+                        rs.getString("phoneNumber"),
+                        rs.getString("password"),
+                        Status.valueOf(rs.getString("status")),
+                        new Role(rs.getInt("role_id"), rs.getString("role_name"))
+                );
+            }
+        }
+        return null;
+    }
+    public void updateRoomStatus(Room room) throws SQLException {
+        String sql = "UPDATE room SET status = ?, maintained_by = ? WHERE room_id = ?";
+        System.out.println("Thực hiện cập nhật trạng thái phòng: room_id=" + room.getId() + ", status=" + room.getStatus() + ", maintained_by=" + room.getMaintainedBy());
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, room.getStatus().name()); // Đảm bảo gán đúng giá trị enum
+            stmt.setString(2, room.getMaintainedBy());
+            stmt.setString(3, room.getId());
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Số hàng bị ảnh hưởng: " + rowsAffected);
+            if (rowsAffected == 0) {
+                throw new SQLException("Không có hàng nào được cập nhật, kiểm tra room_id hoặc quyền truy cập.");
+            }
+        }
+    }
+
+    public void updateDeviceStatus(Device device) throws SQLException {
+        String sql = "UPDATE devices SET status = ?, maintained_by = ? WHERE id = ?";
+        System.out.println("Thực hiện cập nhật trạng thái thiết bị: id=" + device.getId() + ", status=" + device.getStatus() + ", maintained_by=" + device.getMaintainedBy());
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Lấy tên của enum và loại bỏ khoảng trắng thừa (nếu có)
+            String statusToSet = device.getStatus().name().trim();
+
+            // **THÊM DÒNG NÀY ĐỂ KIỂM TRA GIÁ TRỊ CUỐI CÙNG ĐƯỢC GỬI ĐI**
+            System.out.println("Giá trị status cuối cùng gửi đi: '" + statusToSet + "'");
+
+            stmt.setString(1, statusToSet); // Sử dụng giá trị đã được trim
+            stmt.setString(2, device.getMaintainedBy());
+            stmt.setString(3, device.getId());
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Số hàng bị ảnh hưởng: " + rowsAffected);
+            if (rowsAffected == 0) {
+                throw new SQLException("Không có hàng nào được cập nhật, kiểm tra device_id hoặc quyền truy cập.");
+            }
+        }
 
     public Boolean updatePassword(String id, String password){
         String sql = "UPDATE users SET password = ? WHERE user_id = ?";

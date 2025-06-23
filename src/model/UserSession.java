@@ -3,6 +3,7 @@ package model;
 public class UserSession {
     private static String userId = null;
     private static int roleId = 0;
+    private static String currentUserId;
 
 
     public static void startSession(String id, int role) {
@@ -23,4 +24,7 @@ public class UserSession {
         roleId = 0;
     }
 
+    public static String getCurrentUserId() { return currentUserId;
+    }
+}
 }

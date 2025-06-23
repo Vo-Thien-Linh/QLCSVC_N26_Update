@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="799.0" prefWidth="1351.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.InfoRoomController">
+   <bottom>
+      <HBox alignment="CENTER" prefHeight="60.0" prefWidth="1209.0" spacing="10">
+         <ComboBox fx:id="maintainerComboBox" prefWidth="200.0" promptText="Chọn người bảo trì" />
+         <Button mnemonicParsing="false" onAction="#confirmMaintenance" style="-fx-background-radius: 20; -fx-padding: 10px 24px; -fx-background-color: #4CAF50;" text="Xác nhận" textFill="WHITE">
+            <font>
+               <Font name="Calibri Bold" size="14.0" />
+            </font>
+            <cursor>
+               <Cursor fx:constant="HAND" />
+            </cursor>
+         </Button>
+      </HBox>
+   </bottom>
+   <top>
+      <VBox alignment="CENTER" prefHeight="63.0" prefWidth="1211.0">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="98.0" prefWidth="1264.0" text="Thông tin các phòng chưa được bảo trì" textFill="#1b861e">
+               <font>
+                  <Font name="Cambria Bold" size="23.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <TableView fx:id="roomTable" prefHeight="599.0" prefWidth="1211.0" BorderPane.alignment="CENTER">
+         <columns>
+            <TableColumn fx:id="roomIdColumn" prefWidth="75.0" text="ID Phòng" />
+            <TableColumn fx:id="roomNumberColumn" prefWidth="129.0" text="Số phòng" />
+            <TableColumn fx:id="statusColumn" prefWidth="100.0" text="Trạng thái" />
+            <TableColumn fx:id="seatingCapacityColumn" prefWidth="90.0" text="Sức chứa" />
+            <TableColumn fx:id="roomTypeColumn" prefWidth="120.0" text="Loại phòng" />
+            <TableColumn fx:id="locationColumn" prefWidth="150.0" text="Vị trí" />
+            <TableColumn fx:id="maintainedByNameColumn" prefWidth="150.0" text="Người bảo trì" />
+         </columns>
+      </TableView>
+   </center>
+</BorderPane>
