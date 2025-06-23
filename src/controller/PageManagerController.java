@@ -67,12 +67,16 @@ public class PageManagerController implements Initializable {
     private Button btnBorrowClassroom;
 
     @FXML
+    private Button btnIncidentReport;
+
+    @FXML
+    private Button btnHandleIncident; // Thêm nút xử lý sự cố
+
+    @FXML
     private ImageView imgAvatar;
 
     @FXML
     private HBox userBox;
-
-
 
     private List<Button> navButtons = new ArrayList<>();
     private PermissionRepository permissionRepository = new PermissionRepository();
@@ -91,17 +95,20 @@ public class PageManagerController implements Initializable {
         navButtons.add(btnSetting);
         navButtons.add(btnBorrowEquipment);
         navButtons.add(btnBorrowClassroom);
-
+        navButtons.add(btnIncidentReport);
+        navButtons.add(btnHandleIncident); // Thêm nút mới vào danh sách
 
         Map<Button, String> buttonFunctionMap = new LinkedHashMap<>();
-        buttonFunctionMap.put(btnDashboard, "Tổng quản");
+        buttonFunctionMap.put(btnDashboard, "Tổng quan");
         buttonFunctionMap.put(btnDevice, "Quản lý thiết bị");
         buttonFunctionMap.put(btnRoom, "Quản lý phòng");
         buttonFunctionMap.put(btnUser, "Quản lý người dùng");
         buttonFunctionMap.put(btnGroupPermission, "Nhóm quyền");
         buttonFunctionMap.put(btnStatistical, "Thống kê");
         buttonFunctionMap.put(btnBorrowEquipment, "Mượn thiết bị");
-        buttonFunctionMap.put(btnBorrowClassroom, "Mượn thiết bị");
+        buttonFunctionMap.put(btnBorrowClassroom, "Mượn phòng");
+        buttonFunctionMap.put(btnIncidentReport, "Báo cáo sự cố");
+        buttonFunctionMap.put(btnHandleIncident, "Xử lý sự cố"); // Thêm chức năng mới
 
         // Phân quyền hiển thị button
         int roleId = UserSession.getRoleId();
@@ -129,11 +136,6 @@ public class PageManagerController implements Initializable {
         btnRoom.setOnAction(e -> {
             switchView(RoomManagerView.getView());
             highlightButton(btnRoom);
-        });
-
-        btnMaintenance.setOnAction(e -> {
-            switchView(new Label("🔧 Đây là Quản lý bảo trì"));
-            highlightButton(btnMaintenance);
         });
 
         btnMaintenance.setOnAction(e -> {
@@ -176,9 +178,18 @@ public class PageManagerController implements Initializable {
             highlightButton(btnBorrowClassroom);
         });
 
+        btnIncidentReport.setOnAction(e -> {
+            switchView(IncidentReportView.getView());
+            highlightButton(btnIncidentReport);
+        });
+
+        btnHandleIncident.setOnAction(e -> { // Thêm sự kiện cho nút xử lý sự cố
+            switchView(IncidentHandlingView.getView());
+            highlightButton(btnHandleIncident);
+        });
+
         // Initialize with dashboard view
         for (Map.Entry<Button, String> entry : buttonFunctionMap.entrySet()) {
-            System.out.println(entry.getValue());
             boolean canView = permissionRepository.isAllowed(roleId, entry.getValue(), "Xem");
             if (canView) {
                 switchView(getViewByFunction(entry.getValue()));
@@ -195,14 +206,16 @@ public class PageManagerController implements Initializable {
 
     private Node getViewByFunction(String functionName) {
         return switch (functionName) {
-            case "Tổng quản" -> DashboardView.getView();
+            case "Tổng quan" -> DashboardView.getView();
             case "Quản lý thiết bị" -> DeviceView.getView();
             case "Quản lý phòng" -> RoomManagerView.getView();
             case "Quản lý người dùng" -> UserView.getView();
             case "Nhóm quyền" -> PermissionView.getView();
             case "Thống kê" -> new Label("📊 Đây là Thống kê");
-            case "Mượn thiết bị" -> new Label("📦 Đây là mượn thiết bị");
-            case "Mượn phòng" -> new Label("🏫 Đây là mượn phòng");
+            case "Mượn thiết bị" -> BorrowDeviceView.getView();
+            case "Mượn phòng" -> BorrowRoomView.getView();
+            case "Báo cáo sự cố" -> IncidentReportView.getView();
+            case "Xử lý sự cố" -> IncidentHandlingView.getView(); // Thêm view cho xử lý sự cố
             case "Cài đặt" -> new Label("⚙️ Đây là Cài đặt");
             default -> new Label("❓ Chức năng không tồn tại");
         };
@@ -226,7 +239,7 @@ public class PageManagerController implements Initializable {
         profileItem.setGraphic(userIcon);
         profileItem.getStyleClass().add("manager_menu-item");
 
-        SVGPath settingsIcon = createIcon("M19.43 12.98c.04-.32.07-.66.07-1s-.03-.68-.07-1l2.11-1.65a.5.5 0 0 0 .12-.66l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.04 7.04 0 0 0-1.5-.88l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.43l-.38 2.65a7.04 7.04 0 0 0-1.5.88l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.66L4.57 11c-.04.32-.07.66-.07 1s.03.68.07 1l-2.11 1.65a.5.5 0 0 0-.12.66l2 3.46a.5.5 0 0 0 .61.22l2.49-1c.46.36.96.66 1.5.88l.38 2.65A.5.5 0 0 0 10 22h4a.5.5 0 0 0 .5-.43l.38-2.65c.54-.22 1.04-.52 1.5-.88l2.49 1a.5.5 0 0 0 .61-.22l2-3.46a.5.5 0 0 0-.12-.66L19.43 12.98z", Color.BLACK);
+        SVGPath settingsIcon = createIcon("M19.43 12.98c.04-.32.07-.66.07-1s-.03-.68-.07-1l2.11-1.65a.5.5 0 0 0 .12-.66l-2 3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.04 7.04 0 0 0-1.5-.88l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.43l-.38 2.65a7.04 7.04 0 0 0-1.5.88l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.66L4.57 11c-.04.32-.07.66-.07 1s.03.68.07 1l-2.11 1.65a.5.5 0 0 0-.12.66l2 3.46a.5.5 0 0 0 .61.22l2.49-1c.46.36.96.66 1.5.88l.38 2.65A.5.5 0 0 0 10 22h4a.5.5 0 0 0 .5-.43l.38-2.65c.54-.22 1.04-.52 1.5-.88l2.49 1a.5.5 0 0 0 .61-.22l2-3.46a.5.5 0 0 0-.12-.66L19.43 12.98z", Color.BLACK);
         MenuItem settingsItem = new MenuItem("Cài đặt");
         settingsItem.setGraphic(settingsIcon);
         settingsItem.getStyleClass().add("manager_menu-item");
@@ -237,14 +250,12 @@ public class PageManagerController implements Initializable {
         logoutItem.getStyleClass().add("manager_menu-item");
         logoutItem.setOnAction(e -> handleLogout());
 
-
         contextMenu.getItems().addAll(profileItem, settingsItem, logoutItem);
 
         // Sự kiện click hiện menu
         userBox.setOnMouseClicked(event -> {
             contextMenu.show(userBox, Side.BOTTOM, 80, 0);
         });
-
     }
 
     private void switchView(Node view) {

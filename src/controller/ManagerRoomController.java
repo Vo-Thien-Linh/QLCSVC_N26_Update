@@ -337,7 +337,7 @@ public class ManagerRoomController implements Initializable {
                                 Room room = getTableView().getItems().get(getIndex());
                                 System.out.println("Schedule icon clicked for room: " + room.getRoomNumber());
                                 try {
-                                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SChedule/Schedule.fxml"));
+                                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/room/Schedule.fxml"));
                                     Parent root = loader.load();
                                     RoomScheduleController controller = loader.getController();
                                     controller.setRoomId(room.getId());

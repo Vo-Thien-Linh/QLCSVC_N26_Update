@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="TOP_CENTER" prefHeight="489.0" prefWidth="1501.0" spacing="15" style="-fx-padding: 25; -fx-background-color: #FFFFFF;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ReportHistoryController">
+
+    <!-- Tiêu đề -->
+    <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" text="LỊCH SỬ ĐƠN BÁO CÁO" />
+
+    <!-- Bảng lịch sử -->
+    <TableView fx:id="tblReportHistory" maxWidth="1250.0" prefHeight="342.0" prefWidth="1200.0" style="-fx-background-color: #FAFAFA; -fx-border-color: #DADFE1; -fx-border-radius: 8; -fx-background-radius: 8;">
+        <columns>
+            <TableColumn fx:id="colIdReport" prefWidth="150" style="-fx-alignment: CENTER; -fx-font-weight: bold;" text="Mã đơn" />
+            <TableColumn fx:id="colRoomNumber" prefWidth="150" style="-fx-alignment: CENTER; -fx-font-weight: bold;" text="Số phòng" /> <!-- Đổi tên cột thành "Số phòng" -->
+            <TableColumn fx:id="colReportDate" prefWidth="250" style="-fx-alignment: CENTER; -fx-font-weight: bold;" text="Ngày báo cáo" />
+            <TableColumn fx:id="colDescription" prefWidth="550" style="-fx-alignment: CENTER_LEFT;" text="Mô tả" />
+            <TableColumn fx:id="colStatus" maxWidth="300.0" prefWidth="150.0" style="-fx-alignment: CENTER; -fx-font-weight: bold;" text="Trạng thái" />
+        </columns>
+    </TableView>
+
+    <!-- Nút đóng -->
+    <HBox alignment="CENTER_RIGHT" maxWidth="1400" spacing="10">
+        <Button fx:id="btnClose" onAction="#handleClose" prefHeight="36.0" prefWidth="94.0" style="-fx-background-color: #E74C3C; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8px 20px; -fx-border-radius: 6px; -fx-background-radius: 6px;" text="Đóng">
+            <cursor>
+                <Cursor fx:constant="HAND" />
+            </cursor>
+            <HBox.margin>
+                <Insets right="40.0" />
+            </HBox.margin></Button>
+    </HBox>
+</VBox>

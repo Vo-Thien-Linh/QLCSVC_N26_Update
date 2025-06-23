@@ -150,6 +150,24 @@
                             </ImageView>
                         </graphic>
                     </Button>
+                    <Button fx:id="btnIncidentReport" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Báo cáo sự cố">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/maintanance.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnHandleIncident" contentDisplay="LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" styleClass="button-sidebar" text="Xử lý sự cố">
+                        <graphic>
+                            <ImageView>
+                                <image>
+                                    <Image url="@/img/maintanance.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
                 </children>
             </VBox>
         </left>
