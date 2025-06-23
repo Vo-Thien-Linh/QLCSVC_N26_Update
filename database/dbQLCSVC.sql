@@ -572,3 +572,15 @@ INSERT INTO usage_logs (id, device_id, used_at) VALUES
 (19, 'D018', '2025-04-01 14:30:00'),
 (20, 'D018', '2025-04-18 11:45:00');
 
+ALTER TABLE room
+ADD COLUMN maintained_by VARCHAR(10),
+ADD FOREIGN KEY (maintained_by) REFERENCES users(user_id);
+
+ALTER TABLE devices
+ADD COLUMN maintained_by VARCHAR(10),
+ADD FOREIGN KEY (maintained_by) REFERENCES users(user_id);
+UPDATE room SET status = 'MAINTENANCE', maintained_by = 'MTL0003' WHERE room_id = 'R001';
+UPDATE devices SET status = 'UNDER_MAINTENANCE', maintained_by = 'MTL0003' WHERE id = 'D002';
+
+ALTER TABLE room MODIFY COLUMN status VARCHAR(50) DEFAULT 'AVAILABLE';
+ALTER TABLE devices MODIFY COLUMN status VARCHAR(50) DEFAULT 'AVAILABLE';
